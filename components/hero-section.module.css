@@ -1,0 +1,8 @@
+.heroSection {
+  display: flex;
+  width: calc(100vw - 15px);
+  height: 100%;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+}

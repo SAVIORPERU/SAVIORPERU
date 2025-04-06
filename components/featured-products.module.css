@@ -1,0 +1,4 @@
+.customWidth {
+  width: calc(100vw - 15px);
+  margin-top: 15px;
+}

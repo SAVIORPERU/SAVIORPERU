@@ -3,16 +3,25 @@
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { useCart } from '@/contexts/CartContext'
+import { useState } from 'react'
 
 interface Product {
   id: number
   name: string
   price: number
   image: string
+  image2?: string
 }
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({
+  product,
+  from
+}: {
+  product: Product
+  from?: string
+}) {
   const { addToCart } = useCart()
+  const [image, setImage] = useState<string>(product.image)
 
   const handleAddToCart = () => {
     addToCart({
@@ -24,21 +33,45 @@ export default function ProductCard({ product }: { product: Product }) {
   }
 
   return (
-    <div className='bg-white rounded-lg shadow-md overflow-hidden'>
-      <div className='relative h-64'>
+    <div className='bg-white rounded-sm shadow-sm overflow-hidden'>
+      <div
+        className={`relative ${
+          from === 'featured'
+            ? 'h-[567px]'
+            : from === 'bestSellers'
+            ? 'h-[380px]'
+            : 'h-64'
+        } ${from === 'featured' ? 'w-[450px]' : 'h-64'}`}
+      >
         <Image
-          src={product.image || '/placeholder.svg'}
+          src={image || '/placeholder.svg'}
           alt={product.name}
           fill
-          className='object-cover'
+          className='object-cover transition-opacity duration-300 ease-in-out'
+          onMouseEnter={() =>
+            setImage(product.image2 ? product.image2 : product.image)
+          }
+          onMouseLeave={() => setImage(product.image)}
         />
       </div>
       <div className='p-4'>
-        <h3 className='text-lg font-semibold mb-2'>{product.name}</h3>
-        <p className='text-gray-600 mb-4'>${product.price.toFixed(2)}</p>
-        <Button className='w-full' onClick={handleAddToCart}>
-          Add to Cart
-        </Button>
+        <h3
+          className={`${
+            from === 'featured' || from === 'bestSellers'
+              ? 'text-sm'
+              : 'text-lg'
+          } font-medium mb-2 text-[#31302e]`}
+        >
+          {product.name}
+        </h3>
+        {from !== 'bestSellers' && (
+          <p className='text-gray-600 mb-4'>S/ {product.price.toFixed(2)}</p>
+        )}
+        {!from && (
+          <Button className='w-full' onClick={handleAddToCart}>
+            Add to Cart
+          </Button>
+        )}
       </div>
     </div>
   )
