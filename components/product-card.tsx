@@ -4,6 +4,8 @@ import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { useCart } from '@/contexts/CartContext'
 import { useState } from 'react'
+import styles from './product-card.module.css'
+import Link from 'next/link'
 
 interface Product {
   id: number
@@ -32,16 +34,40 @@ export default function ProductCard({
     })
   }
 
+  if (from === 'bestSellers') {
+    return (
+      <div className='bg-white overflow-hidden w-full'>
+        <Link href='/collection'>
+          <div className={styles.fromBestSellers}>
+            <Image
+              src={image || '/placeholder.svg'}
+              alt={product.name}
+              fill
+              className='object-cover transition-opacity duration-300 ease-in-out shadow-md'
+              onMouseEnter={() =>
+                setImage(product.image2 ? product.image2 : product.image)
+              }
+              onMouseLeave={() => setImage(product.image)}
+            />
+          </div>
+        </Link>
+        <div className='px-0 pt-4 pb-0 flex mb-2'>
+          <h3 className={styles.fromBestSellersh3}>{product.name}</h3>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className='bg-white rounded-sm shadow-sm overflow-hidden'>
+    <div className='bg-white shadow-md rounded-sm overflow-hidden w-full'>
       <div
         className={`relative ${
           from === 'featured'
-            ? 'h-[567px]'
+            ? styles.fromFeatured
             : from === 'bestSellers'
-            ? 'h-[380px]'
+            ? styles.fromBestSellers
             : 'h-64'
-        } ${from === 'featured' ? 'w-[450px]' : 'h-64'}`}
+        }`}
       >
         <Image
           src={image || '/placeholder.svg'}
@@ -54,7 +80,13 @@ export default function ProductCard({
           onMouseLeave={() => setImage(product.image)}
         />
       </div>
-      <div className='p-4'>
+      <div
+        className={`${
+          from === 'bestSellers' || from === 'featured'
+            ? 'px-2 pt-2 pb-0'
+            : 'p-4'
+        }`}
+      >
         <h3
           className={`${
             from === 'featured' || from === 'bestSellers'

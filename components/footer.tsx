@@ -1,6 +1,5 @@
 import Link from 'next/link'
-import { Facebook, Instagram, Twitter } from 'lucide-react'
-
+import { FaFacebook, FaInstagram, FaTiktok } from 'react-icons/fa'
 export default function Footer() {
   return (
     <footer className='bg-gray-100 mt-12'>
@@ -16,22 +15,22 @@ export default function Footer() {
               </li>
               <li>
                 <Link href='/collection' className='hover:text-primary'>
-                  Collection
+                  Productos
                 </Link>
               </li>
               <li>
                 <Link href='/about' className='hover:text-primary'>
-                  About
+                  Nosotros
                 </Link>
               </li>
               <li>
                 <Link href='/contact' className='hover:text-primary'>
-                  Contact
+                  Contactanos
                 </Link>
               </li>
             </ul>
           </div>
-          <div>
+          {/* <div>
             <h3 className='font-bold mb-2'>Customer Service</h3>
             <ul className='space-y-2'>
               <li>
@@ -50,24 +49,36 @@ export default function Footer() {
                 </Link>
               </li>
             </ul>
-          </div>
+          </div> */}
           <div>
             <h3 className='font-bold mb-2'>Follow Us</h3>
-            <div className='flex space-x-4'>
-              <Link href='#' className='hover:text-primary'>
-                <Facebook />
+            <div className='flex flex-col'>
+              <Link
+                href='https://www.facebook.com/profile.php?id=100091971171948'
+                className='hover:text-primary flex items-center gap-1 mb-2'
+                target='_blank'
+              >
+                <FaFacebook className='h-8 w-7' /> Facebook
               </Link>
-              <Link href='#' className='hover:text-primary'>
-                <Instagram />
+              <Link
+                href='https://www.instagram.com/savior.peru?igsh=MTNlYWRlbzk3ZzcxYQ%3D%3D'
+                className='hover:text-primary flex items-center gap-1 mb-2'
+                target='_blank'
+              >
+                <FaInstagram className='h-8 w-7' /> Instagram
               </Link>
-              <Link href='#' className='hover:text-primary'>
-                <Twitter />
+              <Link
+                href='https://www.tiktok.com/@savior.peru'
+                className='hover:text-primary flex items-center gap-1 mb-2'
+                target='_blank'
+              >
+                <FaTiktok className='h-8 w-7' /> Tiktok
               </Link>
             </div>
           </div>
         </div>
         <div className='mt-8 text-center text-sm text-gray-500'>
-          © 2025 Elegant Bags. All rights reserved.
+          © 2025 Savior. Todos los derechos reservados.
         </div>
       </div>
     </footer>

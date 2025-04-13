@@ -4,41 +4,40 @@ import styles from './featured-products.module.css'
 const featuredProducts = [
   {
     id: 1,
-    name: 'Casaca negra',
+    name: 'Polo Fire Blanco',
+    color: 'Blanco',
     price: 129.99,
-    image: '/casaca negra edit.jpg',
-    image2: '/casaca negra no edit.jpg'
+    image: '/Polo Fire Blanco.jpg'
+    // image2: '/casaca negra no edit.jpg'
   },
   {
     id: 2,
-    name: 'Casaca negra no edit',
+    name: 'Polo Forgiven Jade',
     price: 79.99,
-    image: '/casaca negra no edit.jpg',
-    image2: '/casaca negra edit.jpg'
+    image: '/Polo Forgiven Jade.jpg'
+    // image2: '/casaca negra edit.jpg'
   },
   {
     id: 3,
-    name: 'Gorra roja',
+    name: "Polo God's club Celeste",
     price: 159.99,
-    image: '/gorra roja edit.jpg',
-    image2: '/gorra roja no edit.jpg'
+    image: '/Polo Gods club Celeste.jpg'
+    // image2: '/gorra roja no edit.jpg'
   },
   {
     id: 4,
-    name: 'Gorra gris',
+    name: 'Polo Hope Amarillo',
     price: 89.99,
-    image: '/gorra gris edit.jpg',
-    image2: '/gorra roja edit.jpg'
+    image: '/Polo Hope Amarillo.jpg'
+    // image2: '/gorra roja edit.jpg'
   }
 ]
 
 export default function FeaturedProducts() {
   return (
     <section className={styles.customWidth}>
-      {/* <h2 className='text-3xl font-bold mb-8 text-center mx-auto'>
-        Featured Products
-      </h2> */}
-      <div className='flex gap-2 justify-center'>
+      <h2 className={styles.h2}>Productos Destacados</h2>
+      <div className={styles.cardContainer}>
         {featuredProducts.map((product) => (
           <ProductCard key={product.id} product={product} from='featured' />
         ))}

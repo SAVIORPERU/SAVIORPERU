@@ -8,11 +8,21 @@ import { isAuthenticated, logout } from '@/lib/auth'
 import ShoppingCartPanel from './ShoppingCartPanel'
 import { useCart } from '@/contexts/CartContext'
 import UserMenu from './UserMenu'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger
+} from '@/components/ui/sheet'
+import { PiBaseballCapDuotone } from 'react-icons/pi'
+import { usePathname } from 'next/navigation'
 
 export default function Header() {
   const [isCartOpen, setIsCartOpen] = useState(false)
   const { cartItems } = useCart()
+  const pathname = usePathname()
+  console.log('pathname ==>', pathname)
 
   const handleLogout = () => {
     logout()
@@ -27,8 +37,9 @@ export default function Header() {
     <header className='border-b'>
       <div className='container py-4 flex items-center justify-between mx-auto'>
         <div className='flex items-center'>
-          <Link href='/' className='text-2xl font-bold'>
-            Elegant Bags
+          <Link href='/' className='text-2xl font-bold flex items-center gap-1'>
+            <PiBaseballCapDuotone className='w-10 h-10' />
+            Savior
           </Link>
         </div>
 
@@ -36,23 +47,43 @@ export default function Header() {
         <nav className='hidden md:block'>
           <ul className='flex space-x-4'>
             <li>
-              <Link href='/' className='hover:text-primary'>
+              <Link
+                href='/'
+                className={`hover:text-slate-400 ${
+                  pathname === '/' || pathname === '' ? 'text-slate-500' : ''
+                }`}
+              >
                 Home
               </Link>
             </li>
             <li>
-              <Link href='/collection' className='hover:text-primary'>
-                Collection
+              <Link
+                href='/collection'
+                className={`hover:text-slate-400 ${
+                  pathname === '/collection' ? 'text-slate-500' : ''
+                }`}
+              >
+                Productos
               </Link>
             </li>
             <li>
-              <Link href='/about' className='hover:text-primary'>
-                About
+              <Link
+                href='/about'
+                className={`hover:text-slate-400 ${
+                  pathname === '/about' ? 'text-slate-500' : ''
+                }`}
+              >
+                Nosotros
               </Link>
             </li>
             <li>
-              <Link href='/contact' className='hover:text-primary'>
-                Contact
+              <Link
+                href='/contact'
+                className={`hover:text-slate-400 ${
+                  pathname === '/contact' ? 'text-slate-500' : ''
+                }`}
+              >
+                Contactanos
               </Link>
             </li>
           </ul>
@@ -96,6 +127,9 @@ export default function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side='right' className='w-[250px] sm:w-[300px]'>
+              <SheetHeader>
+                <SheetTitle className='sr-only'>Menu de navegación</SheetTitle>
+              </SheetHeader>
               <div className='flex flex-col h-full'>
                 <div className='py-6'>
                   <nav className='flex flex-col space-y-4'>
@@ -106,21 +140,21 @@ export default function Header() {
                       href='/collection'
                       className='text-lg hover:text-primary'
                     >
-                      Collection
+                      Productos
                     </Link>
                     <Link href='/about' className='text-lg hover:text-primary'>
-                      About
+                      Nosotros
                     </Link>
                     <Link
                       href='/contact'
                       className='text-lg hover:text-primary'
                     >
-                      Contact
+                      Contactanos
                     </Link>
                   </nav>
                 </div>
 
-                {!isAuthenticated() && (
+                {/* {!isAuthenticated() && (
                   <div className='mt-auto pb-6 flex flex-col space-y-2'>
                     <Link href='/login'>
                       <Button variant='outline' className='w-full'>
@@ -131,7 +165,7 @@ export default function Header() {
                       <Button className='w-full'>Register</Button>
                     </Link>
                   </div>
-                )}
+                )} */}
               </div>
             </SheetContent>
           </Sheet>

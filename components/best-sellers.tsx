@@ -4,35 +4,35 @@ import styles from './best-sellers.module.css'
 const bestSellers = [
   {
     id: 1,
-    name: 'Compra casacas =>',
+    name: 'Buso Vintage B&W',
     price: 129.99,
-    image: '/casaca negra edit.jpg'
+    image: '/Buso Vintage B&W.jpeg'
   },
   {
     id: 2,
-    name: 'Compra casacas =>',
+    name: 'Casaca Vintage B&W',
     price: 79.99,
-    image: '/casaca negra no edit.jpg'
+    image: '/Casaca Vintage B&W.jpeg'
   },
   {
     id: 3,
-    name: 'Compra Gorras =>',
-    price: 159.99,
-    image: '/gorra roja edit.jpg'
+    name: 'Polo Heaven Negro',
+    price: 89.99,
+    image: '/Polo Heaven Negro.jpg'
   },
   {
     id: 4,
-    name: 'Compra gorras =>',
-    price: 89.99,
-    image: '/gorra gris edit.jpg'
+    name: 'Gorro Choosen Negro',
+    price: 159.99,
+    image: '/Gorro Choosen Negro.JPEG'
   }
 ]
 
 export default function BestSellers() {
   return (
-    <section className={styles.bestSellersSection}>
-      <h2 className='text-3xl font-bold mb-8 text-center'>Best Sellers</h2>
-      <div className={styles.cardsContainer}>
+    <section className={styles.customWidth}>
+      <h2 className={styles.h2}>Ver Colección</h2>
+      <div className={styles.cardContainer}>
         {bestSellers.map((product) => (
           <ProductCard key={product.id} product={product} from='bestSellers' />
         ))}

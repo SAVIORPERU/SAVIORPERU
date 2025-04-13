@@ -1,18 +1,22 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { MdOutlinePhoneIphone, MdOutlineMailOutline } from 'react-icons/md'
+import Benefits from '@/components/benefits'
 
 export default function Contact() {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: "",
+    name: '',
+    email: '',
+    message: ''
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target
     setFormData((prevData) => ({ ...prevData, [name]: value }))
   }
@@ -20,16 +24,16 @@ export default function Contact() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // Handle form submission
-    console.log("Form submitted:", formData)
+    console.log('Form submitted:', formData)
     // Reset form
-    setFormData({ name: "", email: "", message: "" })
+    setFormData({ name: '', email: '', message: '' })
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Contact Us</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div>
+    <div className='container mx-auto px-4 py-8'>
+      <h1 className='text-3xl font-bold mb-8'>Contactanos</h1>
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-8 mb-10'>
+        {/* <div>
           <h2 className="text-2xl font-semibold mb-4">Get in Touch</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -52,18 +56,24 @@ export default function Contact() {
             </div>
             <Button type="submit">Send Message</Button>
           </form>
-        </div>
+        </div> */}
         <div>
-          <h2 className="text-2xl font-semibold mb-4">Contact Information</h2>
-          <p className="mb-2">Email: info@elegantbags.com</p>
-          <p className="mb-2">Phone: +1 (555) 123-4567</p>
-          <h3 className="text-xl font-semibold mt-6 mb-2">Business Hours</h3>
-          <p className="mb-1">Monday - Friday: 9:00 AM - 6:00 PM</p>
-          <p className="mb-1">Saturday: 10:00 AM - 4:00 PM</p>
-          <p>Sunday: Closed</p>
+          <h2 className='text-2xl font-semibold mb-4'>
+            Informacion de contacto
+          </h2>
+          <p className='mb-2 flex gap-2 items-center'>
+            <MdOutlineMailOutline />: Saviorstore.pe@gmail.com
+          </p>
+          <p className='mb-2 flex gap-2 items-center'>
+            <MdOutlinePhoneIphone />: 958284730
+          </p>
+          <h3 className='text-xl font-semibold mt-6 mb-2'>Horio de atencion</h3>
+          <p className='mb-1'>Lunes a Viernes: 9:00 AM - 6:00 PM</p>
+          <p className='mb-1'>Sabado y Domingo: 10:00 AM - 4:00 PM</p>
+          {/* <p>Sunday: Closed</p> */}
         </div>
       </div>
+      <Benefits />
     </div>
   )
 }
-

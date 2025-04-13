@@ -1,5 +1,5 @@
 .heroSection {
-  display: flex;
+  display: none;
   width: calc(100vw - 15px);
   height: 100%;
   gap: 10px;
@@ -9,12 +9,7 @@
 
 @media screen and (max-width: 990px) {
   .heroSection {
-    justify-content: center;
-    width: calc(100vw - 15px);
-  }
-
-  .heroSection > div:nth-child(1) {
-    display: none;
+    display: flex;
   }
 }
 

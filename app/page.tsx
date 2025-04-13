@@ -4,15 +4,17 @@ import FeaturedProducts from '@/components/featured-products'
 import BestSellers from '@/components/best-sellers'
 import Newsletter from '@/components/newsletter'
 import HeroSection from '@/components/hero-section'
+import HeroFooterSection from '@/components/hero-footerSection'
 
 export default function Home() {
   return (
     <div className='container'>
       {/* <HeroCarousel /> */}
       <HeroSection />
-      {/* <Benefits /> */}
       <FeaturedProducts />
       <BestSellers />
+      <HeroFooterSection />
+      <Benefits />
       {/* <Newsletter /> */}
     </div>
   )
