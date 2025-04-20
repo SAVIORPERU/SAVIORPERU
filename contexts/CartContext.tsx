@@ -1,13 +1,14 @@
-"use client"
+'use client'
 
-import type React from "react"
-import { createContext, useContext, useState, useEffect } from "react"
+import type React from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
 
 interface CartItem {
   id: number
   name: string
   price: number
   quantity: number
+  image: string
 }
 
 interface CartContextType {
@@ -24,21 +25,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>([])
 
   useEffect(() => {
-    const storedCart = localStorage.getItem("cart")
+    const storedCart = localStorage.getItem('cart')
     if (storedCart) {
       setCartItems(JSON.parse(storedCart))
     }
   }, [])
 
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cartItems))
+    localStorage.setItem('cart', JSON.stringify(cartItems))
   }, [cartItems])
 
   const addToCart = (item: CartItem) => {
     setCartItems((prevItems) => {
       const existingItem = prevItems.find((i) => i.id === item.id)
       if (existingItem) {
-        return prevItems.map((i) => (i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i))
+        return prevItems.map((i) =>
+          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+        )
       }
       return [...prevItems, { ...item, quantity: 1 }]
     })
@@ -53,11 +56,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }
 
   const getCartTotal = () => {
-    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0)
+    return cartItems.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    )
   }
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, clearCart, getCartTotal }}>
+    <CartContext.Provider
+      value={{ cartItems, addToCart, removeFromCart, clearCart, getCartTotal }}
+    >
       {children}
     </CartContext.Provider>
   )
@@ -66,8 +74,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 export function useCart() {
   const context = useContext(CartContext)
   if (context === undefined) {
-    throw new Error("useCart must be used within a CartProvider")
+    throw new Error('useCart must be used within a CartProvider')
   }
   return context
 }
-

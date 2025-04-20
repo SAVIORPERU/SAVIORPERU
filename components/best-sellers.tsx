@@ -4,27 +4,31 @@ import styles from './best-sellers.module.css'
 const bestSellers = [
   {
     id: 1,
-    name: 'Buso Vintage B&W',
+    name: 'PANTALONES',
     price: 129.99,
-    image: '/Buso Vintage B&W.jpeg'
+    image:
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745109976/PORTADA_PANTS_gl5twi.jpg'
   },
   {
     id: 2,
-    name: 'Casaca Vintage B&W',
+    name: 'Gorros',
     price: 79.99,
-    image: '/Casaca Vintage B&W.jpeg'
+    image:
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745109947/GORROS_PORTADA_w6cn7y.jpg'
   },
   {
     id: 3,
-    name: 'Polo Heaven Negro',
-    price: 89.99,
-    image: '/Polo Heaven Negro.jpg'
+    name: 'Pantalones',
+    price: 129.99,
+    image:
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745109976/PORTADA_PANTS_gl5twi.jpg'
   },
   {
     id: 4,
-    name: 'Gorro Choosen Negro',
+    name: 'Gorros',
     price: 159.99,
-    image: '/Gorro Choosen Negro.JPEG'
+    image:
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745109947/GORROS_PORTADA_w6cn7y.jpg'
   }
 ]
 
