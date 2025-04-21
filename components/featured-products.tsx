@@ -14,7 +14,7 @@ const featuredProducts = [
   },
   {
     id: 2,
-    name: 'BUSO NEGRO VINTAGE',
+    name: 'Buso Negro Vintage',
     price: 75,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105793/Buso_Vintage_B_W_uuzxcd.jpg',

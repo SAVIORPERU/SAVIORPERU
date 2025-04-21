@@ -7,28 +7,28 @@ const bestSellers = [
     name: 'PANTALONES',
     price: 129.99,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745109976/PORTADA_PANTS_gl5twi.jpg'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745205636/Photoroom_20250420_221506_qw0ozw.jpg'
   },
   {
     id: 2,
     name: 'Gorros',
     price: 79.99,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745109947/GORROS_PORTADA_w6cn7y.jpg'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745205638/Photoroom_20250420_221724_rnunpi.jpg'
   },
   {
     id: 3,
-    name: 'Pantalones',
+    name: 'Polos',
     price: 129.99,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745109976/PORTADA_PANTS_gl5twi.jpg'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745205639/Photoroom_20250420_221836_rg7t8m.jpg'
   },
   {
     id: 4,
-    name: 'Gorros',
+    name: 'Casacas',
     price: 159.99,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745109947/GORROS_PORTADA_w6cn7y.jpg'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745205638/Photoroom_20250420_221742_llecxs.jpg'
   }
 ]
 

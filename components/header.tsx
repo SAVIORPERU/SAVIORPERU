@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { ShoppingBag, Menu } from 'lucide-react'
+import { MdOutlineShoppingCart } from 'react-icons/md'
 import { Button } from '@/components/ui/button'
 import { isAuthenticated, logout } from '@/lib/auth'
 import ShoppingCartPanel from './ShoppingCartPanel'
@@ -17,6 +18,7 @@ import {
 } from '@/components/ui/sheet'
 import { PiBaseballCapDuotone } from 'react-icons/pi'
 import { usePathname } from 'next/navigation'
+import Image from 'next/image'
 
 export default function Header() {
   const [isCartOpen, setIsCartOpen] = useState(false)
@@ -34,11 +36,17 @@ export default function Header() {
   }
 
   return (
-    <header className='border-b'>
+    <header className='border-b fixed z-10 w-full bg-white'>
       <div className='container py-4 flex items-center justify-between mx-auto'>
         <div className='flex items-center'>
-          <Link href='/' className='text-2xl font-bold flex items-center gap-1'>
-            <PiBaseballCapDuotone className='w-10 h-10' />
+          <Link href='/' className='text-2xl font-bold flex items-center gap-3'>
+            <Image
+              src='https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745110576/Logo_mk3nez.jpg'
+              width={40}
+              height={40}
+              alt='Logo'
+              className='rounded-full'
+            />
             Savior
           </Link>
         </div>
@@ -96,7 +104,7 @@ export default function Header() {
             onClick={toggleCart}
             className='relative'
           >
-            <ShoppingBag className='h-6 w-6' />
+            <MdOutlineShoppingCart className='h-20 w-20' />
             {cartItems.length > 0 && (
               <span className='absolute -top-1 -right-1 bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs'>
                 {cartItems.reduce((total, item) => total + item.quantity, 0)}

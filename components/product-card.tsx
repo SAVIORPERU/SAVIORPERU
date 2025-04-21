@@ -6,6 +6,7 @@ import { useCart } from '@/contexts/CartContext'
 import { useState } from 'react'
 import styles from './product-card.module.css'
 import Link from 'next/link'
+import { MdOutlineShoppingCart } from 'react-icons/md'
 
 interface Product {
   id: number
@@ -100,11 +101,9 @@ export default function ProductCard({
         {from !== 'bestSellers' && (
           <p className='text-gray-600 mb-4'>S/ {product.price.toFixed(2)}</p>
         )}
-        {!from && (
-          <Button className='w-full' onClick={handleAddToCart}>
-            Add to Cart
-          </Button>
-        )}
+        <Button className='w-full mb-2' onClick={handleAddToCart}>
+          Añadir al carrito <MdOutlineShoppingCart />
+        </Button>
       </div>
     </div>
   )

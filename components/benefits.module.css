@@ -1,4 +1,4 @@
 .section {
   @apply py-12;
-  width: calc(100vw - 15px);
+  width: 100%;
 }

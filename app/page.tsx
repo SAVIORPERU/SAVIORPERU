@@ -5,6 +5,7 @@ import BestSellers from '@/components/best-sellers'
 import Newsletter from '@/components/newsletter'
 import HeroSection from '@/components/hero-section'
 import HeroFooterSection from '@/components/hero-footerSection'
+import './globals.css'
 
 export default function Home() {
   return (
@@ -14,7 +15,9 @@ export default function Home() {
       <FeaturedProducts />
       <BestSellers />
       <HeroFooterSection />
-      <Benefits />
+      <div className='containerBenefits'>
+        <Benefits />
+      </div>
       {/* <Newsletter /> */}
     </div>
   )
