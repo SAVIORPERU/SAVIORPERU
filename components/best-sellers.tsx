@@ -4,7 +4,7 @@ import styles from './best-sellers.module.css'
 const bestSellers = [
   {
     id: 1,
-    name: 'PANTALONES',
+    name: 'Pantalones',
     price: 129.99,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745205636/Photoroom_20250420_221506_qw0ozw.jpg'

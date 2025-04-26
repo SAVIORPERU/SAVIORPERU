@@ -39,7 +39,7 @@ export default function ProductCard({
   if (from === 'bestSellers') {
     return (
       <div className='bg-white overflow-hidden w-full'>
-        <Link href='/collection'>
+        <Link href={`/collection?category=${product.name.toLowerCase()}`}>
           <div className={styles.fromBestSellers}>
             <Image
               src={image || '/placeholder.svg'}
@@ -52,10 +52,10 @@ export default function ProductCard({
               onMouseLeave={() => setImage(product.image)}
             />
           </div>
+          <div className='px-0 pt-4 pb-0 flex mb-2'>
+            <h3 className={styles.fromBestSellersh3}>{product.name}</h3>
+          </div>
         </Link>
-        <div className='px-0 pt-4 pb-0 flex mb-2'>
-          <h3 className={styles.fromBestSellersh3}>{product.name}</h3>
-        </div>
       </div>
     )
   }
