@@ -5,6 +5,7 @@ import Header from '@/components/header'
 import Footer from '@/components/footer'
 import { CartProvider } from '@/contexts/CartContext'
 import type React from 'react' // Import React
+import { Suspense } from 'react'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -25,12 +26,12 @@ export default function RootLayout({
       <body className={inter.className}>
         <CartProvider>
           <Header />
-          <main className='pt-[72px]'>{children}</main>
+          <Suspense>
+            <main className='pt-[72px]'>{children}</main>
+          </Suspense>
           <Footer />
         </CartProvider>
       </body>
     </html>
   )
 }
-
-import './globals.css'
