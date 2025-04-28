@@ -21,7 +21,7 @@ export default function About() {
             esencia.
           </p>
         </div>
-        <div className='relative h-64 md:h-full'>
+        <div className='relative h-96 md:h-full'>
           <Image
             src='https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745205959/IMG_7217_o8wpvh.jpg'
             alt='Savior Showroom'

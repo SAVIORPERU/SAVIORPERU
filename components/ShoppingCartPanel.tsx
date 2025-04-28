@@ -216,7 +216,7 @@ ${
                 <input
                   className='inputinputClientName'
                   id='inputName'
-                  placeholder='Ingrese su direccion...'
+                  placeholder='Departamento / Direccion'
                   onChange={(event) => {
                     setAddress(event.target.value)
                   }}

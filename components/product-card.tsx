@@ -73,7 +73,7 @@ export default function ProductCard({
             ? styles.fromFeatured
             : from === 'bestSellers'
             ? styles.fromBestSellers
-            : 'h-64'
+            : 'lg:h-64 max-[400px]:h-[300px] max-[460px]:h-[400px] h-[450px]'
         }`}
       >
         <Image
@@ -125,9 +125,12 @@ export default function ProductCard({
                   <FiPlusCircle className='h-4 w-4' />
                 </button>
               </div>
-              <form className='flex gap-3'>
+              <form className='flex gap-2'>
                 {product.size?.split(' - ').map((ele, index) => (
-                  <div className='radio-container gap-1 flex' key={index}>
+                  <div
+                    className='radio-container gap-[2px] flex items-center'
+                    key={index}
+                  >
                     <input
                       type='radio'
                       id={ele}
@@ -136,7 +139,9 @@ export default function ProductCard({
                       onChange={() => setSelectedSize(ele)}
                       checked={selectedSize === ele}
                     />
-                    <label htmlFor={ele}>{ele}</label>
+                    <label htmlFor={ele} className='m-0'>
+                      {ele}
+                    </label>
                   </div>
                 ))}
               </form>

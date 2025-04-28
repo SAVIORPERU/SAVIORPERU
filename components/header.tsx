@@ -22,6 +22,7 @@ import Image from 'next/image'
 
 export default function Header() {
   const [isCartOpen, setIsCartOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)  // Agregar este estado
   const { cartItems } = useCart()
   const pathname = usePathname()
   console.log('pathname ==>', pathname)
@@ -38,7 +39,7 @@ export default function Header() {
   return (
     <header className='border-b fixed z-10 w-full bg-white'>
       <div className='container py-4 flex items-center justify-between mx-auto'>
-        <div className='flex items-center'>
+        <div className='flex items-center ml-3'>
           <Link href='/' className='text-2xl font-bold flex items-center gap-1'>
             <Image
               src='https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745110576/Logo_mk3nez.jpg'
@@ -104,19 +105,14 @@ export default function Header() {
         </nav>
 
         <div className='flex items-center space-x-4'>
-          <Button
-            variant='ghost'
-            size='icon'
-            onClick={toggleCart}
-            className='relative'
-          >
-            <MdOutlineShoppingCart className='h-20 w-20' />
+          <button onClick={toggleCart} className='relative h-8 w-8 p-0'>
+            <MdOutlineShoppingCart className='h-6 w-6' />
             {cartItems.length > 0 && (
               <span className='absolute -top-1 -right-1 bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs'>
                 {cartItems.reduce((total, item) => total + item.quantity, 0)}
               </span>
             )}
-          </Button>
+          </button>
 
           {/* // !  aqui abajo esta el Login Descomentar para seguir trabajando */}
           {/* {isAuthenticated() ? (
@@ -133,11 +129,10 @@ export default function Header() {
           )} */}
 
           {/* Mobile Menu Button */}
-          <Sheet>
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button variant='ghost' size='icon' className='md:hidden'>
                 <Menu className='h-6 w-6' />
-                <span className='sr-only'>Open menu</span>
               </Button>
             </SheetTrigger>
             <SheetContent side='right' className='w-[250px] sm:w-[300px]'>
@@ -147,21 +142,37 @@ export default function Header() {
               <div className='flex flex-col h-full'>
                 <div className='py-6'>
                   <nav className='flex flex-col space-y-4'>
-                    <Link href='/' className='text-lg hover:text-primary'>
+                    <Link 
+                      href='/' 
+                      className='text-lg hover:text-primary'
+                      onClick={() => setIsOpen(false)}
+                    >
                       Home
                     </Link>
                     <Link
                       href='/collection'
                       className='text-lg hover:text-primary'
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setIsOpen(false)
+                        setTimeout(() => {
+                          window.location.href = '/collection'
+                        }, 100)
+                      }}
                     >
                       Productos
                     </Link>
-                    <Link href='/about' className='text-lg hover:text-primary'>
+                    <Link 
+                      href='/about' 
+                      className='text-lg hover:text-primary'
+                      onClick={() => setIsOpen(false)}
+                    >
                       Nosotros
                     </Link>
                     <Link
                       href='/contact'
                       className='text-lg hover:text-primary'
+                      onClick={() => setIsOpen(false)}
                     >
                       Contactanos
                     </Link>

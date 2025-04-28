@@ -5,7 +5,7 @@ const benefits = [
   {
     icon: Truck,
     title: 'Envio Gratis',
-    description: 'En Ordenes Superiores a S/ 75.00'
+    description: 'En Ordenes Superiores a S/ 150.00'
   },
   {
     icon: HeadphonesIcon,
