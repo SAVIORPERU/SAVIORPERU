@@ -18,7 +18,7 @@ const products = [
     name: 'Polo Blanco Fire',
     category: 'polos',
     Estado: 'DISPONIBLE',
-    Tamaño: 'S - M - L',
+    size: 'S - M - L',
     price: 45.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105696/Polo_Fire_Blanco_kjlxx3.jpg'
@@ -28,7 +28,7 @@ const products = [
     name: 'Polo Negro Heaven',
     category: 'polos',
     Estado: 'SOLO DISPONIBLE',
-    Tamaño: 'M - L',
+    size: 'M - L',
     price: 45.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105694/Polo_Heaven_Negro_zlfuln.jpg'
@@ -38,7 +38,7 @@ const products = [
     name: 'Polo Azul Forgiven',
     category: 'polos',
     Estado: 'DISPONIBLE',
-    Tamaño: 'S - M - L',
+    size: 'S - M - L',
     price: 45.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105695/Polo_Forgiven_Jade_ffghlh.jpg'
@@ -48,7 +48,7 @@ const products = [
     name: 'Polo Amarillo Hope',
     category: 'polos',
     Estado: 'DISPONIBLE',
-    Tamaño: 'S - M - L',
+    size: 'S - M - L',
     price: 45.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105695/Polo_Hope_Amarillo_larrbx.jpg'
@@ -58,7 +58,7 @@ const products = [
     name: "Polo Azul God's Club",
     category: 'polos',
     Estado: 'DISPONIBLE',
-    Tamaño: 'S - M - L',
+    size: 'S - M - L',
     price: 45.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105698/Polo_God_s_club_Celeste_nrl0nw.jpg'
@@ -68,7 +68,7 @@ const products = [
     name: 'Polo Verde Peace',
     category: 'polos',
     Estado: 'DISPONIBLE',
-    Tamaño: 'S - M - L',
+    size: 'S - M - L',
     price: 45.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105697/Polo_Peace_Verde_Acero_bamazm.jpg'
@@ -78,7 +78,6 @@ const products = [
     name: 'Gorro Verde Faith',
     category: 'gorros',
     Estado: 'DISPONIBLE',
-    Tamaño: 'STANDARD',
     price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/fl_preserve_transparency/v1745105574/Gorro_Celeste_Choosen_ldend5.jpg?_s=public-apps'
@@ -88,7 +87,6 @@ const products = [
     name: 'Gorro Beige Faith',
     category: 'gorros',
     Estado: 'DISPONIBLE',
-    Tamaño: 'STANDARD',
     price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105579/Gorro_Faith_Beige_JPEG_albpeh.jpg'
@@ -98,7 +96,6 @@ const products = [
     name: 'Gorro Negro Faith',
     category: 'gorros',
     Estado: 'DISPONIBLE',
-    Tamaño: 'STANDARD',
     price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105579/Gorro_Faith_Negro_uqvxix.jpg'
@@ -108,7 +105,6 @@ const products = [
     name: 'Gorro Azul Blessed',
     category: 'gorros',
     Estado: 'DISPONIBLE',
-    Tamaño: 'STANDARD',
     price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105574/Gorro_Azul_Blessed_fv9jbr.jpg'
@@ -118,7 +114,6 @@ const products = [
     name: 'Gorro Blanco Blessed',
     category: 'gorros',
     Estado: 'DISPONIBLE',
-    Tamaño: 'STANDARD',
     price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105576/Gorro_Blanco_Blessed_ylzv1p.jpg'
@@ -128,7 +123,6 @@ const products = [
     name: 'Gorro Negro Choosen',
     category: 'gorros',
     Estado: 'DISPONIBLE',
-    Tamaño: 'STANDARD',
     price: 39.9,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105578/Gorro_Choosen_Negro_px338e.jpg'
@@ -138,7 +132,6 @@ const products = [
     name: 'Gorro Blanco Choosen',
     category: 'gorros',
     Estado: 'DISPONIBLE',
-    Tamaño: 'STANDARD',
     price: 39.9,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105576/Gorro_Choosen_Blanco_vp3pas.jpg'
@@ -148,7 +141,6 @@ const products = [
     name: 'Gorro Marron Choosen',
     category: 'gorros',
     Estado: 'DISPONIBLE',
-    Tamaño: 'STANDARD',
     price: 39.9,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105574/Gorro_Marron_Chosen_sqascv.jpg'
@@ -158,7 +150,6 @@ const products = [
     name: 'Gorro Celeste Choosen',
     category: 'gorros',
     Estado: 'DISPONIBLE',
-    Tamaño: 'STANDARD',
     price: 39.9,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/fl_preserve_transparency/v1745105574/Gorro_Celeste_Choosen_ldend5.jpg?_s=public-apps'
@@ -168,7 +159,6 @@ const products = [
     name: 'Gorro Negro Savior',
     category: 'gorros',
     Estado: 'DISPONIBLE',
-    Tamaño: 'STANDARD',
     price: 39.9,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105574/Gorro_Negro_Savior_pcj98c.jpg'
@@ -178,7 +168,6 @@ const products = [
     name: 'Gorro Blanco Savior',
     category: 'gorros',
     Estado: 'DISPONIBLE',
-    Tamaño: 'STANDARD',
     price: 39.9,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105575/Gorro_Blanco_Savior_n5derf.jpg'
@@ -188,7 +177,6 @@ const products = [
     name: 'Gorro Rojo Savior',
     category: 'gorros',
     Estado: 'DISPONIBLE',
-    Tamaño: 'STANDARD',
     price: 39.9,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105577/Gorro_Rojo_Savior_tfkse7.jpg'
@@ -198,7 +186,6 @@ const products = [
     name: 'Gorro Azul Acero Savior',
     category: 'gorros',
     Estado: 'NO DISPONIBLE',
-    Tamaño: 'STANDARD',
     price: 39.9,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105576/Gorro_Azul_Savior_k6hhqk.jpg'
@@ -208,7 +195,7 @@ const products = [
     name: 'Casaca Negra Vintage',
     category: 'casacas',
     Estado: 'SOLO DISPONIBLE',
-    Tamaño: 'M - L',
+    size: 'M - L',
     price: 95.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745107452/Casaca_vintage_lsanbz.jpg'
@@ -218,7 +205,7 @@ const products = [
     name: 'Buso Negro Vintage',
     category: 'pantalones',
     Estado: 'SOLO DISPONIBLE',
-    Tamaño: 'M - L',
+    size: 'M - L',
     price: 75.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105793/Buso_Vintage_B_W_uuzxcd.jpg'
@@ -228,7 +215,7 @@ const products = [
     name: 'Hoodie Negro Faith',
     category: 'casacas',
     Estado: 'NO DISPONIBLE',
-    Tamaño: null,
+    size: 'S - M - L',
     price: 120.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745108612/Polera_Faith_vqggss.jpg'
@@ -238,6 +225,7 @@ const products = [
 export default function Collection() {
   const [filter, setFilter] = useState('')
   const [sort, setSort] = useState('name')
+  const [showCategory, setShowCategory] = useState('')
   const searchParams = useSearchParams()
   const category = searchParams.get('category')
 
@@ -261,23 +249,44 @@ export default function Collection() {
 
   return (
     <div className='container mx-auto px-4 py-8'>
-      <h1 className='text-3xl font-bold mb-8'>Our Collection</h1>
+      <h1 className='text-3xl font-bold mb-8'>Colecciones</h1>
       <div className='flex flex-col md:flex-row gap-4 mb-8'>
         <Input
           type='text'
           placeholder='Search products...'
           value={filter}
-          onChange={(e) => setFilter(e.target.value)}
+          onChange={(e) => {
+            setShowCategory('')
+            setFilter(e.target.value)
+          }}
           className='md:w-64'
         />
-        <Select value={sort} onValueChange={setSort}>
+        <Select
+          value={showCategory}
+          onValueChange={(e) => {
+            console.log('e ==>', e)
+            setFilter(e)
+            setShowCategory(e)
+          }}
+        >
           <SelectTrigger className='md:w-48'>
-            <SelectValue placeholder='Sort by' />
+            <SelectValue placeholder='Ver todos' />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value='name'>Name</SelectItem>
-            <SelectItem value='price-asc'>Price: Low to High</SelectItem>
-            <SelectItem value='price-desc'>Price: High to Low</SelectItem>
+            <SelectItem value='casacas'>Casacas</SelectItem>
+            <SelectItem value='gorros'>Gorros</SelectItem>
+            <SelectItem value='pantalones'>Pantalones</SelectItem>
+            <SelectItem value='polos'>Polos</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={sort} onValueChange={setSort}>
+          <SelectTrigger className='md:w-48'>
+            <SelectValue placeholder='Ordenar por' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='name'>Nombre</SelectItem>
+            <SelectItem value='price-asc'>Precio: menos a mas</SelectItem>
+            <SelectItem value='price-desc'>Precio: mas a menos</SelectItem>
           </SelectContent>
         </Select>
       </div>

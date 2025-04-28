@@ -18,6 +18,7 @@ interface ProsItemsProduct {
   price: number
   image: string
   quantity: number
+  size?: string
 }
 
 export default function ShoppingCartPanel({
@@ -28,6 +29,8 @@ export default function ShoppingCartPanel({
   const [itemsProducts, setItemsProducts] = useState<ProsItemsProduct[]>([])
   const [showCardClientName, setShowCardClientName] = useState(false)
   const [clientName, setClientName] = useState('')
+  const [address, setAddress] = useState('')
+  const [disctount, setDiscount] = useState('')
 
   useEffect(() => {
     setItemsProducts(
@@ -36,26 +39,39 @@ export default function ShoppingCartPanel({
         name: item.name,
         price: item.price,
         image: item.image,
-        quantity: item.quantity
+        quantity: item.quantity,
+        size: item.size
       }))
     )
   }, [cartItems])
 
   if (!isOpen) return null
 
-  const contenidoACopiar = `Cliente: ${clientName}.
+  const contenidoACopiar = `🙍🏻Cliente: ${clientName}.
+📍Dirección: ${address}.
 
   ${itemsProducts
-    .map(
-      (item) =>
-        `📌Producto: ${item.name}.
+    .map((item) => {
+      if (item.size) {
+        return `📌Producto: ${item.name}.
 #️⃣Cantidad: ${item.quantity}.
-💲Precio unidad: S/ ${item.price.toFixed(2)}.
-\n`
-    )
+↕️Talla: ${item.size}.
+💲Precio: S/ ${item.price.toFixed(2)}.
+    \n`
+      } else {
+        return `📌Producto: ${item.name}.
+#️⃣Cantidad: ${item.quantity}.
+💲Precio: S/ ${item.price.toFixed(2)}.
+    \n`
+      }
+    })
     .join('')}
-
-💰Total: S/ ${getCartTotal().toFixed(2)}.
+${
+  disctount === 'PROMOSAVIOR'
+    ? `🏷️Descuento:15% 
+💰Total: S/ ${((getCartTotal() * 85) / 100).toFixed(2)}.`
+    : `💰Total: S/ ${getCartTotal().toFixed(2)}`
+}
 `
   const countryCode = '51' // Código de país (cambiar según sea necesario)
   const phoneNumber = '958284730'
@@ -99,6 +115,7 @@ export default function ShoppingCartPanel({
                     <span className='font-medium text-gray-800'>
                       {item.name}
                     </span>
+                    <span>{item.size}</span>
                     <button
                       onClick={() => removeFromCart(item.id)}
                       className='text-gray-400 hover:text-red-500 transition-colors duration-200 p-1 rounded-full hover:bg-gray-200'
@@ -118,10 +135,33 @@ export default function ShoppingCartPanel({
               ))}
             </ul>
             <div className='border-t border-gray-200 pt-4 mb-6'>
+              <div className='flex mb-2 justify-center'>
+                <span className='text-gray-600'>Cupon:</span>
+                <input
+                  type='text'
+                  placeholder='Cupon de descuento...'
+                  className='text-sm w-full p-1 outline outline-1 border-0 rounded ml-2 outline-gray-300'
+                  value={disctount}
+                  onChange={(event) => {
+                    setDiscount(event.target.value)
+                  }}
+                />
+              </div>
+              <div
+                className={`flex justify-between text-sm ${
+                  disctount === 'PROMOSAVIOR' ? 'text-red-400' : 'text-gray-600'
+                }`}
+              >
+                <span>Descuento</span>
+                <span>{disctount === 'PROMOSAVIOR' ? '-15%' : '0%'}</span>
+              </div>
               <div className='flex justify-between items-center mb-4'>
                 <span className='text-gray-600'>Subtotal:</span>
                 <span className='text-xl font-semibold text-gray-800'>
-                  S/ {getCartTotal().toFixed(2)}
+                  S/{' '}
+                  {disctount === 'PROMOSAVIOR'
+                    ? ((getCartTotal() * 85) / 100).toFixed(2)
+                    : getCartTotal().toFixed(2)}
                 </span>
               </div>
             </div>
@@ -138,12 +178,7 @@ export default function ShoppingCartPanel({
                 className='buttonShowCardClientName'
                 onClick={() => setShowCardClientName(true)}
               >
-                Continuar con{' '}
-                <img
-                  src='/BlackWhatsApp.svg'
-                  alt='whatappicon'
-                  className='h-8 [filter:brightness(0)_invert(1)]'
-                />
+                Continuar
               </button>
             </div>
           </>
@@ -160,21 +195,40 @@ export default function ShoppingCartPanel({
               className='formContainer'
               onClick={(e) => e.stopPropagation()}
             >
-              <label htmlFor='inputName' className='labelClientName'>
-                Su Nombre
-              </label>
-              <input
-                className='inputinputClientName'
-                id='inputName'
-                placeholder='Ingrese su nombre...'
-                onChange={(event) => {
-                  setClientName(event.target.value)
-                }}
-                value={clientName}
-              />
+              <div>
+                <label htmlFor='inputName' className='labelClientName'>
+                  Nombre
+                </label>
+                <input
+                  className='inputinputClientName'
+                  id='inputName'
+                  placeholder='Ingrese su nombre...'
+                  onChange={(event) => {
+                    setClientName(event.target.value)
+                  }}
+                  value={clientName}
+                />
+              </div>
+              <div>
+                <label htmlFor='inputName' className='labelClientName'>
+                  Direccion
+                </label>
+                <input
+                  className='inputinputClientName'
+                  id='inputName'
+                  placeholder='Ingrese su direccion...'
+                  onChange={(event) => {
+                    setAddress(event.target.value)
+                  }}
+                  value={address}
+                />
+              </div>
               <button
                 style={{
-                  pointerEvents: clientName.length < 3 ? 'none' : 'auto'
+                  pointerEvents:
+                    clientName.length < 3 && address.length < 3
+                      ? 'none'
+                      : 'auto'
                 }}
               >
                 <Link
@@ -186,7 +240,7 @@ export default function ShoppingCartPanel({
                   }}
                   className='linkWhatsapp'
                 >
-                  Enviar pedido a{' '}
+                  Realizar pedido{' '}
                   <img
                     src='/BlackWhatsApp.svg'
                     alt='whatappicon'

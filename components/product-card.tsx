@@ -7,6 +7,7 @@ import { useState } from 'react'
 import styles from './product-card.module.css'
 import Link from 'next/link'
 import { MdOutlineShoppingCart } from 'react-icons/md'
+import { FiMinusCircle, FiPlusCircle } from 'react-icons/fi'
 
 interface Product {
   id: number
@@ -14,6 +15,7 @@ interface Product {
   price: number
   image: string
   image2?: string
+  size?: string
 }
 
 export default function ProductCard({
@@ -25,14 +27,17 @@ export default function ProductCard({
 }) {
   const { addToCart } = useCart()
   const [image, setImage] = useState<string>(product.image)
+  const [selectedSize, setSelectedSize] = useState<string>('') // Estado para el tamañ
+  const [quantity, setQuantity] = useState(1) // Estado para la cantidad
 
   const handleAddToCart = () => {
     addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
-      quantity: 1,
-      image: product.image
+      quantity: quantity,
+      image: product.image,
+      size: selectedSize
     })
   }
 
@@ -94,14 +99,57 @@ export default function ProductCard({
             from === 'featured' || from === 'bestSellers'
               ? 'text-sm'
               : 'text-lg'
-          } font-medium mb-2 text-[#31302e]`}
+          } font-medium mb-1 text-[#31302e]`}
         >
           {product.name}
         </h3>
         {from !== 'bestSellers' && (
-          <p className='text-gray-600 mb-4'>S/ {product.price.toFixed(2)}</p>
+          <div className='text-gray-600 mb-3 w-full'>
+            <p>S/ {product.price.toFixed(2)}</p>
+
+            <div className='flex justify-between mt-1'>
+              <div className='flex gap-2'>
+                <button
+                  className='hover:text-gray-950'
+                  onClick={() =>
+                    setQuantity((prev) => (prev > 1 ? prev - 1 : prev))
+                  }
+                >
+                  <FiMinusCircle className='h-4 w-4' />
+                </button>
+                <span>{quantity}</span>
+                <button
+                  className='hover:text-gray-950'
+                  onClick={() => setQuantity((prev) => prev + 1)}
+                >
+                  <FiPlusCircle className='h-4 w-4' />
+                </button>
+              </div>
+              <form className='flex gap-3'>
+                {product.size?.split(' - ').map((ele, index) => (
+                  <div className='radio-container gap-1 flex' key={index}>
+                    <input
+                      type='radio'
+                      id={ele}
+                      value={ele}
+                      name='size'
+                      onChange={() => setSelectedSize(ele)}
+                      checked={selectedSize === ele}
+                    />
+                    <label htmlFor={ele}>{ele}</label>
+                  </div>
+                ))}
+              </form>
+            </div>
+          </div>
         )}
-        <Button className='w-full mb-2' onClick={handleAddToCart}>
+        <Button
+          className='w-full mb-2'
+          onClick={handleAddToCart}
+          disabled={
+            selectedSize ? false : product.name.includes('Gorro') ? false : true
+          }
+        >
           Añadir al carrito <MdOutlineShoppingCart />
         </Button>
       </div>

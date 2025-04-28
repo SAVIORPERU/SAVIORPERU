@@ -6,8 +6,16 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { MdOutlinePhoneIphone, MdOutlineMailOutline } from 'react-icons/md'
 import Benefits from '@/components/benefits'
+import { IoBookOutline } from 'react-icons/io5'
+import Link from 'next/link'
+
+const countryCode = '51' // Código de país (cambiar según sea necesario)
+const phoneNumber = '958284730'
 
 export default function Contact() {
+  const [clientName, setClientName] = useState('')
+  const [email, setEmail] = useState('')
+  const [message, setMessage] = useState('')
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -28,6 +36,8 @@ export default function Contact() {
     // Reset form
     setFormData({ name: '', email: '', message: '' })
   }
+
+  const contenidoACopiar = `🚨RECLAMO🚨\nNombre: ${clientName}\nEmail: ${email}\nMensaje: ${message}`
 
   return (
     <div className='container mx-auto px-4 py-8'>
@@ -72,6 +82,68 @@ export default function Contact() {
           <p className='mb-1'>Sabado y Domingo: 10:00 AM - 4:00 PM</p>
           {/* <p>Sunday: Closed</p> */}
         </div>
+        <form className='flex flex-col'>
+          <h2 className='flex items-center gap-2 text-2xl font-semibold mb-4'>
+            <IoBookOutline /> Libro de Reclamaciones
+          </h2>
+          <label htmlFor='name'>Nombre</label>
+          <input
+            type='text'
+            name='name'
+            id='name'
+            className='outline outline-1 outline-gray-400 rounded py-1 px-2 mb-2'
+            value={clientName}
+            onChange={(e) => setClientName(e.target.value)}
+          />
+          <label htmlFor='email'>Email</label>
+          <input
+            type='email'
+            name='email'
+            id='email'
+            className='outline outline-1 outline-gray-400 rounded py-1 px-2 mb-2'
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <label htmlFor='complaints'>Reclamo</label>
+          <textarea
+            name='complaints '
+            id='complaints'
+            className='outline outline-1 outline-gray-400 rounded py-1 px-2 mb-2'
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          ></textarea>
+          <button
+            className='rounded'
+            style={{
+              pointerEvents:
+                clientName.length > 2 && email.length > 2 && message.length > 2
+                  ? 'auto'
+                  : 'none'
+            }}
+          >
+            <Link
+              href={`https://wa.me/+${countryCode}${phoneNumber}?text=${encodeURIComponent(
+                contenidoACopiar
+              )}`}
+              style={{
+                backgroundColor:
+                  clientName.length > 2 &&
+                  email.length > 2 &&
+                  message.length > 2
+                    ? '#00d95f'
+                    : 'gray'
+              }}
+              className='linkWhatsapp'
+            >
+              Enviar{' '}
+              <img
+                src='/BlackWhatsApp.svg'
+                alt='whatappicon'
+                className='h-8 [filter:brightness(0)_invert(1)]'
+              />
+            </Link>
+          </button>
+        </form>
       </div>
       <Benefits />
     </div>

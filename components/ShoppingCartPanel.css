@@ -29,7 +29,7 @@
 }
 
 .formContainer {
-  @apply flex flex-col gap-4 p-4 bg-white rounded-lg;
+  @apply flex flex-col gap-4 p-4 bg-white rounded-lg w-11/12 md:w-96;
   -webkit-animation: scaleUpCenter 0.4s cubic-bezier(0.39, 0.575, 0.565, 1) both;
   animation: scaleUpCenter 0.4s cubic-bezier(0.39, 0.575, 0.565, 1) both;
 }

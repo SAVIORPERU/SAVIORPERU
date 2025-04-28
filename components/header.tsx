@@ -39,7 +39,7 @@ export default function Header() {
     <header className='border-b fixed z-10 w-full bg-white'>
       <div className='container py-4 flex items-center justify-between mx-auto'>
         <div className='flex items-center'>
-          <Link href='/' className='text-2xl font-bold flex items-center gap-3'>
+          <Link href='/' className='text-2xl font-bold flex items-center gap-1'>
             <Image
               src='https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745110576/Logo_mk3nez.jpg'
               width={40}
@@ -47,7 +47,13 @@ export default function Header() {
               alt='Logo'
               className='rounded-full'
             />
-            Savior
+            <Image
+              src='/NombreMarca.JPG'
+              width={100}
+              height={70}
+              alt='Logo'
+              className='rounded-full'
+            />
           </Link>
         </div>
 
