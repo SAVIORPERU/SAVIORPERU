@@ -152,9 +152,10 @@ ${
                   disctount === 'PROMOSAVIOR' ? 'text-red-400' : 'text-gray-600'
                 }`}
               >
-                <span>Descuento</span>
+                <span>Descuento:</span>
                 <span>{disctount === 'PROMOSAVIOR' ? '-15%' : '0%'}</span>
               </div>
+
               <div className='flex justify-between items-center mb-4'>
                 <span className='text-gray-600'>Subtotal:</span>
                 <span className='text-xl font-semibold text-gray-800'>
@@ -162,6 +163,15 @@ ${
                   {disctount === 'PROMOSAVIOR'
                     ? ((getCartTotal() * 85) / 100).toFixed(2)
                     : getCartTotal().toFixed(2)}
+                </span>
+              </div>
+              <div
+                className={`flex justify-between text-xs ${
+                  disctount === 'PROMOSAVIOR' ? 'text-red-400' : 'text-gray-600'
+                } bg-green-100 rounded py-2 px-4 mb-2 border border-green-300`}
+              >
+                <span>
+                  Delivery gratuito solo para compras mayores a S/.150.00
                 </span>
               </div>
             </div>
