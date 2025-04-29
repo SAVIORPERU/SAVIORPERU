@@ -8,6 +8,8 @@ import styles from './product-card.module.css'
 import Link from 'next/link'
 import { MdOutlineShoppingCart } from 'react-icons/md'
 import { FiMinusCircle, FiPlusCircle } from 'react-icons/fi'
+import { FiCheckCircle } from 'react-icons/fi'
+import { ImSpinner2 } from 'react-icons/im'
 
 interface Product {
   id: number
@@ -29,16 +31,24 @@ export default function ProductCard({
   const [image, setImage] = useState<string>(product.image)
   const [selectedSize, setSelectedSize] = useState<string>('') // Estado para el tamañ
   const [quantity, setQuantity] = useState(1) // Estado para la cantidad
+  const [buttonState, setButtonState] = useState<'idle' | 'loading' | 'success'>('idle')
 
-  const handleAddToCart = () => {
-    addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      quantity: quantity,
-      image: product.image,
-      size: selectedSize
-    })
+  const handleAddToCart = async () => {
+    setButtonState('loading')
+    setTimeout(() => {
+      addToCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: quantity,
+        image: product.image,
+        size: selectedSize
+      })
+      setButtonState('success')
+      setTimeout(() => {
+        setButtonState('idle')
+      }, 1000)
+    }, 1000)
   }
 
   if (from === 'bestSellers') {
@@ -149,13 +159,25 @@ export default function ProductCard({
           </div>
         )}
         <Button
-          className='w-full mb-2'
+          className='w-full mb-2 flex items-center justify-center gap-2'
           onClick={handleAddToCart}
           disabled={
-            selectedSize ? false : product.name.includes('Gorro') ? false : true
+            buttonState === 'loading' ||
+            buttonState === 'success' ||
+            (selectedSize ? false : product.name.includes('Gorro') ? false : true)
           }
         >
-          Añadir al carrito <MdOutlineShoppingCart />
+          {buttonState === 'loading' && (
+            <ImSpinner2 className='animate-spin h-5 w-5' />
+          )}
+          {buttonState === 'success' && (
+            <FiCheckCircle className='h-5 w-5 text-green-600' />
+          )}
+          {buttonState === 'idle' && (
+            <>
+              Añadir al carrito <MdOutlineShoppingCart />
+            </>
+          )}
         </Button>
       </div>
     </div>
