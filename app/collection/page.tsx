@@ -37,7 +37,7 @@ const products = [
   },
   {
     id: 3,
-    name: 'Polo Azul Forgiven',
+    name: 'Polo Jade Forgiven',
     category: 'polos',
     Estado: 'DISPONIBLE',
     size: 'S - M - L',
@@ -57,7 +57,7 @@ const products = [
   },
   {
     id: 5,
-    name: "Polo Azul God's Club",
+    name: "Polo Celeste God's Club",
     category: 'polos',
     Estado: 'DISPONIBLE',
     size: 'S - M - L',
