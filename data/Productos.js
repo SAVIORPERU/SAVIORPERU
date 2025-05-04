@@ -278,7 +278,7 @@ export const products = [
     category: 'Pantalones',
     Estado: 'DISPONIBLE',
     size: 'S - M - L',
-    price: 38.0,
+    price: 69.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746329533/Photoroom_20250503_222918_ggwhtz.jpg'
   }
