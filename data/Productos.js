@@ -282,3 +282,4 @@ export const products = [
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746329533/Photoroom_20250503_222918_ggwhtz.jpg'
   }
+  ]
