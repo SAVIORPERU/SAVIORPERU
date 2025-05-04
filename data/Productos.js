@@ -230,7 +230,7 @@ export const products = [
     size: 'M - L',
     price: 75.0,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746328153/Photoroom_20250503_220710_2_xlifxz.jpg'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746329534/Photoroom_20250503_223113_chca5s.jpg'
   },
   {
     id: 25,
