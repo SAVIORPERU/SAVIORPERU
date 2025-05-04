@@ -270,7 +270,7 @@ export const products = [
     size: 'S - M - L',
     price: 69.0,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746227958/Jogger_Franela_Melange_rylaug.jpg'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746329534/Photoroom_20250503_223004_geifzm.jpg'
   },
   {
     id: 33,
@@ -280,6 +280,5 @@ export const products = [
     size: 'S - M - L',
     price: 38.0,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746227958/Jogger_Franela_Negro_ok0juu.jpg'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746329533/Photoroom_20250503_222918_ggwhtz.jpg'
   }
-]
