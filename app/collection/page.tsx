@@ -82,7 +82,7 @@ const products = [
     Estado: 'DISPONIBLE',
     price: 42.5,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/fl_preserve_transparency/v1745105578/Gorro_Faith_Verde_ri6zhv.jpg?_s=public-apps'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235208/Gorro_Verde_Faith_iz5nbj.jpg'
   },
   {
     id: 10,
@@ -91,7 +91,7 @@ const products = [
     Estado: 'DISPONIBLE',
     price: 42.5,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105579/Gorro_Faith_Beige_JPEG_albpeh.jpg'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235205/Gorro_Beige_Faith_pxfsp0.jpg'
   },
   {
     id: 11,
@@ -100,7 +100,7 @@ const products = [
     Estado: 'DISPONIBLE',
     price: 42.5,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105579/Gorro_Faith_Negro_uqvxix.jpg'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235208/Gorro_Negro_Faith_arid6q.jpg'
   },
   {
     id: 12,
@@ -109,7 +109,7 @@ const products = [
     Estado: 'DISPONIBLE',
     price: 42.5,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105574/Gorro_Azul_Blessed_fv9jbr.jpg'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235204/Gorro_Azul_Blessed_ljhzkx.jpg'
   },
   {
     id: 13,
@@ -118,7 +118,7 @@ const products = [
     Estado: 'DISPONIBLE',
     price: 42.5,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105576/Gorro_Blanco_Blessed_ylzv1p.jpg'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235205/Gorro_Blanco_Blessed_vf7udu.jpg'
   },
   {
     id: 14,
@@ -127,7 +127,7 @@ const products = [
     Estado: 'DISPONIBLE',
     price: 39.9,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105578/Gorro_Choosen_Negro_px338e.jpg'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235207/Gorro_Negro_Choosen_ychlsz.jpg'
   },
   {
     id: 15,
@@ -136,7 +136,7 @@ const products = [
     Estado: 'DISPONIBLE',
     price: 39.9,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105576/Gorro_Choosen_Blanco_vp3pas.jpg'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235206/Gorro_Blanco_Choosen_xmxwrz.jpg'
   },
   {
     id: 16,
@@ -145,7 +145,7 @@ const products = [
     Estado: 'DISPONIBLE',
     price: 39.9,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105574/Gorro_Marron_Chosen_sqascv.jpg'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235206/Gorro_Marron_Choosen_zklfe8.jpg'
   },
   {
     id: 17,
@@ -154,7 +154,7 @@ const products = [
     Estado: 'DISPONIBLE',
     price: 39.9,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/fl_preserve_transparency/v1745105574/Gorro_Celeste_Choosen_ldend5.jpg?_s=public-apps'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235206/Gorro_Celeste_Choosen_uzjttp.jpg'
   },
   {
     id: 18,
@@ -163,7 +163,7 @@ const products = [
     Estado: 'DISPONIBLE',
     price: 39.9,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105574/Gorro_Negro_Savior_pcj98c.jpg'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235208/Gorro_Negro_Savior_rs8vw6.jpg'
   },
   {
     id: 19,
@@ -172,7 +172,7 @@ const products = [
     Estado: 'DISPONIBLE',
     price: 39.9,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105575/Gorro_Blanco_Savior_n5derf.jpg'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235206/Gorro_Blanco_Savior_rce4tq.jpg'
   },
   {
     id: 20,
@@ -181,7 +181,7 @@ const products = [
     Estado: 'DISPONIBLE',
     price: 39.9,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105577/Gorro_Rojo_Savior_tfkse7.jpg'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235208/Gorro_Rojo_Savior_htnzzg.jpg'
   },
   {
     id: 21,
@@ -190,7 +190,43 @@ const products = [
     Estado: 'NO DISPONIBLE',
     price: 39.9,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105576/Gorro_Azul_Savior_k6hhqk.jpg'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235203/Gorro_Azul_Acero_Savior_ctxbhj.jpg'
+  },
+  {
+    id: 26,
+    name: 'Bucket Azul',
+    category: 'gorros',
+    Estado: 'DISPONIBLE',
+    price: 42.5,
+    image:
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235203/Bucket_Azul_l8b18p.jpg'
+  },
+  {
+    id: 27,
+    name: 'Bucket Negro',
+    category: 'gorros',
+    Estado: 'DISPONIBLE',
+    price: 42.5,
+    image:
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235203/Bucket_Negro_qyhbcg.jpg'
+  },
+  {
+    id: 28,
+    name: 'Bucket Rosado',
+    category: 'gorros',
+    Estado: 'DISPONIBLE',
+    price: 42.5,
+    image:
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235204/Bucket_Rosado_fw14ia.jpg'
+  },
+  {
+    id: 29,
+    name: 'Bucket Verde',
+    category: 'gorros',
+    Estado: 'DISPONIBLE',
+    price: 42.5,
+    image:
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235203/Bucket_Verde_Choosen_qnxijc.jpg'
   },
   {
     id: 22,
@@ -210,17 +246,57 @@ const products = [
     size: 'M - L',
     price: 75.0,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105793/Buso_Vintage_B_W_uuzxcd.jpg'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746328153/Photoroom_20250503_220710_2_xlifxz.jpg'
   },
   {
     id: 25,
     name: 'Hoodie Negro Faith',
     category: 'casacas',
     Estado: 'NO DISPONIBLE',
-    size: 'S - M - L',
+    size: 'S - M',
     price: 120.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745108612/Polera_Faith_vqggss.jpg'
+  },
+  {
+    id: 30,
+    name: 'Polo Blanco Basico',
+    category: 'polos',
+    Estado: 'DISPONIBLE',
+    size: 'M - L',
+    price: 38.0,
+    image:
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746322735/Polo_Basico_Blanco_c8nrmt.jpg'
+  },
+  {
+    id: 31,
+    name: 'Polo Negro Basico',
+    category: 'polos',
+    Estado: 'DISPONIBLE',
+    size: 'S - M - L',
+    price: 38.0,
+    image:
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746322735/Polo_Basico_Negro_qedvhh.png'
+  },
+  {
+    id: 32,
+    name: 'Jogger Melange',
+    category: 'Pantalones',
+    Estado: 'DISPONIBLE',
+    size: 'S - M - L',
+    price: 69.0,
+    image:
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746227958/Jogger_Franela_Melange_rylaug.jpg'
+  },
+  {
+    id: 33,
+    name: 'Jogger Negro',
+    category: 'Pantalones',
+    Estado: 'DISPONIBLE',
+    size: 'S - M - L',
+    price: 38.0,
+    image:
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746227958/Jogger_Franela_Negro_ok0juu.jpg'
   }
 ]
 
@@ -255,7 +331,7 @@ export default function Collection() {
   }
 
   useEffect(() => {
-    setFilter(category || '')
+    setFilter(category?.split(' ')[1] || '')
     console.log('category ==>', category)
   }, [])
 

@@ -31,7 +31,9 @@ export default function ProductCard({
   const [image, setImage] = useState<string>(product.image)
   const [selectedSize, setSelectedSize] = useState<string>('') // Estado para el tamañ
   const [quantity, setQuantity] = useState(1) // Estado para la cantidad
-  const [buttonState, setButtonState] = useState<'idle' | 'loading' | 'success'>('idle')
+  const [buttonState, setButtonState] = useState<
+    'idle' | 'loading' | 'success'
+  >('idle')
 
   const handleAddToCart = async () => {
     setButtonState('loading')
@@ -47,8 +49,8 @@ export default function ProductCard({
       setButtonState('success')
       setTimeout(() => {
         setButtonState('idle')
-      }, 1000)
-    }, 1000)
+      }, 500)
+    }, 500)
   }
 
   if (from === 'bestSellers') {
@@ -83,7 +85,7 @@ export default function ProductCard({
             ? styles.fromFeatured
             : from === 'bestSellers'
             ? styles.fromBestSellers
-            : 'lg:h-64 max-[400px]:h-[300px] max-[460px]:h-[400px] h-[450px]'
+            : 'lg:h-64 max-[400px]:h-[300px] max-[460px]:h-[400px] h-[450px] 2xl:h-[450px]'
         }`}
       >
         <Image
@@ -164,7 +166,12 @@ export default function ProductCard({
           disabled={
             buttonState === 'loading' ||
             buttonState === 'success' ||
-            (selectedSize ? false : product.name.includes('Gorro') ? false : true)
+            (selectedSize
+              ? false
+              : product.name.includes('Gorro') ||
+                product.name.includes('Bucket')
+              ? false
+              : true)
           }
         >
           {buttonState === 'loading' && (

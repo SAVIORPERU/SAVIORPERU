@@ -12,19 +12,19 @@ const featuredProducts = [
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745107452/Casaca_vintage_lsanbz.jpg',
     image2:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745106904/Casaca_vintage_model2_s5v1is.jpg'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746325153/IMG_8636_k9znqw.jpg'
   },
   {
     id: 23,
-    name: 'Buso Negro Vintage',
+    name: 'Gorro Negro Choosen',
     category: 'pantalones',
     Estado: 'SOLO DISPONIBLE',
     size: 'M - L',
     price: 75.0,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105793/Buso_Vintage_B_W_uuzxcd.jpg',
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235207/Gorro_Negro_Choosen_ychlsz.jpg',
     image2:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745107285/Buso_vintage_model_3_keozsp.jpg'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746328307/IMG_8762_jpg_csherq.jpg'
   },
   {
     id: 1,
@@ -43,7 +43,7 @@ const featuredProducts = [
     name: 'Hoodie Negro Faith',
     category: 'casacas',
     Estado: 'NO DISPONIBLE',
-    size: 'S - M - L',
+    size: 'S - M',
     price: 120.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745108612/Polera_Faith_vqggss.jpg',
