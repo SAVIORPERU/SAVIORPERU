@@ -270,7 +270,7 @@ export const products = [
     size: 'S - M - L',
     price: 69.0,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746329534/Photoroom_20250503_223004_geifzm.webp'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746413100/Photoroom_20250504_214159_en2f0h.webp'
   },
   {
     id: 33,
@@ -280,6 +280,6 @@ export const products = [
     size: 'S - M - L',
     price: 69.0,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746329533/Photoroom_20250503_222918_ggwhtz.webp'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746413100/Photoroom_20250504_214334_cznzus.webp'
   }
 ]
