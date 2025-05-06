@@ -234,13 +234,13 @@ export const products = [
   },
   {
     id: 25,
-    name: 'Hoodie Negro oversize',
+    name: 'Hoodie Negro Faith',
     category: 'casacas',
     Estado: 'DISPONIBLE',
     size: 'S - M',
     price: 120.0,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746491948/Photoroom_20250505_174923_bybkzr.webp'
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746491948/Photoroom_20250505_174643_lslkxr.webp'
   },
   {
     id: 30,
