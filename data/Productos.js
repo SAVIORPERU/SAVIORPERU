@@ -234,7 +234,7 @@ export const products = [
   },
   {
     id: 25,
-    name: 'Hoodie Negro Faith',
+    name: 'Hoodie Negro oversize',
     category: 'casacas',
     Estado: 'DISPONIBLE',
     size: 'S - M',
