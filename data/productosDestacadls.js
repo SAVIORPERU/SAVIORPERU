@@ -38,11 +38,11 @@ export const featuredProducts = [
     id: 25,
     name: 'Hoodie Negro Faith',
     category: 'casacas',
-    Estado: 'NO DISPONIBLE',
+    Estado: 'DISPONIBLE',
     size: 'S - M',
     price: 120.0,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745108612/Polera_Faith_vqggss.webp',
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746491948/Photoroom_20250505_174643_lslkxr.webp',
     image2:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745108631/Polera_Faith_model_z4zkmi.webp'
   }
