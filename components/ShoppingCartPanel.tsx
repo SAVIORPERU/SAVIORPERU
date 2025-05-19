@@ -6,6 +6,7 @@ import { X, CircleX } from 'lucide-react'
 import './ShoppingCartPanel.css'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { codigoCupon, mostrarCupon } from '../data/cupon'
 
 interface ShoppingCartPanelProps {
   isOpen: boolean
@@ -67,7 +68,7 @@ export default function ShoppingCartPanel({
     })
     .join('')}
 ${
-  disctount === 'PROMOSAVIOR'
+  disctount === codigoCupon
     ? `🏷️Descuento:15% 
 💰Total: S/ ${((getCartTotal() * 85) / 100).toFixed(2)}.`
     : `💰Total: S/ ${getCartTotal().toFixed(2)}`
@@ -135,39 +136,45 @@ ${
               ))}
             </ul>
             <div className='border-t border-gray-200 pt-4 mb-6'>
-              <div className='flex mb-2 justify-center'>
-                <span className='text-gray-600'>Cupon:</span>
-                <input
-                  type='text'
-                  placeholder='Cupon de descuento...'
-                  className='text-sm w-full p-1 outline outline-1 border-0 rounded ml-2 outline-gray-300'
-                  value={disctount}
-                  onChange={(event) => {
-                    setDiscount(event.target.value)
-                  }}
-                />
-              </div>
-              <div
-                className={`flex justify-between text-sm ${
-                  disctount === 'PROMOSAVIOR' ? 'text-red-400' : 'text-gray-600'
-                }`}
-              >
-                <span>Descuento:</span>
-                <span>{disctount === 'PROMOSAVIOR' ? '-15%' : '0%'}</span>
-              </div>
+              {mostrarCupon && (
+                <>
+                  <div className='flex mb-2 justify-center'>
+                    <span className='text-gray-600'>Cupon:</span>
+                    <input
+                      type='text'
+                      placeholder='Cupon de descuento...'
+                      className='text-sm w-full p-1 outline outline-1 border-0 rounded ml-2 outline-gray-300'
+                      value={disctount}
+                      onChange={(event) => {
+                        setDiscount(event.target.value)
+                      }}
+                    />
+                  </div>
+                  <div
+                    className={`flex justify-between text-sm ${
+                      disctount === codigoCupon
+                        ? 'text-red-400'
+                        : 'text-gray-600'
+                    }`}
+                  >
+                    <span>Descuento:</span>
+                    <span>{disctount === codigoCupon ? '-15%' : '0%'}</span>
+                  </div>
+                </>
+              )}
 
               <div className='flex justify-between items-center mb-4'>
                 <span className='text-gray-600'>Subtotal:</span>
                 <span className='text-xl font-semibold text-gray-800'>
                   S/{' '}
-                  {disctount === 'PROMOSAVIOR'
+                  {disctount === codigoCupon
                     ? ((getCartTotal() * 85) / 100).toFixed(2)
                     : getCartTotal().toFixed(2)}
                 </span>
               </div>
               <div
                 className={`flex justify-between text-xs ${
-                  disctount === 'PROMOSAVIOR' ? 'text-red-400' : 'text-gray-600'
+                  disctount === codigoCupon ? 'text-red-400' : 'text-gray-600'
                 } bg-green-100 rounded py-2 px-4 mb-2 border border-green-300`}
               >
                 <span>
