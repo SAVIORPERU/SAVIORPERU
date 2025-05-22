@@ -296,7 +296,7 @@ export const products = [
     category: 'Pantalones',
     Estado: 'DISPONIBLE',
     size: 'S - M - L',
-    price: 69.0,
+    price: 65.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746413100/Photoroom_20250504_214159_en2f0h.webp',
     image2: ''
@@ -307,9 +307,31 @@ export const products = [
     category: 'Pantalones',
     Estado: 'DISPONIBLE',
     size: 'S - M - L',
-    price: 69.0,
+    price: 65.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746413100/Photoroom_20250504_214334_cznzus.webp',
     image2: ''
+  },
+  {
+    id: 32,
+    name: 'Polera Negra',
+    category: 'casacas',
+    Estado: 'DISPONIBLE',
+    size: 'S - M - L',
+    price: 65.0,
+    image:
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1747940453/Photoroom_20250522_130625_madrju.webp',
+    image2: ''
+  },
+  {
+    id: 32,
+    name: 'Polera Melange',
+    category: 'casacas',
+    Estado: 'DISPONIBLE',
+    size: 'S - M - L',
+    price: 65.0,
+    image:
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1747940453/Photoroom_20250522_130926_aksgnc.webp',
+    image2: ''
   }
-]
+  ]
