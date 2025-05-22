@@ -313,7 +313,7 @@ export const products = [
     image2: ''
   },
   {
-    id: 32,
+    id: 34,
     name: 'Polera Negra',
     category: 'casacas',
     Estado: 'DISPONIBLE',
@@ -324,7 +324,7 @@ export const products = [
     image2: ''
   },
   {
-    id: 32,
+    id: 35,
     name: 'Polera Melange',
     category: 'casacas',
     Estado: 'DISPONIBLE',
