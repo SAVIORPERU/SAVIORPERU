@@ -40,7 +40,7 @@ export const featuredProducts = [
     category: 'casacas',
     Estado: 'DISPONIBLE',
     size: 'S - M',
-    price: 120.0,
+    price: 119.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746491948/Photoroom_20250505_174643_lslkxr.webp',
     image2:
