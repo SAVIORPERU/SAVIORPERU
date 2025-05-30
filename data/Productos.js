@@ -333,5 +333,38 @@ export const products = [
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1747941537/Photoroom_20250522_130926_zgpmx5.webp',
     image2: ''
+  },
+  {
+    id: 36,
+    name: 'Polera Verde Acero',
+    category: 'casacas',
+    Estado: 'DISPONIBLE',
+    size: 'S - M - L',
+    price: 69.0,
+    image:
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1748624403/Photoroom_20250530_112356_jbz80g.webp',
+    image2: ''
+  },
+  {
+    id: 37,
+    name: 'Polera Verde Hoja',
+    category: 'casacas',
+    Estado: 'DISPONIBLE',
+    size: 'S - M - L',
+    price: 69.0,
+    image:
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1748624403/Photoroom_20250530_112554_rau9ih.webp',
+    image2: ''
+  },
+  {
+    id: 38,
+    name: 'Polera Marron',
+    category: 'casacas',
+    Estado: 'DISPONIBLE',
+    size: 'S - M - L',
+    price: 69.0,
+    image:
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1748624403/Photoroom_20250530_112450_ci4gr1.webp',
+    image2: ''
   }
-  ]
+]
