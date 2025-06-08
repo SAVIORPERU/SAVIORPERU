@@ -78,7 +78,10 @@ export default function Footer() {
           </div>
         </div>
         <div className='mt-8 text-center text-sm text-gray-500'>
-          © 2025 Savior. Todos los derechos reservados.
+          © 2025 Savior. Todos los derechos reservados. By{' '}
+          <Link href='https://marteldev.com/' style={{ color: 'blue' }} target='_blank'>
+            Terry
+          </Link>
         </div>
       </div>
     </footer>
