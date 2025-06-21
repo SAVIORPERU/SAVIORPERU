@@ -86,7 +86,7 @@ export default function Contact() {
           <h2 className='flex items-center gap-2 text-2xl font-semibold mb-4'>
             <IoBookOutline /> Libro de Reclamaciones
           </h2>
-          <label htmlFor='name'>Nombre</label>
+          {/* <label htmlFor='name'>Nombre</label>
           <input
             type='text'
             name='name'
@@ -111,36 +111,41 @@ export default function Contact() {
             className='outline outline-1 outline-gray-400 rounded py-1 px-2 mb-2'
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-          ></textarea>
-          <button
-            className='rounded'
-            style={{
-              pointerEvents:
-                clientName.length > 2 && email.length > 2 && message.length > 2
-                  ? 'auto'
-                  : 'none'
-            }}
-          >
+          ></textarea> */}
+          <ul className='list-decimal flex justify-start flex-col pl-5'>
+            <li>
+              Haz clic en el botón de abajo para descargar el formulario PDF .
+            </li>
+            <li>Una vez descargado, puedes:</li>
+            <ul className='list-disc pl-5'>
+              <li>
+                Imprimirlo , rellenarlo a mano, tomarle una foto o escanearlo, y
+                enviarlo por correo a:{' '}
+                <strong>Saviorstore.pe@gmail.com.</strong>
+              </li>
+              <li>
+                O rellenarlo digitalmente desde tu dispositivo usando cualquier
+                app de PDF, y luego enviarlo al mismo correo:{' '}
+                <strong>Saviorstore.pe@gmail.com.</strong>
+              </li>
+            </ul>
+            <li>¡Listo! Nos pondremos en contacto contigo pronto.</li>
+          </ul>
+          <button className='rounded pt-5'>
             <Link
-              href={`https://wa.me/+${countryCode}${phoneNumber}?text=${encodeURIComponent(
-                contenidoACopiar
-              )}`}
+              href={`https://cdn.www.gob.pe/uploads/document/file/3510113/Anexo%20I%20DS%20N%20101-2022-PCM_.pdf.pdf`}
               style={{
-                backgroundColor:
-                  clientName.length > 2 &&
-                  email.length > 2 &&
-                  message.length > 2
-                    ? '#00d95f'
-                    : 'gray'
+                backgroundColor: 'black'
               }}
               className='linkWhatsapp'
+              target='_blank'
             >
-              Enviar{' '}
-              <img
+              Descargar Formato PDF
+              {/* <img
                 src='/BlackWhatsApp.svg'
                 alt='whatappicon'
                 className='h-8 [filter:brightness(0)_invert(1)]'
-              />
+              /> */}
             </Link>
           </button>
         </form>
