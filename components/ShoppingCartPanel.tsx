@@ -7,6 +7,10 @@ import './ShoppingCartPanel.css'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { codigoCupon, mostrarCupon } from '../data/cupon'
+import dynamic from 'next/dynamic'
+
+import InteractiveMap from './Maps/Maps'
+import { LatLng } from 'leaflet'
 
 interface ShoppingCartPanelProps {
   isOpen: boolean
@@ -32,6 +36,9 @@ export default function ShoppingCartPanel({
   const [clientName, setClientName] = useState('')
   const [address, setAddress] = useState('')
   const [disctount, setDiscount] = useState('')
+  const [location, setLocation] = useState<LatLng | null>(null)
+  const [showMap, setShowMap] = useState(false)
+  const [deliveryCost, setDeliveryCost] = useState(0)
 
   useEffect(() => {
     setItemsProducts(
@@ -77,18 +84,28 @@ ${
   const countryCode = '51' // Código de país (cambiar según sea necesario)
   const phoneNumber = '958284730'
 
-  console.log('contenidoACopiar', contenidoACopiar)
+  const handleLocationSelect = (location: LatLng) => {
+    setLocation(location)
+    // Aquí puedes enviar los datos al backend o almacenarlos en el estado global.
+  }
+
+  const getDiscount = () => {
+    if (disctount === codigoCupon) {
+      return ((getCartTotal() * 85) / 100).toFixed(2)
+    }
+    return getCartTotal().toFixed(2)
+  }
 
   return (
     <>
       {/* Backdrop */}
       <div
-        className='fixed inset-0 bg-black bg-opacity-50 z-40'
+        className='fixed inset-0 bg-black bg-opacity-50 z-auto'
         onClick={onClose}
       />
 
       {/* Cart Panel */}
-      <div className='fixed inset-y-0 right-0 w-[280px] sm:w-[350px] bg-white shadow-xl px-2 py-6 transform transition-all duration-300 ease-in-out z-50 border-l'>
+      <div className='cartPanel'>
         <div className='flex justify-between items-center mb-6'>
           <h2 className='text-xl font-semibold text-gray-800'>Tu Carrito</h2>
           <button
@@ -166,10 +183,7 @@ ${
               <div className='flex justify-between items-center mb-4'>
                 <span className='text-gray-600'>Subtotal:</span>
                 <span className='text-xl font-semibold text-gray-800'>
-                  S/{' '}
-                  {disctount === codigoCupon
-                    ? ((getCartTotal() * 85) / 100).toFixed(2)
-                    : getCartTotal().toFixed(2)}
+                  S/ {getDiscount()}
                 </span>
               </div>
               <div
@@ -214,36 +228,82 @@ ${
             >
               <div>
                 <label htmlFor='inputName' className='labelClientName'>
-                  Nombre
+                  Nombre*
                 </label>
                 <input
                   className='inputinputClientName'
                   id='inputName'
-                  placeholder='Ingrese su nombre...'
+                  placeholder='Ingrese su nombre y apellido'
                   onChange={(event) => {
                     setClientName(event.target.value)
                   }}
                   value={clientName}
                 />
               </div>
+
+              {/* <Button
+                onClick={() => setShowMap(true)}
+                variant='outline'
+                className='w-full hover:bg-gray-100 transition-colors duration-200'
+              >
+                Seleccionar ubicación
+              </Button>
+              {showMap && ( */}
+              <div className='w-full h-[300px] sm:h-[400px] pb-4'>
+                <label className='labelClientName'>
+                  Marca tu ubicación 📍*
+                </label>
+                <InteractiveMap setDeliveryCost={setDeliveryCost} />
+              </div>
+              {/* )} */}
               <div>
                 <label htmlFor='inputName' className='labelClientName'>
-                  Direccion
+                  Detalles de direccion*
                 </label>
                 <input
                   className='inputinputClientName'
                   id='inputName'
-                  placeholder='Departamento / Direccion'
+                  placeholder='Calle / N° de Casa / N° de Departamento'
                   onChange={(event) => {
                     setAddress(event.target.value)
                   }}
                   value={address}
                 />
               </div>
+
+              <div
+                className={`border ${
+                  clientName.length < 3 || address.length < 3 || !deliveryCost
+                    ? 'border-orange-600'
+                    : 'border-green-500'
+                } px-2 py-1 rounded-sm`}
+              >
+                <div
+                  className={
+                    clientName.length < 3 || address.length < 3 || !deliveryCost
+                      ? 'text-orange-500'
+                      : 'text-green-500'
+                  }
+                >
+                  <span>Costo Delivery: </span>
+                  <span>S/ {deliveryCost < 7 ? 7 : deliveryCost}.00</span>
+                </div>
+                <div>
+                  <span>Subtotal: </span>
+                  <span>S/ {getDiscount()}</span>
+                </div>
+                <div className='font-bold text-lg'>
+                  <span>Total: </span>
+                  <span>
+                    S/ {(Number(getDiscount()) + deliveryCost).toFixed(2)}
+                  </span>
+                </div>
+              </div>
+
               <button
                 style={{
                   pointerEvents:
-                    clientName.length < 3 && address.length < 3
+                    clientName.length < 3 || address.length < 3 || !deliveryCost
                       ? 'none'
                       : 'auto'
                 }}
@@ -253,7 +313,12 @@ ${
                     contenidoACopiar
                   )}`}
                   style={{
-                    backgroundColor: clientName.length < 3 ? 'gray' : '#00d95f'
+                    backgroundColor:
+                      clientName.length < 3 ||
+                      address.length < 3 ||
+                      !deliveryCost
+                        ? 'gray'
+                        : '#00d95f'
                   }}
                   className='linkWhatsapp'
                 >
