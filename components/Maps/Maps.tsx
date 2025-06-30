@@ -19,10 +19,12 @@ interface RouteInfo {
 
 interface InteractiveMapProps {
   setDeliveryCost: (cost: number) => void
+  setGetlocation: (position: Position) => void
 }
 
 export default function InteractiveMap({
-  setDeliveryCost
+  setDeliveryCost,
+  setGetlocation
 }: InteractiveMapProps) {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<any>(null)
@@ -152,6 +154,7 @@ export default function InteractiveMap({
       map.on('click', (e: any) => {
         const { lat, lng } = e.latlng
         setDestinationPosition({ lat, lng })
+        setGetlocation({ lat, lng })
       })
 
       mapInstanceRef.current = { map, startIcon, endIcon }
@@ -295,7 +298,7 @@ export default function InteractiveMap({
 
   if (!mapLoaded || !userPosition) {
     return (
-      <div className='w-full h-full flex items-center justify-center'>
+      <div className='w-full h-full flex items-center justify-center min-h-64'>
         <Card className='w-96'>
           <CardHeader>
             <CardTitle className='flex items-center gap-2'>
@@ -317,7 +320,7 @@ export default function InteractiveMap({
   }
 
   return (
-    <div className='relative w-full h-full'>
+    <div className='relative w-full h-full min-h-64'>
       <div ref={mapRef} className='w-full h-full' />
 
       {/* Panel de información */}

@@ -1,5 +1,5 @@
 .cartPanel {
-  @apply fixed inset-y-0 right-0 w-full sm:w-[640px] bg-white shadow-xl px-2 py-6;
+  @apply fixed inset-y-0 right-0 w-full sm:w-[640px] bg-white shadow-xl px-2 py-6 overflow-y-auto;
   @apply transform transition-all duration-300 ease-in-out z-50 border-l;
 }
 
@@ -25,16 +25,15 @@
 }
 
 .cardFormCaontainer {
-  @apply fixed flex justify-center items-center px-2;
+  @apply fixed flex justify-center p-2 z-50 h-full;
   bottom: 0px;
-  right: 0;
-  height: 100%;
+  right: 0px;
   width: 100vw;
   background-color: rgba(26, 26, 26, 0.349);
 }
 
 .formContainer {
-  @apply flex flex-col gap-4 px-2 py-4 bg-white rounded-lg w-full md:w-[800px];
+  @apply flex flex-col gap-4 px-2 py-4 bg-white rounded-lg w-full md:px-10 md:py-8 md:w-[800px] overflow-y-auto;
   -webkit-animation: scaleUpCenter 0.4s cubic-bezier(0.39, 0.575, 0.565, 1) both;
   animation: scaleUpCenter 0.4s cubic-bezier(0.39, 0.575, 0.565, 1) both;
 }
@@ -65,7 +64,7 @@
 }
 
 .labelClientName {
-  @apply text-sm font-medium text-gray-700;
+  @apply text-base font-medium text-gray-700;
 }
 
 .inputinputClientName {
