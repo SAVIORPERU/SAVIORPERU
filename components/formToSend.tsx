@@ -144,7 +144,7 @@ ${
 
 ${
   getlocation.lat
-    ? `📍Ubicación: https://www.google.com/maps?q=${getlocation.lat},${getlocation.lng}&z=17&hl=es}`
+    ? `📍Ubicación: https://www.google.com/maps?q=${getlocation.lat},${getlocation.lng}&z=17&hl=es`
     : ''
 }
 `

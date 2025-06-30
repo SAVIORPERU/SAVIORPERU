@@ -65,35 +65,49 @@ export default function InteractiveMap({
     loadLeaflet()
   }, [])
 
-  // Obtener ubicación del usuario
-  useEffect(() => {
+  const getLocationDevice = () => {
     if (navigator.geolocation) {
+      let verification
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          console.log(position.coords.latitude, position.coords.longitude)
           setUserPosition({
             lat: position.coords.latitude,
             lng: position.coords.longitude
           })
+          // setUserPosition({
+          //   lat: -11.993006368779662,
+          //   lng: -77.04907178878786
+          // })
+          verification = true
         },
         (error) => {
           console.log('Error obteniendo ubicación:', error)
           setError(
             'No se pudo obtener la ubicación. Usando ubicación por defecto.'
           )
-          // Ubicación por defecto (Ciudad de México)
+          // Ubicación por defecto (Ciudad Lima)
           setUserPosition({
             lat: -12.0892609,
             lng: -77.0248411
           })
+          verification = false
         }
       )
+      return verification
     } else {
       setError('Geolocalización no soportada por el navegador')
       setUserPosition({
         lat: -12.0892609,
         lng: -77.0248411
       })
+      return false
     }
+  }
+
+  // Obtener ubicación del usuario
+  useEffect(() => {
+    getLocationDevice()
   }, [])
 
   // Inicializar mapa cuando Leaflet esté cargado y tengamos la posición del usuario
@@ -142,22 +156,23 @@ export default function InteractiveMap({
       })
 
       // Agregar marcador de posición del usuario
-      //   const userMarker = L.marker([userPosition.lat, userPosition.lng], {
-      //     icon: startIcon
-      //   })
-      //     .addTo(map)
-      //     .bindPopup(
-      //       '<div style="text-align: center;"><strong>Tu ubicación</strong><br><small>Punto de inicio</small></div>'
-      //     )
+      // const userMarker = L.marker([userPosition.lat, userPosition.lng], {
+      //   icon: startIcon
+      // })
+      //   .addTo(map)
+      //   .bindPopup(
+      //     '<div style="text-align: center;"><strong>Tu ubicación</strong><br><small>Punto de inicio</small></div>'
+      //   )
 
       // Manejar clicks en el mapa
       map.on('click', (e: any) => {
         const { lat, lng } = e.latlng
+        console.log(lat, lng)
         setDestinationPosition({ lat, lng })
         setGetlocation({ lat, lng })
       })
 
-      mapInstanceRef.current = { map, startIcon, endIcon }
+      mapInstanceRef.current = { map /* userMarker */, startIcon, endIcon }
     }
   }, [mapLoaded, userPosition])
 
@@ -191,65 +206,265 @@ export default function InteractiveMap({
     }
   }, [destinationPosition, userPosition])
 
-  // Calcular ruta
+  // Calcular ruta usando OpenRouteService
   const calculateRoute = async () => {
-    if (!userPosition || !destinationPosition) return
+    if (!destinationPosition) return
+    // ;-11.993006368779662 - 77.04907178878786
+
+    const userPosition = {
+      lat: -11.993006368779662,
+      lng: -77.04907178878786
+    }
 
     setLoading(true)
+    setError(null)
+
     try {
-      // Calcular distancia en línea recta como fallback
-      const distance = calculateStraightLineDistance(
+      // Intentar primero con OpenRouteService
+      const routeData = await getRouteFromORS(userPosition, destinationPosition)
+
+      if (routeData) {
+        displayRoute(routeData)
+      } else {
+        // Fallback a cálculo directo si falla el servicio
+        const fallbackRoute = calculateFallbackRoute(
+          userPosition,
+          destinationPosition
+        )
+        displayRoute(fallbackRoute)
+      }
+    } catch (error) {
+      console.error('Error calculando ruta:', error)
+      // Usar fallback en caso de error
+      const fallbackRoute = calculateFallbackRoute(
         userPosition,
         destinationPosition
       )
+      displayRoute(fallbackRoute)
+    }
 
-      const costDelivery = Math.ceil(Number(distance.toFixed(2)) * 10) / 10
+    setLoading(false)
+  }
 
-      setDeliveryCost(Math.ceil(costDelivery * 1.2))
+  // Obtener ruta de OpenRouteService
+  const getRouteFromORS = async (start: Position, end: Position) => {
+    try {
+      // Usando la API pública de OpenRouteService (limitada pero funcional)
+      const response = await fetch(
+        `https://api.openrouteservice.org/v2/directions/driving-car?api_key=5b3ce3597851110001cf62487d47185c1a574927a757648458453cc2&start=${start.lng},${start.lat}&end=${end.lng},${end.lat}`,
+        {
+          headers: {
+            Accept:
+              'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8'
+          }
+        }
+      )
 
-      // Crear línea recta entre los puntos
-      const L = (window as any).L
-      const { map } = mapInstanceRef.current
-
-      // Remover ruta anterior si existe
-      if (mapInstanceRef.current.routeLine) {
-        map.removeLayer(mapInstanceRef.current.routeLine)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      // Agregar nueva línea de ruta
-      // necesario descomentar userPosition para ver las lineas conectadas
-      const routeLine = L.polyline(
-        [
-          //   [userPosition.lat, userPosition.lng],
-          [destinationPosition.lat, destinationPosition.lng]
-        ],
-        { color: 'blue', weight: 4, opacity: 0.7 }
-      ).addTo(map)
+      const data = await response.json()
 
-      mapInstanceRef.current.routeLine = routeLine
+      if (data.features && data.features[0]) {
+        const route = data.features[0]
+        const coordinates = route.geometry.coordinates.map(
+          (coord: [number, number]) => [coord[1], coord[0]]
+        ) // Intercambiar lat/lng
+        const distance = route.properties.segments[0].distance / 1000 // Convertir a km
+        const duration = route.properties.segments[0].duration / 60 // Convertir a minutos
 
-      // Ajustar vista para mostrar ambos puntos
-      // si descomento se mostraria en el mapa ambos puntos conectados
+        return {
+          distance,
+          duration,
+          coordinates
+        }
+      }
+
+      return null
+    } catch (error) {
+      console.error('Error con OpenRouteService:', error)
+      return null
+    }
+  }
+
+  // Usar Nominatim + OSRM como alternativa
+  const getRouteFromOSRM = async (start: Position, end: Position) => {
+    try {
+      const response = await fetch(
+        `https://router.project-osrm.org/route/v1/driving/${start.lng},${start.lat};${end.lng},${end.lat}?overview=full&geometries=geojson`
+      )
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+
+      if (data.routes && data.routes[0]) {
+        const route = data.routes[0]
+        const coordinates = route.geometry.coordinates.map(
+          (coord: [number, number]) => [coord[1], coord[0]]
+        ) // Intercambiar lat/lng
+        const distance = route.distance / 1000 // Convertir a km
+        const duration = route.duration / 60 // Convertir a minutos
+
+        return {
+          distance,
+          duration,
+          coordinates
+        }
+      }
+
+      return null
+    } catch (error) {
+      console.error('Error con OSRM:', error)
+      // Intentar con GraphHopper como última opción
+      return await getRouteFromGraphHopper(start, end)
+    }
+  }
+
+  // GraphHopper como alternativa adicional
+  const getRouteFromGraphHopper = async (start: Position, end: Position) => {
+    try {
+      const response = await fetch(
+        `https://graphhopper.com/api/1/route?point=${start.lat},${start.lng}&point=${end.lat},${end.lng}&vehicle=car&locale=es&calc_points=true&key=YOUR_API_KEY`
+      )
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+
+      if (data.paths && data.paths[0]) {
+        const path = data.paths[0]
+        // Decodificar coordenadas (GraphHopper usa encoded polyline)
+        const coordinates = decodePolyline(path.points)
+        const distance = path.distance / 1000 // Convertir a km
+        const duration = path.time / 60000 // Convertir a minutos
+
+        return {
+          distance,
+          duration,
+          coordinates
+        }
+      }
+
+      return null
+    } catch (error) {
+      console.error('Error con GraphHopper:', error)
+      return null
+    }
+  }
+
+  // Decodificar polyline (para GraphHopper)
+  const decodePolyline = (encoded: string): [number, number][] => {
+    const coordinates: [number, number][] = []
+    let index = 0
+    let lat = 0
+    let lng = 0
+
+    while (index < encoded.length) {
+      let b,
+        shift = 0,
+        result = 0
+      do {
+        b = encoded.charCodeAt(index++) - 63
+        result |= (b & 0x1f) << shift
+        shift += 5
+      } while (b >= 0x20)
+      const dlat = result & 1 ? ~(result >> 1) : result >> 1
+      lat += dlat
+
+      shift = 0
+      result = 0
+      do {
+        b = encoded.charCodeAt(index++) - 63
+        result |= (b & 0x1f) << shift
+        shift += 5
+      } while (b >= 0x20)
+      const dlng = result & 1 ? ~(result >> 1) : result >> 1
+      lng += dlng
+
+      coordinates.push([lat / 1e5, lng / 1e5])
+    }
+
+    return coordinates
+  }
+
+  // Ruta de fallback mejorada
+  const calculateFallbackRoute = (start: Position, end: Position) => {
+    const distance = calculateStraightLineDistance(start, end)
+
+    // Crear una ruta simple que siga una aproximación de calles
+    // Esto es una aproximación básica, en una app real deberías usar siempre APIs de routing
+    const coordinates: [number, number][] = []
+
+    // Punto de inicio
+    coordinates.push([start.lat, start.lng])
+
+    // Crear algunos puntos intermedios para simular seguir calles
+    const latDiff = end.lat - start.lat
+    const lngDiff = end.lng - start.lng
+
+    // Agregar puntos intermedios con pequeñas variaciones para simular calles
+    for (let i = 1; i < 4; i++) {
+      const ratio = i / 4
+      const intermediateLat =
+        start.lat + latDiff * ratio + (Math.random() - 0.5) * 0.001
+      const intermediateLng =
+        start.lng + lngDiff * ratio + (Math.random() - 0.5) * 0.001
+      coordinates.push([intermediateLat, intermediateLng])
+    }
+
+    // Punto final
+    coordinates.push([end.lat, end.lng])
+
+    return {
+      distance: distance * 1.3, // Multiplicar por 1.3 para simular que las calles no van en línea recta
+      duration: distance * 1.3 * 2, // Estimación: 2 minutos por km
+      coordinates
+    }
+  }
+
+  // Mostrar la ruta en el mapa
+  const displayRoute = (routeData: RouteInfo) => {
+    const L = (window as any).L
+    const { map } = mapInstanceRef.current
+
+    // Remover ruta anterior si existe
+    if (mapInstanceRef.current.routeLine) {
+      map.removeLayer(mapInstanceRef.current.routeLine)
+    }
+
+    // Agregar nueva línea de ruta
+    // const routeLine = L.polyline(routeData.coordinates, {
+    //   color: '#2563eb',
+    //   weight: 4,
+    //   opacity: 0.8
+    // }).addTo(map)
+
+    // mapInstanceRef.current.routeLine = routeLine
+
+    // Calcular costo de delivery
+    const costDelivery = Math.ceil(routeData.distance * 10) / 10
+    setDeliveryCost(Math.ceil(costDelivery * 1.2))
+
+    // Ajustar vista para mostrar la ruta completa
+    if (
+      mapInstanceRef.current.userMarker &&
+      mapInstanceRef.current.destinationMarker
+    ) {
       const group = L.featureGroup([
         // mapInstanceRef.current.userMarker,
         mapInstanceRef.current.destinationMarker
+        // routeLine
       ])
-      //   map.fitBounds(group.getBounds().pad(0.1))
-      map.setView([destinationPosition.lat, destinationPosition.lng], 17)
-
-      setRouteInfo({
-        distance,
-        duration: distance * 2, // Estimación simple: 2 minutos por km
-        coordinates: [
-          //   [userPosition.lat, userPosition.lng],
-          [destinationPosition.lat, destinationPosition.lng]
-        ]
-      })
-    } catch (error) {
-      console.error('Error calculando ruta:', error)
-      setError('Error calculando la ruta')
+      map.fitBounds(group.getBounds().pad(0.1))
     }
-    setLoading(false)
+
+    setRouteInfo(routeData)
   }
 
   // Calcular distancia en línea recta
@@ -258,8 +473,8 @@ export default function InteractiveMap({
     pos2: Position
   ): number => {
     const R = 6371 // Radio de la Tierra en km
-    const dLat = ((pos2.lat - -11.9977078) * Math.PI) / 180
-    const dLng = ((pos2.lng - -77.0501454) * Math.PI) / 180
+    const dLat = ((pos2.lat - pos1.lat) * Math.PI) / 180
+    const dLng = ((pos2.lng - pos1.lng) * Math.PI) / 180
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos((pos1.lat * Math.PI) / 180) *
@@ -294,15 +509,13 @@ export default function InteractiveMap({
     setRouteInfo(null)
   }
 
-  const price = routeInfo ? routeInfo.distance * 1 : 0 // $1 por km
-
   if (!mapLoaded || !userPosition) {
     return (
       <div className='w-full h-full flex items-center justify-center min-h-64'>
         <Card className='w-96'>
           <CardHeader>
             <CardTitle className='flex items-center gap-2'>
-              {/* <Navigation className='h-5 w-5' /> */}
+              <Navigation className='h-5 w-5' />
               {!mapLoaded ? 'Cargando mapa...' : 'Obteniendo ubicación...'}
             </CardTitle>
           </CardHeader>
@@ -324,88 +537,101 @@ export default function InteractiveMap({
       <div ref={mapRef} className='w-full h-full' />
 
       {/* Panel de información */}
-      <div className='absolute bottom-1 right-1 z-[1000] h-auto'>
+      <div className='absolute bottom-4 right-4 z-[1000]'>
         <Card className='w-auto'>
-          {/* <CardHeader>
+          {/* <CardHeader className='pb-3'>
             <CardTitle className='flex items-center gap-2'>
               <Navigation className='h-5 w-5' />
-              Información del Viaje
+              Información del Delivery
             </CardTitle>
           </CardHeader> */}
-          <CardContent className='p-0'>
+          <CardContent className='space-y-3 p-0 m-0'>
             {!destinationPosition ? (
-              <p className='text-muted-foreground text-sm w-auto'>
-                Haz click en el mapa para marcar tu ubicación
-              </p>
-            ) : (
               <>
-                {/* {loading ? (
+                {userPosition.lat === -12.0892609 &&
+                userPosition.lng === -77.0248411 ? (
+                  <button
+                    type='button'
+                    className='text-muted-foreground text-sm'
+                    onClick={(e) => {
+                      e.preventDefault()
+                      getLocationDevice()
+                    }}
+                  >
+                    Permitir acceso a la ubicacion
+                  </button>
+                ) : (
                   <p className='text-muted-foreground text-sm'>
-                    Calculando ruta...
+                    Haz click en el mapa para seleccionar el destino
                   </p>
-                ) : routeInfo ? (
-                  <div className='space-y-3'>
-                    <div className='flex justify-between items-center'>
-                      <span className='text-sm font-medium'>Distancia:</span>
-                      <span className='text-sm'>
-                        {routeInfo.distance.toFixed(2)} km
-                      </span>
-                    </div>
-                    <div className='flex justify-between items-center'>
-                      <span className='text-sm font-medium'>
-                        Tiempo estimado:
-                      </span>
-                      <span className='text-sm'>
-                        {Math.round(routeInfo.duration)} min
-                      </span>
-                    </div>
-                    <div className='border-t pt-3'>
-                      <div className='flex justify-between items-center'>
-                        <span className='font-medium flex items-center gap-1'>
-                          <DollarSign className='h-4 w-4' />
-                          Precio total:
-                        </span>
-                        <span className='text-lg font-bold text-green-600'>
-                          ${price.toFixed(2)}
-                        </span>
-                      </div>
-                      <p className='text-xs text-muted-foreground mt-1'>
-                        $1.00 por kilómetro
-                      </p>
-                    </div>
+                )}
+              </>
+            ) : loading ? (
+              <p className='text-muted-foreground text-sm'>
+                Calculando ruta óptima...
+              </p>
+            ) : routeInfo ? (
+              <>
+                {/* <div className='grid grid-cols-2 gap-4'>
+                  <div>
+                    <p className='text-sm font-medium'>Distancia</p>
+                    <p className='text-lg font-semibold'>
+                      {routeInfo.distance.toFixed(1)} km
+                    </p>
                   </div>
-                ) : null} */}
+                  <div>
+                    <p className='text-sm font-medium'>Tiempo est.</p>
+                    <p className='text-lg font-semibold'>
+                      {Math.round(routeInfo.duration)} min
+                    </p>
+                  </div>
+                </div>
+
+                <div className='border-t pt-3'>
+                  <div className='flex justify-between items-center'>
+                    <span className='font-medium flex items-center gap-1'>
+                      <DollarSign className='h-4 w-4' />
+                      Costo de delivery:
+                    </span>
+                    <span className='text-lg font-bold text-green-600'>
+                      S/ {(routeInfo.distance * 1.2).toFixed(2)}
+                    </span>
+                  </div>
+                  <p className='text-xs text-muted-foreground mt-1'>
+                    Tarifa base: S/ 1.20 por kilómetro
+                  </p>
+                </div> */}
 
                 <Button
                   onClick={resetRoute}
                   variant='outline'
-                  className='w-full bg-transparent'
+                  className='w-10'
                   size='sm'
                 >
-                  <FaRegTrashAlt />
+                  <FaRegTrashAlt className='' />
                 </Button>
               </>
-            )}
+            ) : null}
           </CardContent>
         </Card>
       </div>
 
       {/* Instrucciones */}
-      {/* <div className='absolute bottom-4 left-4 z-[1000]'>
+      {/* <div className='absolute top-4 left-4 z-[1000]'>
         <Card className='w-72'>
           <CardContent className='pt-4'>
             <div className='space-y-2 text-sm'>
               <div className='flex items-center gap-2'>
                 <div className='w-3 h-3 bg-green-500 rounded-full'></div>
-                <span>Pin verde: Tu ubicación actual</span>
+                <span>Ubicación actual (origen)</span>
               </div>
               <div className='flex items-center gap-2'>
                 <div className='w-3 h-3 bg-red-500 rounded-full'></div>
-                <span>Pin rojo: Destino (click en el mapa)</span>
+                <span>Destino (click en el mapa)</span>
               </div>
               <div className='flex items-center gap-2'>
-                <div className='w-8 h-0.5 bg-blue-500'></div>
-                <span>Línea azul: Ruta calculada</span>
+                <div className='w-8 h-0.5 bg-blue-600'></div>
+                <span>Ruta optimizada por calles</span>
               </div>
             </div>
           </CardContent>
