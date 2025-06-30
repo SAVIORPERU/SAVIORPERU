@@ -91,7 +91,7 @@ const FormToSend = ({
 
   const calculateDelivery = () => {
     if (locationToSend === 'provincia') {
-      const deliveryCalculate = 'Recargo segun agencia (S/ 10.00 - S/ 5.00)'
+      const deliveryCalculate = 'Recargo segun agencia (S/ 10.00 - S/ 15.00)'
       return deliveryCalculate
     }
     const deliveryCalculate =
@@ -131,7 +131,9 @@ ${itemsProducts
     }
   })
   .join('')}
-${agencia === 'provincia' ? '🏍️' : '🚚'}Delivery: ${calculateDelivery()}
+${agencia === 'provincia' ? '🏍️' : '🚚'}${
+    agencia === 'provincia' ? '' : 'Delivery: '
+  }${calculateDelivery()}
 ${
   disctount === codigoCupon
     ? `🏷️Descuento:15% 
@@ -345,11 +347,13 @@ ${
                 : 'text-green-500'
             }
           >
-            <span>Delivery: </span>
             {locationToSend === 'provincia' ? (
-              <span>Recargo segun agencia {'(S/ 10.00 - S/ 5.00)'}</span>
+              <span>Recargo de agencia: {'(S/ 10.00 - S/ 15.00)'}</span>
             ) : (
-              <span>S/{calculateDelivery()}.00</span>
+              <>
+                <span>Delivery: </span>
+                <span>S/{calculateDelivery()}.00</span>
+              </>
             )}
           </div>
           <div>
