@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { fotoTienda } from '../../data/nosotros'
 
 export default function About() {
   return (
@@ -23,7 +24,7 @@ export default function About() {
         </div>
         <div className='relative h-96 md:h-full'>
           <Image
-            src='https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745205959/IMG_7217_o8wpvh.jpg'
+            src={fotoTienda}
             alt='Savior Showroom'
             fill
             className='object-cover rounded-lg'
