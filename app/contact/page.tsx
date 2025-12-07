@@ -32,7 +32,6 @@ export default function Contact() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // Handle form submission
-    console.log('Form submitted:', formData)
     // Reset form
     setFormData({ name: '', email: '', message: '' })
   }
@@ -131,12 +130,9 @@ export default function Contact() {
             </ul>
             <li>¡Listo! Nos pondremos en contacto contigo pronto.</li>
           </ul>
-          <button className='rounded pt-5'>
+          <button className='rounded pt-5 text-background'>
             <Link
               href={`https://cdn.www.gob.pe/uploads/document/file/3510113/Anexo%20I%20DS%20N%20101-2022-PCM_.pdf.pdf`}
-              style={{
-                backgroundColor: 'black'
-              }}
               className='linkWhatsapp'
               target='_blank'
             >

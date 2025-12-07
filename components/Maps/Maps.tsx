@@ -533,7 +533,7 @@ export default function InteractiveMap({
   }
 
   return (
-    <div className='relative w-full h-full min-h-64'>
+    <div className='relative w-full h-64'>
       <div ref={mapRef} className='w-full h-full' />
 
       {/* Panel de información */}

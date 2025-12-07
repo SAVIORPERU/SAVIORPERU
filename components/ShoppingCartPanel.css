@@ -73,7 +73,7 @@
 
 .linkWhatsapp {
   @apply w-full flex text-white justify-center items-center rounded-lg px-4 transition-all duration-200 hover:opacity-90 hover:shadow-md;
-  @apply h-11 gap-2;
+  @apply h-11 gap-2 text-background bg-foreground;
 }
 
 .buttonCloseCardClientName {

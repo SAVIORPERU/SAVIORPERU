@@ -69,7 +69,7 @@ export default function ProductCard({
               onMouseLeave={() => setImage(product.image)}
             />
           </div>
-          <div className='px-0 pt-4 pb-0 flex mb-2'>
+          <div className='px-2 pt-4 pb-0 flex mb-2'>
             <h3 className={styles.fromBestSellersh3}>{product.name}</h3>
           </div>
         </Link>
@@ -161,7 +161,7 @@ export default function ProductCard({
           </div>
         )}
         <Button
-          className='w-full mb-2 flex items-center justify-center gap-2'
+          className='w-full mb-2 flex items-center justify-center gap-2 text-white bg-black hover:bg-gray-700'
           onClick={handleAddToCart}
           disabled={
             buttonState === 'loading' ||

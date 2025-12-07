@@ -17,6 +17,7 @@ interface ProsItemsProduct {
 }
 
 interface IProps {
+  userName: string
   clientName: string
   setClientName: (value: string) => void
   address: string
@@ -36,6 +37,7 @@ interface IProps {
 }
 
 const FormToSend = ({
+  userName,
   clientName,
   setClientName,
   address,
@@ -68,11 +70,11 @@ const FormToSend = ({
   const [dni, setDni] = useState('')
   const [clientPhone, setClientPhone] = useState('')
   const selectDelivery = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.value)
     setLocationToSend(event.target.value)
     setAddress('')
     setDeliveryCost(0)
   }
+  const [fullNameToClientName, setFullNameToCllientName] = useState(false)
 
   const calculateTotal = () => {
     const total =
@@ -190,9 +192,12 @@ ${
             id='inputName'
             placeholder='Ingrese su nombre y apellido'
             onChange={(event) => {
+              if (!fullNameToClientName) {
+                setFullNameToCllientName(true)
+              }
               setClientName(event.target.value)
             }}
-            value={clientName}
+            value={!fullNameToClientName ? userName : clientName}
           />
         </div>
 

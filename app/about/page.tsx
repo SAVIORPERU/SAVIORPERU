@@ -33,21 +33,21 @@ export default function About() {
       </div>
       <h2 className='text-2xl font-bold mt-12 mb-6'>Nuestros Valores</h2>
       <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
-        <div className='bg-gray-100 p-6 rounded-lg'>
+        <div className='bg-primary-foreground p-6 rounded-lg'>
           <h3 className='text-xl font-semibold mb-2'>Calidad</h3>
           <p>
             Seleccionamos cuidadosamente nuestros materiales y procesos de
             confección para garantizar prendas duraderas.
           </p>
         </div>
-        <div className='bg-gray-100 p-6 rounded-lg'>
+        <div className='bg-primary-foreground p-6 rounded-lg'>
           <h3 className='text-xl font-semibold mb-2'>Estilo</h3>
           <p>
             Nuestros diseños se inspiran en las últimas tendencias mientras
             mantienen una elegancia atemporal.
           </p>
         </div>
-        <div className='bg-gray-100 p-6 rounded-lg'>
+        <div className='bg-primary-foreground p-6 rounded-lg'>
           <h3 className='text-xl font-semibold mb-2'>Sostenibilidad</h3>
           <p>
             Nos comprometemos con prácticas de producción éticas y la reducción

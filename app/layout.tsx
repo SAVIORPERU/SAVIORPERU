@@ -6,6 +6,9 @@ import Footer from '@/components/footer'
 import { CartProvider } from '@/contexts/CartContext'
 import type React from 'react' // Import React
 import { Suspense } from 'react'
+import { ClerkProvider } from '@clerk/nextjs'
+import { ThemeProvider } from '@/components/theme-provider'
+import { esMX } from '@clerk/localizations'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -48,22 +51,42 @@ export const metadata: Metadata = {
   }
 }
 
+const customEs = {
+  ...esMX,
+  signIn: {
+    ...esMX.signIn,
+    start: {
+      ...esMX.signIn?.start,
+      subtitle: 'para continuar con Savior'
+    }
+  },
+  signUp: {
+    ...esMX.signUp,
+    start: { ...esMX.signUp?.start, subtitle: 'para continuar con Savior' }
+  },
+  formFieldHintText__optional: ''
+}
+
 export default function RootLayout({
   children
 }: {
   children: React.ReactNode
 }) {
   return (
-    <html lang='en'>
-      <body className={inter.className}>
-        <CartProvider>
-          <Header />
-          <Suspense>
-            <main className='pt-[72px]'>{children}</main>
-          </Suspense>
-          <Footer />
-        </CartProvider>
-      </body>
-    </html>
+    <ClerkProvider localization={customEs}>
+      <html lang='en' suppressHydrationWarning>
+        <body className={inter.className}>
+          <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
+            <CartProvider>
+              <Header />
+              <Suspense>
+                <main className='pt-[72px]'>{children}</main>
+              </Suspense>
+              <Footer />
+            </CartProvider>
+          </ThemeProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }

@@ -2,13 +2,14 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ShoppingBag, Menu } from 'lucide-react'
+import { ShoppingBag, Menu, LayoutDashboard } from 'lucide-react'
 import { MdOutlineShoppingCart } from 'react-icons/md'
 import { Button } from '@/components/ui/button'
 import { isAuthenticated, logout } from '@/lib/auth'
 import ShoppingCartPanel from './ShoppingCartPanel'
 import { useCart } from '@/contexts/CartContext'
 import UserMenu from './UserMenu'
+import { ThemeToggle } from './ThemeToggle'
 import {
   Sheet,
   SheetContent,
@@ -19,13 +20,47 @@ import {
 import { PiBaseballCapDuotone } from 'react-icons/pi'
 import { usePathname } from 'next/navigation'
 import Image from 'next/image'
+import { SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs'
+import Profile from '@/app/(protected)/profile/page'
+import FormToSend from './formToSend'
+import { codigoCupon } from '@/data/cupon'
+import FormularioUsuario from './formDataUser'
+import './header.css'
+
+interface ProsItemsProduct {
+  id: number
+  name: string
+  price: number
+  image: string
+  quantity: number
+  size?: string
+}
 
 export default function Header() {
   const [isCartOpen, setIsCartOpen] = useState(false)
-  const [isOpen, setIsOpen] = useState(false)  // Agregar este estado
-  const { cartItems } = useCart()
+  const [isOpen, setIsOpen] = useState(false) // Agregar este estado
+  const { cartItems, removeFromCart, clearCart, getCartTotal } = useCart()
   const pathname = usePathname()
-  console.log('pathname ==>', pathname)
+  const { user, isSignedIn, isLoaded } = useUser()
+  const [itemsProducts, setItemsProducts] = useState<ProsItemsProduct[]>([])
+  const [showCardClientName, setShowCardClientName] = useState(false)
+  const [clientName, setClientName] = useState('')
+  const [address, setAddress] = useState('')
+  const [disctount, setDiscount] = useState('')
+  const [locationToSend, setLocationToSend] = useState('')
+  const [deliveryCost, setDeliveryCost] = useState(0)
+  const [agencia, setAgencia] = useState('')
+
+  const countryCode = '51' // Código de país (cambiar según sea necesario)
+  const phoneNumber = '958284730'
+
+  const getDiscount = () => {
+    if (disctount === codigoCupon) {
+      const calculateDiscount = ((getCartTotal() * 85) / 100).toFixed(2)
+      return (Math.round(Number(calculateDiscount) * 10) / 10).toFixed(2)
+    }
+    return getCartTotal().toFixed(2)
+  }
 
   const handleLogout = () => {
     logout()
@@ -37,7 +72,7 @@ export default function Header() {
   }
 
   return (
-    <header className='border-b fixed z-10 w-full bg-white'>
+    <header className='header'>
       <div className='container py-4 flex items-center justify-between mx-auto'>
         <div className='flex items-center ml-3'>
           <Link href='/' className='text-2xl font-bold flex items-center gap-1'>
@@ -49,7 +84,7 @@ export default function Header() {
               className='rounded-full'
             />
             <Image
-              src='/NombreMarca.JPG'
+              src='/NombreMarca.jpg'
               width={100}
               height={70}
               alt='Logo'
@@ -105,6 +140,7 @@ export default function Header() {
         </nav>
 
         <div className='flex items-center space-x-4'>
+          <ThemeToggle />
           <button onClick={toggleCart} className='relative h-8 w-8 p-0'>
             <MdOutlineShoppingCart className='h-6 w-6' />
             {cartItems.length > 0 && (
@@ -115,18 +151,25 @@ export default function Header() {
           </button>
 
           {/* // !  aqui abajo esta el Login Descomentar para seguir trabajando */}
-          {/* {isAuthenticated() ? (
-            <UserMenu onLogout={handleLogout} />
+          {isSignedIn ? (
+            // <UserMenu onLogout={handleLogout} />
+            <div className='min-w-7'>
+              <SignedIn>
+                <UserButton></UserButton>
+              </SignedIn>
+            </div>
+          ) : !isLoaded ? (
+            <span className='loader'></span>
           ) : (
-            <div className="hidden md:flex space-x-2">
-              <Link href="/login">
-                <Button variant="ghost">Login</Button>
+            <div className='hidden md:flex space-x-2'>
+              <Link href='/sign-in'>
+                <Button variant='ghost'>Login</Button>
               </Link>
-              <Link href="/register">
+              <Link href='/sign-up'>
                 <Button>Register</Button>
               </Link>
             </div>
-          )} */}
+          )}
 
           {/* Mobile Menu Button */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -142,8 +185,8 @@ export default function Header() {
               <div className='flex flex-col h-full'>
                 <div className='py-6'>
                   <nav className='flex flex-col space-y-4'>
-                    <Link 
-                      href='/' 
+                    <Link
+                      href='/'
                       className='text-lg hover:text-primary'
                       onClick={() => setIsOpen(false)}
                     >
@@ -162,8 +205,8 @@ export default function Header() {
                     >
                       Productos
                     </Link>
-                    <Link 
-                      href='/about' 
+                    <Link
+                      href='/about'
                       className='text-lg hover:text-primary'
                       onClick={() => setIsOpen(false)}
                     >

@@ -2,16 +2,14 @@
 
 import { useCart } from '@/contexts/CartContext'
 import { Button } from '@/components/ui/button'
-import { X, CircleX } from 'lucide-react'
+import { X } from 'lucide-react'
 import './ShoppingCartPanel.css'
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
 import { codigoCupon, mostrarCupon } from '../data/cupon'
-import dynamic from 'next/dynamic'
 
-import InteractiveMap from './Maps/Maps'
 import { LatLng } from 'leaflet'
 import FormToSend from './formToSend'
+import { useUser } from '@clerk/nextjs'
 
 interface ShoppingCartPanelProps {
   isOpen: boolean
@@ -41,6 +39,8 @@ export default function ShoppingCartPanel({
   const [locationToSend, setLocationToSend] = useState('')
   const [deliveryCost, setDeliveryCost] = useState(0)
   const [agencia, setAgencia] = useState('')
+
+  const { user } = useUser()
 
   useEffect(() => {
     setItemsProducts(
@@ -193,6 +193,7 @@ export default function ShoppingCartPanel({
         </div>
         {showCardClientName && (
           <FormToSend
+            userName={user?.fullName || ''}
             clientName={clientName}
             setClientName={setClientName}
             address={address}

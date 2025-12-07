@@ -47,7 +47,6 @@ export default function Collection() {
 
   useEffect(() => {
     setFilter(category?.split(' ')[1] || '')
-    console.log('category ==>', category)
   }, [])
 
   const filteredProducts = products
@@ -75,17 +74,16 @@ export default function Collection() {
             setShowCategory('')
             setFilter(e.target.value)
           }}
-          className='md:w-64'
+          className='md:w-64 border border-border outline-0'
         />
         <Select
           value={showCategory}
           onValueChange={(e) => {
-            console.log('e ==>', e)
             setFilter(e)
             setShowCategory(e)
           }}
         >
-          <SelectTrigger className='md:w-48'>
+          <SelectTrigger className='md:w-48 border border-border'>
             <SelectValue placeholder='Ver todos' />
           </SelectTrigger>
           <SelectContent>
@@ -96,7 +94,7 @@ export default function Collection() {
           </SelectContent>
         </Select>
         <Select value={sort} onValueChange={setSort}>
-          <SelectTrigger className='md:w-48'>
+          <SelectTrigger className='md:w-48 border border-border'>
             <SelectValue placeholder='Ordenar por' />
           </SelectTrigger>
           <SelectContent>

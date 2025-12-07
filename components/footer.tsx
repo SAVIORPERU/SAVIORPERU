@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { FaFacebook, FaInstagram, FaTiktok } from 'react-icons/fa'
 export default function Footer() {
   return (
-    <footer className='bg-gray-100 mt-12'>
+    <footer className='bg-secondary text-foreground mt-12'>
       <div className='container mx-auto px-4 py-8'>
         <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
           <div>
@@ -79,7 +79,11 @@ export default function Footer() {
         </div>
         <div className='mt-8 text-center text-sm text-gray-500'>
           © 2025 Savior. Todos los derechos reservados. By{' '}
-          <Link href='https://marteldev.com/' style={{ color: 'blue' }} target='_blank'>
+          <Link
+            href='https://marteldev.com/'
+            target='_blank'
+            className='text-foreground'
+          >
             Terry
           </Link>
         </div>
