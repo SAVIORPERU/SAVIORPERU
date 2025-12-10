@@ -19,21 +19,31 @@ enum DeliveryLocation {
   Null
 }
 
+enum Role {
+  USER
+  ADMIN
+  EDITOR
+}
+
 model User {
   id               Int              @id @default(autoincrement())
   email            String           @unique
   name             String?
   deliveryLocation DeliveryLocation @default(Null)
+  orders           Orders[]
+  clerkId          String?          @unique
+  role             Role             @default(USER)
 
-  // si es Lima
   location Json?
   address  String?
 
-  // si es Provincia
   agencia    String?
   dni        String?
   phone      String?
   department String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Agencia {
@@ -41,6 +51,9 @@ model Agencia {
   agencias       String[]
   minimoDelivery Int      @default(10)
   maximoDelivery Int      @default(15)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Coleccion {
@@ -48,12 +61,18 @@ model Coleccion {
   name  String
   price Float
   image String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Cupon {
   id           Int     @id @default(autoincrement())
   codigoCupon  String  @default("qwer")
   mostrarCupon Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Fotos {
@@ -61,6 +80,9 @@ model Fotos {
   imagenIzquierda String
   imagenDerecha   String
   fotoTienda      String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Productos {
@@ -68,17 +90,57 @@ model Productos {
   name     String
   category String
   estado   String
-  size     String
-  price    Float
+  size     String?
+  price    Decimal
   image    String
   image2   String?
-  stock    Int     @default(0)
+  stock    Int     @default(1)
 
-  destacados ProductosDestacados[] // lado inverso
+  destacados ProductosDestacados[]
+  orderItems OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ProductosDestacados {
   id         Int       @id @default(autoincrement())
   producto   Productos @relation(fields: [productoId], references: [id], onDelete: Cascade)
-  productoId Int       @unique // ✅ evita duplicados
+  productoId Int       @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Orders {
+  id             Int         @id @default(autoincrement())
+  address        String
+  agencia        String?
+  clientName     String
+  clientPhone    String?
+  deliveryCost   Decimal     @default(0)
+  dni            String?
+  getlocation    Json
+  locationToSend String
+  status         String      @default("Pendiente")
+  userId         Int
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderItems     OrderItem[] @relation("OrderItemsOnOrder")
+  totalPrice     Decimal     @default(0)
+  totalProducts  Int         @default(0)
+  discount       Decimal     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrderItem {
+  id         Int       @id @default(autoincrement())
+  order      Orders    @relation("OrderItemsOnOrder", fields: [orderId], references: [id], onDelete: Cascade)
+  orderId    Int
+  producto   Productos @relation(fields: [productoId], references: [id], onDelete: Cascade)
+  productoId Int
+  quantity   Int       @default(1)
+  totalPrice Decimal
+  unitPrice  Decimal
 }

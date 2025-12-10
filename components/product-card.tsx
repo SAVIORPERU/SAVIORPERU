@@ -117,7 +117,7 @@ export default function ProductCard({
         </h3>
         {from !== 'bestSellers' && (
           <div className='text-gray-600 mb-3 w-full'>
-            <p>S/ {product.price.toFixed(2)}</p>
+            <p>S/ {Number(product.price).toFixed(2)}</p>
 
             <div className='flex justify-between mt-1'>
               <div className='flex gap-2'>

@@ -2,13 +2,12 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ShoppingBag, Menu, LayoutDashboard } from 'lucide-react'
+import { Menu } from 'lucide-react'
 import { MdOutlineShoppingCart } from 'react-icons/md'
 import { Button } from '@/components/ui/button'
 import { isAuthenticated, logout } from '@/lib/auth'
 import ShoppingCartPanel from './ShoppingCartPanel'
 import { useCart } from '@/contexts/CartContext'
-import UserMenu from './UserMenu'
 import { ThemeToggle } from './ThemeToggle'
 import {
   Sheet,
@@ -17,14 +16,10 @@ import {
   SheetTitle,
   SheetTrigger
 } from '@/components/ui/sheet'
-import { PiBaseballCapDuotone } from 'react-icons/pi'
 import { usePathname } from 'next/navigation'
 import Image from 'next/image'
 import { SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs'
-import Profile from '@/app/(protected)/profile/page'
-import FormToSend from './formToSend'
 import { codigoCupon } from '@/data/cupon'
-import FormularioUsuario from './formDataUser'
 import './header.css'
 
 interface ProsItemsProduct {
@@ -38,21 +33,11 @@ interface ProsItemsProduct {
 
 export default function Header() {
   const [isCartOpen, setIsCartOpen] = useState(false)
-  const [isOpen, setIsOpen] = useState(false) // Agregar este estado
+  const [isOpen, setIsOpen] = useState(false)
   const { cartItems, removeFromCart, clearCart, getCartTotal } = useCart()
   const pathname = usePathname()
   const { user, isSignedIn, isLoaded } = useUser()
-  const [itemsProducts, setItemsProducts] = useState<ProsItemsProduct[]>([])
-  const [showCardClientName, setShowCardClientName] = useState(false)
-  const [clientName, setClientName] = useState('')
-  const [address, setAddress] = useState('')
   const [disctount, setDiscount] = useState('')
-  const [locationToSend, setLocationToSend] = useState('')
-  const [deliveryCost, setDeliveryCost] = useState(0)
-  const [agencia, setAgencia] = useState('')
-
-  const countryCode = '51' // Código de país (cambiar según sea necesario)
-  const phoneNumber = '958284730'
 
   const getDiscount = () => {
     if (disctount === codigoCupon) {
@@ -64,7 +49,6 @@ export default function Header() {
 
   const handleLogout = () => {
     logout()
-    // Redirect to home page or login page after logout
   }
 
   const toggleCart = () => {
@@ -155,7 +139,7 @@ export default function Header() {
             // <UserMenu onLogout={handleLogout} />
             <div className='min-w-7'>
               <SignedIn>
-                <UserButton></UserButton>
+                <UserButton />
               </SignedIn>
             </div>
           ) : !isLoaded ? (

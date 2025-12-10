@@ -9,7 +9,6 @@ import { codigoCupon, mostrarCupon } from '../data/cupon'
 
 import { LatLng } from 'leaflet'
 import FormToSend from './formToSend'
-import { useUser } from '@clerk/nextjs'
 
 interface ShoppingCartPanelProps {
   isOpen: boolean
@@ -32,15 +31,8 @@ export default function ShoppingCartPanel({
   const { cartItems, removeFromCart, clearCart, getCartTotal } = useCart()
   const [itemsProducts, setItemsProducts] = useState<ProsItemsProduct[]>([])
   const [showCardClientName, setShowCardClientName] = useState(false)
-  const [clientName, setClientName] = useState('')
-  const [address, setAddress] = useState('')
   const [disctount, setDiscount] = useState('')
   const [location, setLocation] = useState<LatLng | null>(null)
-  const [locationToSend, setLocationToSend] = useState('')
-  const [deliveryCost, setDeliveryCost] = useState(0)
-  const [agencia, setAgencia] = useState('')
-
-  const { user } = useUser()
 
   useEffect(() => {
     setItemsProducts(
@@ -64,9 +56,6 @@ export default function ShoppingCartPanel({
     }
     return getCartTotal().toFixed(2)
   }
-
-  const countryCode = '51' // Código de país (cambiar según sea necesario)
-  const phoneNumber = '958284730'
 
   const handleLocationSelect = (location: LatLng) => {
     setLocation(location)
@@ -193,23 +182,11 @@ export default function ShoppingCartPanel({
         </div>
         {showCardClientName && (
           <FormToSend
-            userName={user?.fullName || ''}
-            clientName={clientName}
-            setClientName={setClientName}
-            address={address}
-            setAddress={setAddress}
-            deliveryCost={deliveryCost}
-            setDeliveryCost={setDeliveryCost}
             getDiscount={getDiscount}
             setShowCardClientName={setShowCardClientName}
-            countryCode={countryCode}
-            phoneNumber={phoneNumber}
-            setLocationToSend={setLocationToSend}
-            locationToSend={locationToSend}
-            agencia={agencia}
-            setAgencia={setAgencia}
             itemsProducts={itemsProducts}
             disctount={disctount}
+            onClose={onClose}
           />
         )}
       </div>

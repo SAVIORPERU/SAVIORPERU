@@ -1,10 +1,10 @@
 .header {
-  @apply border-b fixed z-10 w-full backdrop-blur-md;
+  @apply border-b fixed z-30 w-full;
 }
 
 .header::before {
   content: '';
-  @apply absolute inset-0 bg-secondary -z-10 opacity-75;
+  @apply backdrop-blur-md absolute inset-0 bg-secondary -z-10 opacity-95;
 }
 
 .loader {

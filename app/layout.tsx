@@ -72,8 +72,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const SIGN_OUT_URL = '/cleanup-session'
   return (
-    <ClerkProvider localization={customEs}>
+    <ClerkProvider localization={customEs} afterSignOutUrl={SIGN_OUT_URL}>
       <html lang='en' suppressHydrationWarning>
         <body className={inter.className}>
           <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
