@@ -7,6 +7,9 @@ import { agencias } from '../data/agencias'
 import { codigoCupon } from '../data/cupon'
 import { minimoDelivery, maximoDelivery } from '../data/agencias'
 import { useUser } from '@clerk/nextjs'
+import { useCart } from '@/contexts/CartContext'
+import { toast } from '@/hooks/use-toast'
+import { ToastAction } from './ui/toast'
 
 // --- Interfaces ---
 
@@ -77,6 +80,7 @@ const FormToSend = ({
   )
   const [hasFullNameOverride, setHasFullNameOverride] = useState(false)
   const { user } = useUser()
+  const { clearCart, getCartTotal } = useCart()
 
   console.log('productos', itemsProducts)
 
@@ -121,7 +125,7 @@ const FormToSend = ({
             totalPrice: Number(item.price) * item.quantity,
             unitPrice: item.price
           })),
-          totalPrice: Number(calculateTotal()),
+          totalPrice: Number(getCartTotal()),
           totalProducts: itemsProducts.reduce(
             (total, item) => total + item.quantity,
             0
@@ -150,6 +154,8 @@ const FormToSend = ({
       setDeliveryData((prev) => ({ ...prev, clientName: userName }))
     }
   }, [user, loadLocalStorage, hasFullNameOverride])
+
+  console.log('deliveryData =>', deliveryData)
 
   // Manejador de cambios genérico para el estado de la entrega
   const handleInputChange = useCallback(
@@ -205,6 +211,13 @@ const FormToSend = ({
       finalDeliveryCost = minimoDelivery
     }
 
+    if (deliveryCost > maximoDelivery) {
+      finalDeliveryCost = maximoDelivery
+    }
+    console.log(
+      '(discountAmount + finalDeliveryCost).toFixed(2)',
+      (discountAmount + finalDeliveryCost).toFixed(2)
+    )
     // Sumar el costo de delivery al subtotal
     return (discountAmount + finalDeliveryCost).toFixed(2)
   }, [getDiscount, deliveryData])
@@ -423,7 +436,10 @@ ${totalInfo}${locationLink}
               <label className='labelClientName'>Marca tu ubicación 📍*</label>
               <InteractiveMap
                 setDeliveryCost={(cost: number) =>
-                  handleInputChange('deliveryCost', cost)
+                  handleInputChange(
+                    'deliveryCost',
+                    cost < minimoDelivery ? minimoDelivery : cost
+                  )
                 }
                 setGetlocation={(loc: { lat: number; lng: number }) =>
                   handleInputChange('getlocation', loc)
@@ -583,6 +599,20 @@ ${totalInfo}${locationLink}
               className='linkWhatsapp'
               onClick={() => {
                 setShowCardClientName(false)
+                clearCart()
+                toast({
+                  title: 'Pedido enviado con éxito',
+                  description: 'Revisa tu pedido aquí',
+                  action: (
+                    <ToastAction
+                      altText='Ver detalles'
+                      onClick={() => console.log('exito')}
+                    >
+                      Ver detalles
+                    </ToastAction>
+                  ),
+                  duration: 10000
+                })
               }}
               target='_blank'
             >

@@ -2,17 +2,19 @@
 
 import { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
-import { Sun, Moon } from 'lucide-react'
+import { Sun, Moon, Bell } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export function ThemeToggle() {
   const [mounted, setMounted] = useState(false)
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme, themes } = useTheme()
 
   // useEffect solo se ejecuta en el cliente
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  console.log('theme =>', themes)
 
   // No renderizar hasta que esté montado (evita hydration mismatch)
   if (!mounted) {

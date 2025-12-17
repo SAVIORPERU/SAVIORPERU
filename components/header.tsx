@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Menu } from 'lucide-react'
+import { ClipboardList, DotIcon, Menu } from 'lucide-react'
 import { MdOutlineShoppingCart } from 'react-icons/md'
 import { Button } from '@/components/ui/button'
 import { isAuthenticated, logout } from '@/lib/auth'
@@ -21,6 +21,8 @@ import Image from 'next/image'
 import { SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs'
 import { codigoCupon } from '@/data/cupon'
 import './header.css'
+import { dark, neobrutalism } from '@clerk/themes'
+import { useTheme } from 'next-themes'
 
 interface ProsItemsProduct {
   id: number
@@ -38,6 +40,7 @@ export default function Header() {
   const pathname = usePathname()
   const { user, isSignedIn, isLoaded } = useUser()
   const [disctount, setDiscount] = useState('')
+  const { theme } = useTheme()
 
   const getDiscount = () => {
     if (disctount === codigoCupon) {
@@ -70,7 +73,7 @@ export default function Header() {
             <Image
               src='/NombreMarca.jpg'
               width={100}
-              height={70}
+              height={30}
               alt='Logo'
               className='rounded-full'
             />
@@ -139,7 +142,33 @@ export default function Header() {
             // <UserMenu onLogout={handleLogout} />
             <div className='min-w-7'>
               <SignedIn>
-                <UserButton />
+                <UserButton
+                  appearance={{
+                    theme: theme === 'dark' ? dark : 'simple'
+                  }}
+                  userProfileProps={{
+                    appearance: {
+                      theme: theme === 'dark' ? dark : 'simple'
+                    }
+                  }}
+                >
+                  <UserButton.MenuItems>
+                    <UserButton.Link
+                      label='Mis pedidos'
+                      labelIcon={
+                        <ClipboardList className='w-4 pb-2 mr-2 justify-center items-center' />
+                      }
+                      href='/orders'
+                    />
+                  </UserButton.MenuItems>
+                  <UserButton.UserProfilePage
+                    label='Custom Page'
+                    url='custom'
+                    labelIcon={<DotIcon />}
+                  >
+                    <div>Hola Mundo</div>
+                  </UserButton.UserProfilePage>
+                </UserButton>
               </SignedIn>
             </div>
           ) : !isLoaded ? (

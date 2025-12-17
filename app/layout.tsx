@@ -9,6 +9,7 @@ import { Suspense } from 'react'
 import { ClerkProvider } from '@clerk/nextjs'
 import { ThemeProvider } from '@/components/theme-provider'
 import { esMX } from '@clerk/localizations'
+import { Toaster } from '@/components/ui/toaster'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -76,8 +77,8 @@ export default function RootLayout({
   return (
     <ClerkProvider localization={customEs} afterSignOutUrl={SIGN_OUT_URL}>
       <html lang='en' suppressHydrationWarning>
-        <body className={inter.className}>
-          <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
+        <body className={`${inter.className} body`}>
+          <ThemeProvider attribute='class' defaultTheme='light' enableSystem>
             <CartProvider>
               <Header />
               <Suspense>
@@ -86,6 +87,7 @@ export default function RootLayout({
               <Footer />
             </CartProvider>
           </ThemeProvider>
+          <Toaster />
         </body>
       </html>
     </ClerkProvider>
