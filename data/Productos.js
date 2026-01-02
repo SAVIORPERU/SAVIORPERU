@@ -162,7 +162,7 @@ export const products = [
     Estado: 'DISPONIBLE',
     price: 39.9,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235208/Gorro_Negro_Savior_rs8vw6.webp',
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1767395226/Photoroom_20260101_171526_utdgt9.webp',
     image2: ''
   },
   {
@@ -172,7 +172,7 @@ export const products = [
     Estado: 'DISPONIBLE',
     price: 39.9,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235206/Gorro_Blanco_Savior_rce4tq.webp',
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1767395225/Photoroom_20260101_171755_whakxj.webp',
     image2: ''
   },
   {
@@ -182,7 +182,7 @@ export const products = [
     Estado: 'DISPONIBLE',
     price: 39.9,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235208/Gorro_Rojo_Savior_htnzzg.webp',
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1767395225/Photoroom_20260101_170947_n6f0ce.webp',
     image2: ''
   },
   {
@@ -192,7 +192,7 @@ export const products = [
     Estado: 'DISPONIBLE',
     price: 39.9,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235203/Gorro_Azul_Acero_Savior_ctxbhj.webp',
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1767395225/Photoroom_20260101_172117_a0bgbj.webp',
     image2: ''
   },
   {
