@@ -120,7 +120,7 @@ export const products = [
     name: 'Gorro Negro Choosen',
     category: 'gorros',
     Estado: 'DISPONIBLE',
-    price: 39.9,
+    price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235207/Gorro_Negro_Choosen_ychlsz.webp',
     image2: ''
@@ -130,7 +130,7 @@ export const products = [
     name: 'Gorro Blanco Choosen',
     category: 'gorros',
     Estado: 'DISPONIBLE',
-    price: 39.9,
+    price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235206/Gorro_Blanco_Choosen_xmxwrz.webp',
     image2: ''
@@ -140,7 +140,7 @@ export const products = [
     name: 'Gorro Marron Choosen',
     category: 'gorros',
     Estado: 'DISPONIBLE',
-    price: 39.9,
+    price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235206/Gorro_Marron_Choosen_zklfe8.webp',
     image2: ''
@@ -150,7 +150,7 @@ export const products = [
     name: 'Gorro Celeste Choosen',
     category: 'gorros',
     Estado: 'DISPONIBLE',
-    price: 39.9,
+    price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235206/Gorro_Celeste_Choosen_uzjttp.webp',
     image2: ''
@@ -160,7 +160,7 @@ export const products = [
     name: 'Gorro Negro Savior',
     category: 'gorros',
     Estado: 'DISPONIBLE',
-    price: 39.9,
+    price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235208/Gorro_Negro_Savior_rs8vw6.webp',
     image2: ''
@@ -170,7 +170,7 @@ export const products = [
     name: 'Gorro Blanco Savior',
     category: 'gorros',
     Estado: 'DISPONIBLE',
-    price: 39.9,
+    price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235206/Gorro_Blanco_Savior_rce4tq.webp',
     image2: ''
@@ -180,7 +180,7 @@ export const products = [
     name: 'Gorro Rojo Savior',
     category: 'gorros',
     Estado: 'DISPONIBLE',
-    price: 39.9,
+    price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235208/Gorro_Rojo_Savior_htnzzg.webp',
     image2: ''
@@ -190,7 +190,7 @@ export const products = [
     name: 'Gorro Azul Acero Savior',
     category: 'gorros',
     Estado: 'NO DISPONIBLE',
-    price: 39.9,
+    price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235203/Gorro_Azul_Acero_Savior_ctxbhj.webp',
     image2: ''
