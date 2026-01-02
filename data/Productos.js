@@ -162,7 +162,7 @@ export const products = [
     Estado: 'DISPONIBLE',
     price: 39.9,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1767395226/Photoroom_20260101_171526_utdgt9.webp',
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/c_crop,w_1500,h_2100/v1767395226/Photoroom_20260101_171526_utdgt9.webp',
     image2: ''
   },
   {
@@ -172,7 +172,7 @@ export const products = [
     Estado: 'DISPONIBLE',
     price: 39.9,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1767395225/Photoroom_20260101_171755_whakxj.webp',
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/c_crop,w_1500,h_2100/v1767395225/Photoroom_20260101_171755_whakxj.webp',
     image2: ''
   },
   {
@@ -182,7 +182,7 @@ export const products = [
     Estado: 'DISPONIBLE',
     price: 39.9,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1767395225/Photoroom_20260101_170947_n6f0ce.webp',
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/c_crop,w_1500,h_2100/v1767395225/Photoroom_20260101_170947_n6f0ce.webp',
     image2: ''
   },
   {
@@ -192,7 +192,7 @@ export const products = [
     Estado: 'DISPONIBLE',
     price: 39.9,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1767395225/Photoroom_20260101_172117_a0bgbj.webp',
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/c_crop,w_1500,h_2100/v1767395225/Photoroom_20260101_172117_a0bgbj.webp',
     image2: ''
   },
   {
