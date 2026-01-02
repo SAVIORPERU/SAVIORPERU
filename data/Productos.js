@@ -140,7 +140,7 @@ export const products = [
     name: 'Gorro Marron Choosen',
     category: 'gorros',
     Estado: 'DISPONIBLE',
-    price: 39.9,
+    price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235206/Gorro_Marron_Choosen_zklfe8.webp',
     image2: ''
