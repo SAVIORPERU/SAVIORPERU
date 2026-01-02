@@ -4,7 +4,7 @@ export const products = [
     name: 'Polo Blanco Fire',
     category: 'polos',
     Estado: 'DISPONIBLE',
-    size: 'S - M - L',
+    size: 'M - L',
     price: 45.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105696/Polo_Fire_Blanco_kjlxx3.webp',
@@ -14,7 +14,7 @@ export const products = [
     id: 2,
     name: 'Polo Negro Heaven',
     category: 'polos',
-    Estado: 'SOLO DISPONIBLE',
+    Estado: 'DISPONIBLE',
     size: 'M - L',
     price: 45.0,
     image:
@@ -120,7 +120,7 @@ export const products = [
     name: 'Gorro Negro Choosen',
     category: 'gorros',
     Estado: 'DISPONIBLE',
-    price: 42.5,
+    price: 39.9,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235207/Gorro_Negro_Choosen_ychlsz.webp',
     image2: ''
@@ -189,7 +189,7 @@ export const products = [
     id: 21,
     name: 'Gorro Azul Acero Savior',
     category: 'gorros',
-    Estado: 'NO DISPONIBLE',
+    Estado: 'DISPONIBLE',
     price: 39.9,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235203/Gorro_Azul_Acero_Savior_ctxbhj.webp',
@@ -239,7 +239,7 @@ export const products = [
     id: 22,
     name: 'Casaca Negra Vintage',
     category: 'casacas',
-    Estado: 'SOLO DISPONIBLE',
+    Estado: 'DISPONIBLE',
     size: 'M - L',
     price: 95.0,
     image:
@@ -250,7 +250,7 @@ export const products = [
     id: 23,
     name: 'Buso Negro Vintage',
     category: 'pantalones',
-    Estado: 'SOLO DISPONIBLE',
+    Estado: 'DISPONIBLE',
     size: 'M - L',
     price: 75.0,
     image:
@@ -325,46 +325,35 @@ export const products = [
   },
   {
     id: 35,
-    name: 'Polera Melange',
-    category: 'casacas',
+    name: 'Summer Short Black',
+    category: 'shorts',
     Estado: 'DISPONIBLE',
-    size: 'S - M - L',
-    price: 69.0,
+    size: '30 - 32 - 34',
+    price: 65.0,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1747941537/Photoroom_20250522_130926_zgpmx5.webp',
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1767395226/Photoroom_20260102_132215_zvq3xj.jpg',
     image2: ''
   },
   {
     id: 36,
-    name: 'Polera Verde Acero',
-    category: 'casacas',
+    name: 'Summer Short White',
+    category: 'shorts',
     Estado: 'DISPONIBLE',
-    size: 'S - M - L',
-    price: 69.0,
+    size: '30 - 32 - 34',
+    price: 65.0,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1748624403/Photoroom_20250530_112356_jbz80g.webp',
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1767395225/Photoroom_20260102_132437_njel92.webp',
     image2: ''
   },
   {
     id: 37,
-    name: 'Polera Verde Hoja',
-    category: 'casacas',
+    name: 'Summer Short Blue',
+    category: 'short',
     Estado: 'DISPONIBLE',
-    size: 'S - M - L',
-    price: 69.0,
+    size: '30 - 32 - 34',
+    price: 65.0,
     image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1748624403/Photoroom_20250530_112554_rau9ih.webp',
-    image2: ''
-  },
-  {
-    id: 38,
-    name: 'Polera Marron',
-    category: 'casacas',
-    Estado: 'DISPONIBLE',
-    size: 'S - M - L',
-    price: 69.0,
-    image:
-      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1748624403/Photoroom_20250530_112450_ci4gr1.webp',
+      'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1767395227/Photoroom_20260102_131838_mlefd3.webp',
     image2: ''
   }
 ]
