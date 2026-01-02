@@ -120,7 +120,7 @@ export const products = [
     name: 'Gorro Negro Choosen',
     category: 'gorros',
     Estado: 'DISPONIBLE',
-    price: 39.9,
+    price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235207/Gorro_Negro_Choosen_ychlsz.webp',
     image2: ''
