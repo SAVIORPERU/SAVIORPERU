@@ -143,4 +143,7 @@ model OrderItem {
   quantity   Int       @default(1)
   totalPrice Decimal
   unitPrice  Decimal
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

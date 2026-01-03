@@ -18,6 +18,7 @@ interface Product {
   image: string
   image2?: string
   size?: string
+  estado?: string
 }
 
 export default function ProductCard({
@@ -70,7 +71,7 @@ export default function ProductCard({
             />
           </div>
           <div className='px-2 pt-4 pb-0 flex mb-2'>
-            <h3 className={styles.fromBestSellersh3}>{product.name}</h3>
+            <h3 className={styles.fromBestSellersh3}>Ver {product.name}</h3>
           </div>
         </Link>
       </div>
@@ -164,14 +165,16 @@ export default function ProductCard({
           className='w-full mb-2 flex items-center justify-center gap-2 text-white bg-black hover:bg-gray-700'
           onClick={handleAddToCart}
           disabled={
-            buttonState === 'loading' ||
-            buttonState === 'success' ||
-            (selectedSize
-              ? false
-              : product.name.includes('Gorro') ||
-                product.name.includes('Bucket')
-              ? false
-              : true)
+            product.estado === 'NO DISPONIBLE'
+              ? true
+              : buttonState === 'loading' ||
+                buttonState === 'success' ||
+                (selectedSize
+                  ? false
+                  : product.name.includes('Gorro') ||
+                    product.name.includes('Bucket')
+                  ? false
+                  : true)
           }
         >
           {buttonState === 'loading' && (

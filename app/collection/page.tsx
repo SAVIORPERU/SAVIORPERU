@@ -13,6 +13,7 @@ import {
 import { RiArrowUpDoubleLine } from 'react-icons/ri'
 import './page.css'
 import { ProductsProps } from './interface'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 
 interface Pagination {
   page: number
@@ -22,7 +23,9 @@ interface Pagination {
 }
 
 export default function Collection() {
-  const [filter, setFilter] = useState('')
+  const searchParams = useSearchParams()
+  const category = searchParams.get('category')
+  const [filter, setFilter] = useState(category || '')
   const [sort, setSort] = useState('name')
   const [showCategory, setShowCategory] = useState('')
   const [isVisible, setIsVisible] = useState(false)
@@ -69,6 +72,18 @@ export default function Collection() {
     })
   }
 
+  const pathname = usePathname() // Obtenemos la ruta actual
+  const router = useRouter()
+  const handleFilterChange = (value: string) => {
+    // Solo hace push si NO estamos en /collection
+    if (category) {
+      router.push('/collection')
+    }
+    setFilter(value)
+    setShowCategory(value)
+    setPage(1)
+  }
+
   return (
     <div className='container mx-auto px-4 py-8 relative'>
       <h1 className='text-3xl font-bold mb-8'>Colecciones</h1>
@@ -84,14 +99,7 @@ export default function Collection() {
           }}
           className='md:w-64 border border-border outline-0'
         />
-        <Select
-          value={showCategory}
-          onValueChange={(e) => {
-            setFilter(e)
-            setShowCategory(e)
-            setPage(1)
-          }}
-        >
+        <Select value={showCategory} onValueChange={handleFilterChange}>
           <SelectTrigger className='md:w-48 border border-border'>
             <SelectValue placeholder='Ver todos' />
           </SelectTrigger>
@@ -102,13 +110,7 @@ export default function Collection() {
             <SelectItem value='polos'>Polos</SelectItem>
           </SelectContent>
         </Select>
-        <Select
-          value={sort}
-          onValueChange={(e) => {
-            setSort(e)
-            setPage(1)
-          }}
-        >
+        <Select value={sort} onValueChange={handleFilterChange}>
           <SelectTrigger className='md:w-48 border border-border'>
             <SelectValue placeholder='Ordenar por' />
           </SelectTrigger>

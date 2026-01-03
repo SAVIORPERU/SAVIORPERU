@@ -1,12 +1,12 @@
 'use client'
 
 import { useUser } from '@clerk/nextjs'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import TableSkeleton from './components/DeskSkeleton'
 import OrderSkeleton from './components/MobilSkeleton'
 import OrderDetailsModal from './components/OrderDetailsModal'
 import { usePDFGenerator } from './components/usePDFGenerator'
-import { FileText, Eye } from 'lucide-react'
+import { FileText, Eye, Search, ChevronUp, ChevronDown } from 'lucide-react'
 
 interface OrderItem {
   id: number
@@ -57,6 +57,12 @@ export default function OrdersList({
   const { user, isSignedIn } = useUser()
   const { generatePDF, isGenerating } = usePDFGenerator()
 
+  // Estados para filtros y ordenamiento
+  const [statusFilter, setStatusFilter] = useState<string>('todos')
+  const [searchTerm, setSearchTerm] = useState<string>('')
+  const [sortField, setSortField] = useState<'date' | 'total' | 'name'>('date')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
+
   // 🔹 Fetch cuando cambia la página
   useEffect(() => {
     const fetchOrders = async () => {
@@ -85,6 +91,71 @@ export default function OrdersList({
     fetchOrders()
   }, [page, isSignedIn])
 
+  // Función para filtrar y ordenar los pedidos
+  const filteredAndSortedOrders = useMemo(() => {
+    let filtered = [...orders]
+
+    // Filtro por estado
+    if (statusFilter !== 'todos') {
+      filtered = filtered.filter(
+        (order) => order.status.toLowerCase() === statusFilter.toLowerCase()
+      )
+    }
+
+    // Filtro por búsqueda (cliente o ID)
+    if (searchTerm.trim() !== '') {
+      const term = searchTerm.toLowerCase()
+      filtered = filtered.filter(
+        (order) =>
+          order.clientName.toLowerCase().includes(term) ||
+          order.id.toString().includes(term) ||
+          order.orderItems.some((item) =>
+            item.producto.name.toLowerCase().includes(term)
+          )
+      )
+    }
+
+    // Ordenamiento
+    filtered.sort((a, b) => {
+      let aValue, bValue
+
+      switch (sortField) {
+        case 'date':
+          aValue = new Date(a.createdAt).getTime()
+          bValue = new Date(b.createdAt).getTime()
+          break
+        case 'total':
+          aValue =
+            parseFloat(a.totalPrice) +
+            (a.deliveryCost ? parseFloat(a.deliveryCost) : 0) -
+            (a.discount
+              ? (parseFloat(a.totalPrice) * parseFloat(a.discount)) / 100
+              : 0)
+          bValue =
+            parseFloat(b.totalPrice) +
+            (b.deliveryCost ? parseFloat(b.deliveryCost) : 0) -
+            (b.discount
+              ? (parseFloat(b.totalPrice) * parseFloat(b.discount)) / 100
+              : 0)
+          break
+        case 'name':
+          aValue = a.clientName.toLowerCase()
+          bValue = b.clientName.toLowerCase()
+          break
+        default:
+          return 0
+      }
+
+      if (sortOrder === 'asc') {
+        return aValue > bValue ? 1 : -1
+      } else {
+        return aValue < bValue ? 1 : -1
+      }
+    })
+
+    return filtered
+  }, [orders, statusFilter, searchTerm, sortField, sortOrder])
+
   const handleViewOrder = (order: Order) => {
     setSelectedOrder(order)
   }
@@ -96,8 +167,13 @@ export default function OrdersList({
       status: order.status,
       totalPrice: order.totalPrice,
       createdAt: order.createdAt,
-      orderItems: order.orderItems
-      // Agrega otros campos que necesites
+      orderItems: order.orderItems,
+      address: order.address,
+      agencia: order.agencia,
+      clientPhone: order.clientPhone,
+      dni: order.dni,
+      deliveryCost: order.deliveryCost,
+      discount: order.discount
     }
 
     await generatePDF(pdfData)
@@ -106,7 +182,8 @@ export default function OrdersList({
   // Función para obtener el color según el estado
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'completado':
+      case 'enviado':
+        return 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
       case 'entregado':
         return 'bg-green-500/10 text-green-600 dark:text-green-400'
       case 'pendiente':
@@ -116,6 +193,16 @@ export default function OrdersList({
       default:
         return 'bg-muted text-muted-foreground'
     }
+  }
+
+  // Función para calcular el total con descuento
+  const calculateTotalWithDiscount = (order: Order) => {
+    const subtotal = parseFloat(order.totalPrice) || 0
+    const delivery = order.deliveryCost ? parseFloat(order.deliveryCost) : 0
+    const discount = order.discount
+      ? (subtotal * parseFloat(order.discount)) / 100
+      : 0
+    return (subtotal + delivery - discount).toFixed(2)
   }
 
   return (
@@ -139,17 +226,121 @@ export default function OrdersList({
         </div>
       </div>
 
+      {/* Filtros y Búsqueda */}
+      <div className='flex flex-col md:flex-row gap-4 p-4 bg-card border border-border rounded-lg'>
+        {/* //! Búsqueda only search render thinks" */}
+        {/* <div className='flex-1'>
+          <div className='relative'>
+            <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground' />
+            <input
+              type='text'
+              placeholder='Buscar por cliente, ID o producto...'
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className='w-full pl-10 pr-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-foreground/20'
+            />
+          </div>
+        </div> */}
+
+        {/* Filtro por Estado y Ordenamiento */}
+        <div className='flex gap-2'>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className='px-3 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-foreground/20'
+          >
+            <option value='todos'>Todos los estados</option>
+            <option value='pendiente'>Pendiente</option>
+            <option value='enviado'>Enviado</option>
+            <option value='entregado'>Entregado</option>
+            <option value='cancelado'>Cancelado</option>
+          </select>
+
+          {/* Ordenamiento */}
+          <div className='flex items-center gap-2'>
+            <select
+              value={sortField}
+              onChange={(e) =>
+                setSortField(e.target.value as 'date' | 'total' | 'name')
+              }
+              className='px-3 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-foreground/20'
+            >
+              <option value='date'>Fecha</option>
+              <option value='total'>Total</option>
+              <option value='name'>Cliente</option>
+            </select>
+
+            <button
+              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+              className='px-3 py-2 border border-border rounded-lg hover:bg-accent transition-colors flex items-center gap-1'
+              title={`Orden ${
+                sortOrder === 'asc' ? 'ascendente' : 'descendente'
+              }`}
+            >
+              {sortOrder === 'asc' ? (
+                <ChevronUp className='w-4 h-4' />
+              ) : (
+                <ChevronDown className='w-4 h-4' />
+              )}
+            </button>
+          </div>
+
+          {/* Botón para limpiar filtros */}
+          {(searchTerm || statusFilter !== 'todos' || sortField !== 'date') && (
+            <button
+              onClick={() => {
+                setSearchTerm('')
+                setStatusFilter('todos')
+                setSortField('date')
+                setSortOrder('desc')
+              }}
+              className='px-3 py-2 text-sm border border-border rounded-lg hover:bg-accent transition-colors flex items-center gap-1'
+            >
+              <svg
+                className='w-4 h-4'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M6 18L18 6M6 6l12 12'
+                />
+              </svg>
+              Limpiar
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Lista de pedidos - Vista Tarjetas */}
       <div className='lg:hidden'>
         {!isSignedIn ? (
           [...Array(3)].map((_, i) => <OrderSkeleton key={i} />)
-        ) : orders.length === 0 ? (
+        ) : filteredAndSortedOrders.length === 0 ? (
           <div className='text-center py-12 border border-dashed border-border rounded-lg'>
-            <p className='text-muted-foreground'>No hay pedidos para mostrar</p>
+            <p className='text-muted-foreground'>
+              {searchTerm || statusFilter !== 'todos'
+                ? 'No hay pedidos que coincidan con los filtros aplicados'
+                : 'No hay pedidos para mostrar'}
+            </p>
+            {(searchTerm || statusFilter !== 'todos') && (
+              <button
+                onClick={() => {
+                  setSearchTerm('')
+                  setStatusFilter('todos')
+                }}
+                className='mt-4 px-4 py-2 text-sm bg-foreground text-background rounded-lg hover:opacity-90 transition-opacity'
+              >
+                Limpiar filtros
+              </button>
+            )}
           </div>
         ) : (
           <div className='space-y-4'>
-            {orders.map((order) => (
+            {filteredAndSortedOrders.map((order) => (
               <div
                 key={order.id}
                 className='bg-card border border-border rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow'
@@ -167,6 +358,9 @@ export default function OrdersList({
                         day: 'numeric'
                       })}
                     </p>
+                    <p className='text-xs text-muted-foreground mt-1'>
+                      ID: #{order.id}
+                    </p>
                   </div>
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
@@ -177,39 +371,13 @@ export default function OrdersList({
                   </span>
                 </div>
 
-                {/* <div className='mb-4'>
-                  <h4 className='text-sm font-medium text-foreground mb-2'>
-                    Productos:
-                  </h4>
-                  <div className='space-y-2'>
-                    {order.orderItems.map((item) => (
-                      <div
-                        key={item.id}
-                        className='flex justify-between items-center text-sm py-2 border-b border-border last:border-0'
-                      >
-                        <div>
-                          <span className='text-foreground'>
-                            {item.producto.name}
-                          </span>
-                          <span className='text-muted-foreground ml-2'>
-                            x{item.quantity}
-                          </span>
-                        </div>
-                        <span className='font-medium text-foreground'>
-                          S/. {item.totalPrice}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div> */}
-
                 <div className='flex justify-between items-center pt-4 border-t border-border'>
                   <div>
                     <span className='text-sm text-muted-foreground'>
                       Total:
                     </span>
                     <span className='ml-2 text-lg font-bold text-foreground'>
-                      S/. {Number(order.totalPrice).toFixed(2)}
+                      S/. {calculateTotalWithDiscount(order)}
                     </span>
                   </div>
                   <div className='flex space-x-2'>
@@ -250,22 +418,38 @@ export default function OrdersList({
                     <th className='text-left p-4 font-semibold'>Estado</th>
                     <th className='text-left p-4 font-semibold'>Total</th>
                     <th className='text-left p-4 font-semibold'>Fecha</th>
-                    {/* <th className='text-left p-4 font-semibold'>Productos</th> */}
                     <th className='text-right pr-16 font-semibold'>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {orders.length === 0 ? (
+                  {filteredAndSortedOrders.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={6}
+                        colSpan={5}
                         className='p-8 text-center text-muted-foreground'
                       >
-                        No hay pedidos para mostrar
+                        <div className='space-y-2'>
+                          <p>
+                            {searchTerm || statusFilter !== 'todos'
+                              ? 'No hay pedidos que coincidan con los filtros aplicados'
+                              : 'No hay pedidos para mostrar'}
+                          </p>
+                          {(searchTerm || statusFilter !== 'todos') && (
+                            <button
+                              onClick={() => {
+                                setSearchTerm('')
+                                setStatusFilter('todos')
+                              }}
+                              className='px-4 py-2 text-sm bg-foreground text-background rounded-lg hover:opacity-90 transition-opacity'
+                            >
+                              Limpiar filtros
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ) : (
-                    orders.map((order) => (
+                    filteredAndSortedOrders.map((order) => (
                       <tr
                         key={order.id}
                         className='border-b border-border hover:bg-accent/50 transition-colors'
@@ -273,6 +457,9 @@ export default function OrdersList({
                         <td className='p-4'>
                           <div className='font-medium text-foreground'>
                             {order.clientName}
+                          </div>
+                          <div className='text-sm text-muted-foreground'>
+                            ID: #{order.id}
                           </div>
                         </td>
                         <td className='p-4'>
@@ -286,21 +473,7 @@ export default function OrdersList({
                         </td>
                         <td className='p-4'>
                           <div className='font-bold text-foreground'>
-                            S/.{' '}
-                            {(
-                              Math.round(
-                                (parseFloat(order.totalPrice) +
-                                  (order.deliveryCost
-                                    ? parseFloat(order.deliveryCost)
-                                    : 0) -
-                                  (order.discount
-                                    ? (parseFloat(order.totalPrice) *
-                                        parseFloat(order.discount)) /
-                                      100
-                                    : 0)) *
-                                  10
-                              ) / 10
-                            ).toFixed(2)}
+                            S/. {calculateTotalWithDiscount(order)}
                           </div>
                         </td>
                         <td className='p-4'>
@@ -319,26 +492,6 @@ export default function OrdersList({
                             )}
                           </div>
                         </td>
-                        {/* <td className='p-4'>
-                          <div className='space-y-1'>
-                            {order.orderItems.map((item) => (
-                              <div
-                                key={item.id}
-                                className='flex justify-between items-center text-sm'
-                              >
-                                <span className='text-foreground'>
-                                  {item.producto.name}
-                                  <span className='text-muted-foreground ml-1'>
-                                    (x{item.quantity})
-                                  </span>
-                                </span>
-                                <span className='font-medium text-foreground'>
-                                  S/. {item.totalPrice}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </td> */}
                         <td className='p-4'>
                           <div className='flex space-x-2 justify-end'>
                             <button
@@ -371,7 +524,28 @@ export default function OrdersList({
       {/* Paginación */}
       <div className='flex flex-col sm:flex-row justify-between items-center gap-4 pt-4'>
         <div className='text-sm text-muted-foreground'>
-          Mostrando {orders.length} de {pagination.total} pedidos
+          <div className='flex flex-col sm:flex-row gap-2 items-start sm:items-center'>
+            <span>
+              Mostrando {filteredAndSortedOrders.length} de {pagination.total}{' '}
+              pedidos
+            </span>
+            {statusFilter !== 'todos' && (
+              <span className='px-2 py-1 text-xs bg-accent rounded'>
+                Filtrado por: {statusFilter}
+              </span>
+            )}
+            {searchTerm && (
+              <span className='px-2 py-1 text-xs bg-accent rounded'>
+                Búsqueda: "{searchTerm}"
+              </span>
+            )}
+            {sortField !== 'date' && (
+              <span className='px-2 py-1 text-xs bg-accent rounded'>
+                Ordenado por: {sortField === 'total' ? 'Total' : 'Cliente'} (
+                {sortOrder === 'asc' ? 'Asc' : 'Desc'})
+              </span>
+            )}
+          </div>
         </div>
 
         <div className='flex items-center space-x-2'>

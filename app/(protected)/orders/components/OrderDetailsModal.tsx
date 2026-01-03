@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { X } from 'lucide-react'
 
 interface OrderItem {
@@ -176,7 +176,7 @@ export default function OrderDetailsModal({
                   {order.discount && (
                     <p>
                       <span className='text-muted-foreground'>Descuento:</span>{' '}
-                      -S/. {order.discount}
+                      - {order.discount}%
                     </p>
                   )}
                 </div>
@@ -242,6 +242,12 @@ export default function OrderDetailsModal({
                     S/. {Number(order.totalPrice).toFixed(2)}
                   </span>
                 </div>
+                {order.discount && (
+                  <div className='flex justify-between text-green-600 dark:text-green-400'>
+                    <span>Descuento:</span>
+                    <span>- {order.discount}%</span>
+                  </div>
+                )}
                 {order.deliveryCost && (
                   <div className='flex justify-between'>
                     <span className='text-foreground'>Envío:</span>
@@ -250,12 +256,7 @@ export default function OrderDetailsModal({
                     </span>
                   </div>
                 )}
-                {order.discount && (
-                  <div className='flex justify-between text-green-600 dark:text-green-400'>
-                    <span>Descuento:</span>
-                    <span>-S/. {order.discount}</span>
-                  </div>
-                )}
+
                 <div className='border-t border-border pt-2 mt-2'>
                   <div className='flex justify-between text-lg font-bold text-foreground'>
                     <span>Total:</span>

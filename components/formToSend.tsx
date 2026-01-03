@@ -450,7 +450,7 @@ ${totalInfo}${locationLink}
             {/* Detalles de Dirección */}
             <div>
               <label htmlFor='inputAddress' className='labelClientName'>
-                Detalles de direccion*
+                Direccion exacta*
               </label>
               <input
                 className='inputinputClientName'

@@ -2,10 +2,9 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ClipboardList, DotIcon, Menu } from 'lucide-react'
+import { ClipboardList, Menu } from 'lucide-react'
 import { MdOutlineShoppingCart } from 'react-icons/md'
 import { Button } from '@/components/ui/button'
-import { isAuthenticated, logout } from '@/lib/auth'
 import ShoppingCartPanel from './ShoppingCartPanel'
 import { useCart } from '@/contexts/CartContext'
 import { ThemeToggle } from './ThemeToggle'
@@ -48,10 +47,6 @@ export default function Header() {
       return (Math.round(Number(calculateDiscount) * 10) / 10).toFixed(2)
     }
     return getCartTotal().toFixed(2)
-  }
-
-  const handleLogout = () => {
-    logout()
   }
 
   const toggleCart = () => {
@@ -139,7 +134,6 @@ export default function Header() {
 
           {/* // !  aqui abajo esta el Login Descomentar para seguir trabajando */}
           {isSignedIn ? (
-            // <UserMenu onLogout={handleLogout} />
             <div className='min-w-7'>
               <SignedIn>
                 <UserButton
@@ -161,13 +155,13 @@ export default function Header() {
                       href='/orders'
                     />
                   </UserButton.MenuItems>
-                  <UserButton.UserProfilePage
+                  {/* <UserButton.UserProfilePage
                     label='Custom Page'
                     url='custom'
                     labelIcon={<DotIcon />}
                   >
                     <div>Hola Mundo</div>
-                  </UserButton.UserProfilePage>
+                  </UserButton.UserProfilePage> */}
                 </UserButton>
               </SignedIn>
             </div>
