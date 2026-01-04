@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
     const page = parseInt(searchParams.get('page') || '1', 10)
-    const pageSize = 15
+    const pageSize = 16
     const filter = searchParams.get('filter') || ''
     const sort = searchParams.get('sort') || ''
 

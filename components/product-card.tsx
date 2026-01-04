@@ -151,10 +151,9 @@ export default function ProductCard({
                       name='size'
                       onChange={() => setSelectedSize(ele)}
                       checked={selectedSize === ele}
+                      className="appearance-none w-3 h-3 border-2 border-gray-400 rounded-full checked:border-4 checked:border-blue-800 focus:outline-none transition duration-200 relative after:content-[''] after:absolute after:hidden checked:after:block after:w-0 after:h-0 after:bg-blue-800 after:rounded-full after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 cursor-pointer"
                     />
-                    <label htmlFor={ele} className='m-0'>
-                      {ele}
-                    </label>
+                    <label className='m-0'>{ele}</label>
                   </div>
                 ))}
               </form>

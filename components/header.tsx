@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { ClipboardList, Menu } from 'lucide-react'
-import { MdOutlineShoppingCart } from 'react-icons/md'
+import { MdOutlineShoppingCart, MdAdminPanelSettings } from 'react-icons/md'
+import { GrUserAdmin } from 'react-icons/gr'
 import { Button } from '@/components/ui/button'
 import ShoppingCartPanel from './ShoppingCartPanel'
 import { useCart } from '@/contexts/CartContext'
@@ -153,6 +154,13 @@ export default function Header() {
                         <ClipboardList className='w-4 pb-2 mr-2 justify-center items-center' />
                       }
                       href='/orders'
+                    />
+                    <UserButton.Link
+                      label='Admin Savior'
+                      labelIcon={
+                        <GrUserAdmin className='w-6 h-5 pb-1 mr-3 justify-center items-center' />
+                      }
+                      href='/admin-panel'
                     />
                   </UserButton.MenuItems>
                   {/* <UserButton.UserProfilePage

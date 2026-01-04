@@ -110,7 +110,7 @@ export default function Collection() {
             <SelectItem value='polos'>Polos</SelectItem>
           </SelectContent>
         </Select>
-        <Select value={sort} onValueChange={handleFilterChange}>
+        <Select value={sort} onValueChange={setSort}>
           <SelectTrigger className='md:w-48 border border-border'>
             <SelectValue placeholder='Ordenar por' />
           </SelectTrigger>

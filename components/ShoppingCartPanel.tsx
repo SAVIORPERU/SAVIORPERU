@@ -165,7 +165,7 @@ export default function ShoppingCartPanel({
                 <Button
                   onClick={clearCart}
                   variant='outline'
-                  className='w-full hover:bg-gray-100 transition-colors duration-200'
+                  className='w-full hover:bg-gray-300 dark:hover:text-black transition-colors duration-200'
                 >
                   Limpiar Carrito
                 </Button>

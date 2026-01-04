@@ -2,145 +2,100 @@ import prisma from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const id = parseInt(params.id)
-
-    if (isNaN(id)) {
-      return NextResponse.json(
-        { message: 'ID de orden inválido' },
-        { status: 400 }
-      )
-    }
-
-    const order = await prisma.orders.findUnique({
-      where: { id },
-      include: {
-        user: {
-          select: {
-            id: true,
-            email: true,
-            name: true,
-            phone: true,
-            dni: true
-          }
-        },
-        orderItems: {
-          include: {
-            producto: {
-              select: {
-                id: true,
-                name: true,
-                price: true,
-                image: true,
-                category: true
-              }
-            }
-          }
-        }
-      }
-    })
-
-    if (!order) {
-      return NextResponse.json(
-        { message: 'Orden no encontrada' },
-        { status: 404 }
-      )
-    }
-
-    return NextResponse.json({
-      message: 'Orden obtenida exitosamente',
-      data: order
-    })
-  } catch (error) {
-    console.error('Error obteniendo orden:', error)
-    return NextResponse.json(
-      { message: 'Error interno al obtener orden' },
-      { status: 500 }
-    )
-  }
-}
-
 // Esquema de validación para actualizar orden
 const updateOrderSchema = z.object({
   status: z
-    .enum(['Pendiente', 'Completado', 'Entregado', 'Cancelado'])
+    .enum(['Pendiente', 'Pagado', 'Enviado', 'Entregado', 'Cancelado'])
     .optional(),
   address: z.string().optional(),
   agencia: z.string().optional(),
   clientPhone: z.string().optional(),
   deliveryCost: z.number().min(0).optional(),
   discount: z.number().min(0).max(100).optional()
-  // Puedes agregar más campos según necesites
 })
 
-export async function PUT(
+// GET: Obtener detalle de una orden
+// 1. GET: Obtener detalle
+// 1. GET: Obtener detalle
+export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> } // Cambiado a Promise
 ) {
   try {
-    const id = parseInt(params.id)
+    const { id: idParam } = await params // Esperamos los params
+    const id = parseInt(idParam)
 
-    if (isNaN(id)) {
-      return NextResponse.json(
-        { message: 'ID de orden inválido' },
-        { status: 400 }
-      )
-    }
+    if (isNaN(id))
+      return NextResponse.json({ message: 'ID inválido' }, { status: 400 })
 
-    // Verificar si la orden existe
-    const existingOrder = await prisma.orders.findUnique({
-      where: { id }
+    const order = await prisma.orders.findUnique({
+      where: { id },
+      include: {
+        user: true,
+        orderItems: { include: { producto: true } }
+      }
     })
 
-    if (!existingOrder) {
+    if (!order)
       return NextResponse.json(
         { message: 'Orden no encontrada' },
         { status: 404 }
       )
-    }
 
-    // Obtener y validar datos
+    return NextResponse.json({ data: order })
+  } catch (error) {
+    return NextResponse.json({ message: 'Error interno' }, { status: 500 })
+  }
+}
+
+// 2. PUT: Actualizar orden
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> } // Cambiado a Promise
+) {
+  try {
+    const { id: idParam } = await params // Esperamos los params
+    const id = parseInt(idParam)
+
+    if (isNaN(id))
+      return NextResponse.json({ message: 'ID inválido' }, { status: 400 })
+
     const body = await req.json()
     const validatedData = updateOrderSchema.parse(body)
 
-    // Actualizar la orden
     const updatedOrder = await prisma.orders.update({
       where: { id },
       data: validatedData,
-      include: {
-        orderItems: {
-          include: {
-            producto: true
-          }
-        }
-      }
+      include: { orderItems: { include: { producto: true } } }
     })
 
-    // Si el estado cambia a Completado/Entregado, podrías:
-    // - Enviar email de confirmación
-    // - Actualizar inventario
-    // - Registrar en historial
-
-    return NextResponse.json({
-      message: 'Orden actualizada exitosamente',
-      data: updatedOrder
-    })
+    return NextResponse.json({ message: 'Actualizado', data: updatedOrder })
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { message: 'Datos inválidos', errors: error.errors },
-        { status: 400 }
-      )
-    }
-
-    console.error('Error actualizando orden:', error)
+    if (error instanceof z.ZodError)
+      return NextResponse.json({ errors: error.errors }, { status: 400 })
     return NextResponse.json(
-      { message: 'Error interno al actualizar orden' },
+      { message: 'Error al actualizar' },
       { status: 500 }
     )
+  }
+}
+
+// 3. DELETE: Eliminar orden
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> } // Cambiado a Promise
+) {
+  try {
+    const { id: idParam } = await params // Esperamos los params
+    const id = parseInt(idParam)
+
+    if (isNaN(id))
+      return NextResponse.json({ message: 'ID inválido' }, { status: 400 })
+
+    await prisma.orders.delete({ where: { id } })
+
+    return NextResponse.json({ message: 'Orden eliminada correctamente' })
+  } catch (error) {
+    return NextResponse.json({ message: 'Error al eliminar' }, { status: 500 })
   }
 }

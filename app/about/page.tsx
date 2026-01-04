@@ -22,7 +22,7 @@ export default function About() {
             esencia.
           </p>
         </div>
-        <div className='relative h-96 md:h-full'>
+        <div className='relative min-h-96 md:h-full'>
           <Image
             src={fotoTienda}
             alt='Savior Showroom'

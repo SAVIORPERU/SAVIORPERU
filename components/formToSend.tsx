@@ -1,5 +1,7 @@
+'use client'
+
 import Link from 'next/link'
-import React, { useEffect, useState, useCallback, use } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import InteractiveMap from './Maps/Maps'
 import { X } from 'lucide-react'
 import './ShoppingCartPanel.css'
@@ -10,6 +12,8 @@ import { useUser } from '@clerk/nextjs'
 import { useCart } from '@/contexts/CartContext'
 import { toast } from '@/hooks/use-toast'
 import { ToastAction } from './ui/toast'
+import { useRouter } from 'next/navigation'
+import { useToast } from '@/hooks/use-toast'
 
 // --- Interfaces ---
 
@@ -75,6 +79,8 @@ const FormToSend = ({
   disctount,
   onClose
 }: IProps) => {
+  const router = useRouter() // Inicializamos router
+  const { toast } = useToast() // Extraemos toast
   const [deliveryData, setDeliveryData] = useState<DeliveryData>(
     INITIAL_DELIVERY_STATE
   )
@@ -600,13 +606,18 @@ ${totalInfo}${locationLink}
               onClick={() => {
                 setShowCardClientName(false)
                 clearCart()
-                toast({
+
+                // 3. Capturamos el id del toast para usar dismiss
+                const { id, dismiss } = toast({
                   title: 'Pedido enviado con éxito',
                   description: 'Revisa tu pedido aquí',
                   action: (
                     <ToastAction
                       altText='Ver detalles'
-                      onClick={() => console.log('exito')}
+                      onClick={() => {
+                        dismiss() // Cierra el toast inmediatamente
+                        router.push('/orders') // Redirige sin recargar
+                      }}
                     >
                       Ver detalles
                     </ToastAction>

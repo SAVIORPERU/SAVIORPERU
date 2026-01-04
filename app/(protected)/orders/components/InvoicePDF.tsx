@@ -125,13 +125,11 @@ export function InvoicePDF({ orderData }: InvoicePDFProps) {
         {/* Encabezado */}
         <Text style={styles.title}>COMPROBANTE DE PEDIDO</Text>
         <Text style={styles.companyInfo}>
-          TU EMPRESA S.A.C.
+          SAVIOR PERU
           {'\n'}
-          RUC: 20123456789
+          Web: saviorperu.com
           {'\n'}
-          Dirección: Av. Principal 123, Lima
-          {'\n'}
-          Teléfono: (01) 234-5678
+          Whatsapp: (+51) 958284730
         </Text>
 
         {/* Información del pedido */}
@@ -218,7 +216,7 @@ export function InvoicePDF({ orderData }: InvoicePDFProps) {
         <View style={styles.footer}>
           <Text>Gracias por su compra</Text>
           <Text>Este documento es un comprobante de pedido</Text>
-          <Text>Para consultas contactar a: contacto@tuempresa.com</Text>
+          <Text>Para consultas contactar a: saviorstore.pe@gmail.com</Text>
         </View>
       </Page>
     </Document>
