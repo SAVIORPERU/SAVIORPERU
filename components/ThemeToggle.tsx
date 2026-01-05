@@ -14,8 +14,6 @@ export function ThemeToggle() {
     setMounted(true)
   }, [])
 
-  console.log('theme =>', themes)
-
   // No renderizar hasta que esté montado (evita hydration mismatch)
   if (!mounted) {
     return (

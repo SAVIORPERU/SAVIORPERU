@@ -38,7 +38,7 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const { cartItems, removeFromCart, clearCart, getCartTotal } = useCart()
   const pathname = usePathname()
-  const { user, isSignedIn, isLoaded } = useUser()
+  const { isSignedIn, isLoaded } = useUser()
   const [disctount, setDiscount] = useState('')
   const { theme } = useTheme()
 
@@ -237,18 +237,27 @@ export default function Header() {
                   </nav>
                 </div>
 
-                {/* {!isAuthenticated() && (
+                {!isSignedIn && (
                   <div className='mt-auto pb-6 flex flex-col space-y-2'>
-                    <Link href='/login'>
-                      <Button variant='outline' className='w-full'>
+                    <Link href='/sign-in'>
+                      <Button
+                        variant='outline'
+                        className='w-full'
+                        onClick={() => setIsOpen(false)}
+                      >
                         Login
                       </Button>
                     </Link>
-                    <Link href='/register'>
-                      <Button className='w-full'>Register</Button>
+                    <Link href='/sign-up'>
+                      <Button
+                        className='w-full'
+                        onClick={() => setIsOpen(false)}
+                      >
+                        Register
+                      </Button>
                     </Link>
                   </div>
-                )} */}
+                )}
               </div>
             </SheetContent>
           </Sheet>

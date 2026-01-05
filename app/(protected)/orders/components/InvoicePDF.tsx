@@ -123,7 +123,7 @@ export function InvoicePDF({ orderData }: InvoicePDFProps) {
     <Document>
       <Page size='A4' style={styles.page}>
         {/* Encabezado */}
-        <Text style={styles.title}>COMPROBANTE DE PEDIDO</Text>
+        <Text style={styles.title}>COMPROBANTE DE COMPRA</Text>
         <Text style={styles.companyInfo}>
           SAVIOR PERU
           {'\n'}
@@ -165,6 +165,10 @@ export function InvoicePDF({ orderData }: InvoicePDFProps) {
               <Text style={styles.label}>Agencia:</Text> {orderData.agencia}
             </Text>
           )}
+
+          <Text>
+            <Text style={styles.label}>Estado de pedido:</Text> Entregado
+          </Text>
         </View>
 
         {/* Tabla de productos */}
@@ -215,7 +219,7 @@ export function InvoicePDF({ orderData }: InvoicePDFProps) {
         {/* Pie de página */}
         <View style={styles.footer}>
           <Text>Gracias por su compra</Text>
-          <Text>Este documento es un comprobante de pedido</Text>
+          <Text>Este documento es un comprobante de compra</Text>
           <Text>Para consultas contactar a: saviorstore.pe@gmail.com</Text>
         </View>
       </Page>

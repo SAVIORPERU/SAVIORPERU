@@ -3,12 +3,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Role } from '@/app/generated/prisma/enums'
 import { z } from 'zod'
 
+// En Next.js 15, params es una Promise que debe ser awaited
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id)
+    // Await params antes de acceder a sus propiedades
+    const { id: idParam } = await params
+    const id = parseInt(idParam)
 
     if (isNaN(id)) {
       return NextResponse.json(
@@ -21,7 +24,7 @@ export async function GET(
       where: { id },
       include: {
         orders: {
-          take: 10, // Últimas 10 órdenes
+          take: 10,
           orderBy: { createdAt: 'desc' },
           select: {
             id: true,
@@ -79,7 +82,7 @@ export async function GET(
     // Formatear respuesta
     const responseData = {
       ...user,
-      password: undefined, // Nunca enviar contraseña (aunque no la tienes en el modelo)
+      password: undefined,
       orders: user.orders.map((order) => ({
         ...order,
         totalPrice: Number(order.totalPrice),
@@ -120,10 +123,11 @@ const updateUserSchema = z.object({
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id)
+    const { id: idParam } = await params
+    const id = parseInt(idParam)
 
     if (isNaN(id)) {
       return NextResponse.json(
@@ -240,10 +244,11 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id)
+    const { id: idParam } = await params
+    const id = parseInt(idParam)
 
     if (isNaN(id)) {
       return NextResponse.json(
@@ -364,10 +369,11 @@ const changeRoleSchema = z.object({
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id)
+    const { id: idParam } = await params
+    const id = parseInt(idParam)
 
     if (isNaN(id)) {
       return NextResponse.json(

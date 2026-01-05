@@ -88,8 +88,6 @@ const FormToSend = ({
   const { user } = useUser()
   const { clearCart, getCartTotal } = useCart()
 
-  console.log('productos', itemsProducts)
-
   // Función para cargar datos desde localStorage
   const loadLocalStorage = useCallback(() => {
     try {
@@ -119,6 +117,24 @@ const FormToSend = ({
       })
     )
     if (user?.emailAddresses[0].emailAddress) {
+      console.log({
+        ...deliveryData,
+        email: user?.emailAddresses[0].emailAddress || '',
+        products: itemsProducts.map((item) => ({
+          productoId: item.id,
+          quantity: item.quantity,
+          totalPrice: Number(item.price) * item.quantity,
+          unitPrice: item.price
+        })),
+        totalPrice: Number(getCartTotal()),
+        totalProducts: itemsProducts.reduce(
+          (total, item) => total + item.quantity,
+          0
+        ),
+        discount: disctount === codigoCupon ? 15 : 0,
+        deliveryCost:
+          Number(getCartTotal()) < 150 ? deliveryData.deliveryCost : 0
+      })
       const response = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -136,7 +152,9 @@ const FormToSend = ({
             (total, item) => total + item.quantity,
             0
           ),
-          discount: disctount === codigoCupon ? 15 : 0
+          discount: disctount === codigoCupon ? 15 : 0,
+          deliveryCost:
+            Number(getCartTotal()) < 150 ? deliveryData.deliveryCost : 0
         })
       })
       if (!response.ok) {
@@ -160,8 +178,6 @@ const FormToSend = ({
       setDeliveryData((prev) => ({ ...prev, clientName: userName }))
     }
   }, [user, loadLocalStorage, hasFullNameOverride])
-
-  console.log('deliveryData =>', deliveryData)
 
   // Manejador de cambios genérico para el estado de la entrega
   const handleInputChange = useCallback(
@@ -220,10 +236,6 @@ const FormToSend = ({
     if (deliveryCost > maximoDelivery) {
       finalDeliveryCost = maximoDelivery
     }
-    console.log(
-      '(discountAmount + finalDeliveryCost).toFixed(2)',
-      (discountAmount + finalDeliveryCost).toFixed(2)
-    )
     // Sumar el costo de delivery al subtotal
     return (discountAmount + finalDeliveryCost).toFixed(2)
   }, [getDiscount, deliveryData])
@@ -444,7 +456,11 @@ ${totalInfo}${locationLink}
                 setDeliveryCost={(cost: number) =>
                   handleInputChange(
                     'deliveryCost',
-                    cost < minimoDelivery ? minimoDelivery : cost
+                    cost > maximoDelivery
+                      ? maximoDelivery
+                      : cost < minimoDelivery
+                      ? minimoDelivery
+                      : cost
                   )
                 }
                 setGetlocation={(loc: { lat: number; lng: number }) =>

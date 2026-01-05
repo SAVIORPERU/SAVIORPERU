@@ -6,7 +6,14 @@ import TableSkeleton from './components/DeskSkeleton'
 import OrderSkeleton from './components/MobilSkeleton'
 import OrderDetailsModal from './components/OrderDetailsModal'
 import { usePDFGenerator } from './components/usePDFGenerator'
-import { FileText, Eye, Search, ChevronUp, ChevronDown } from 'lucide-react'
+import {
+  FileText,
+  Eye,
+  Search,
+  ChevronUp,
+  ChevronDown,
+  Info
+} from 'lucide-react'
 
 interface OrderItem {
   id: number
@@ -182,16 +189,16 @@ export default function OrdersList({
   // Función para obtener el color según el estado
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'enviado':
-        return 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
       case 'entregado':
-        return 'bg-green-500/10 text-green-600 dark:text-green-400'
-      case 'pendiente':
-        return 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400'
+        return 'bg-emerald-100 text-green-500 dark:bg-green-600 dark:text-emerald-200'
+      case 'enviado':
+        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+      case 'pagado':
+        return 'bg-sky-100 text-sky-700 dark:bg-sky-700/30 dark:text-sky-400'
       case 'cancelado':
-        return 'bg-red-500/10 text-red-600 dark:text-red-400'
+        return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
       default:
-        return 'bg-muted text-muted-foreground'
+        return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
     }
   }
 
@@ -206,164 +213,144 @@ export default function OrdersList({
   }
 
   return (
-    <div className='space-y-6'>
+    <div className='space-y-4 md:space-y-6'>
+      {' '}
+      {/* Menor espacio superior en móvil */}
       {/* Encabezado */}
-      <div className='flex justify-between items-center'>
+      <div className='flex flex-col xs:flex-row justify-between items-start xs:items-center gap-3'>
         <div>
-          <h1 className='text-2xl font-bold text-foreground'>
+          <h1 className='text-xl md:text-2xl font-bold text-foreground leading-tight'>
             Historial de Pedidos
           </h1>
-          <p className='text-muted-foreground mt-1'>
+          <p className='text-xs md:text-sm text-muted-foreground mt-0.5'>
             {pagination.total} pedidos encontrados
           </p>
         </div>
-        <div className='px-4 py-2 rounded-lg bg-card border border-border'>
-          <span className='text-sm text-muted-foreground'>Página</span>
-          <span className='mx-2 font-semibold text-foreground'>{page}</span>
-          <span className='text-sm text-muted-foreground'>
+        <div className='px-3 py-1.5 rounded-lg bg-card border border-border text-xs md:text-sm self-end xs:self-auto'>
+          <span className='text-muted-foreground'>Pág.</span>
+          <span className='mx-1.5 font-semibold text-foreground'>{page}</span>
+          <span className='text-muted-foreground'>
             de {pagination.totalPages}
           </span>
         </div>
       </div>
-
-      {/* Filtros y Búsqueda */}
-      <div className='flex flex-col md:flex-row gap-4 p-4 bg-card border border-border rounded-lg'>
-        {/* //! Búsqueda only search render thinks" */}
-        {/* <div className='flex-1'>
-          <div className='relative'>
-            <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground' />
-            <input
-              type='text'
-              placeholder='Buscar por cliente, ID o producto...'
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className='w-full pl-10 pr-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-foreground/20'
-            />
-          </div>
-        </div> */}
-
-        {/* Filtro por Estado y Ordenamiento */}
-        <div className='flex gap-2'>
+      {/* Filtros y Búsqueda - Optimizados para 375px */}
+      <div className='flex flex-col gap-3 p-3 bg-card border border-border rounded-lg shadow-sm'>
+        <div className='flex sm:flex-row gap-2'>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className='px-3 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-foreground/20'
+            className='w-full sm:w-auto px-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-foreground/20'
           >
             <option value='todos'>Todos los estados</option>
             <option value='pendiente'>Pendiente</option>
+            <option value='pagado'>Pagado</option>
             <option value='enviado'>Enviado</option>
             <option value='entregado'>Entregado</option>
             <option value='cancelado'>Cancelado</option>
           </select>
 
-          {/* Ordenamiento */}
-          <div className='flex items-center gap-2'>
-            <select
-              value={sortField}
-              onChange={(e) =>
-                setSortField(e.target.value as 'date' | 'total' | 'name')
-              }
-              className='px-3 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-foreground/20'
-            >
-              <option value='date'>Fecha</option>
-              <option value='total'>Total</option>
-              <option value='name'>Cliente</option>
-            </select>
-
-            <button
-              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className='px-3 py-2 border border-border rounded-lg hover:bg-accent transition-colors flex items-center gap-1'
-              title={`Orden ${
-                sortOrder === 'asc' ? 'ascendente' : 'descendente'
-              }`}
-            >
-              {sortOrder === 'asc' ? (
-                <ChevronUp className='w-4 h-4' />
-              ) : (
-                <ChevronDown className='w-4 h-4' />
-              )}
-            </button>
-          </div>
-
-          {/* Botón para limpiar filtros */}
-          {(searchTerm || statusFilter !== 'todos' || sortField !== 'date') && (
-            <button
-              onClick={() => {
-                setSearchTerm('')
-                setStatusFilter('todos')
-                setSortField('date')
-                setSortOrder('desc')
-              }}
-              className='px-3 py-2 text-sm border border-border rounded-lg hover:bg-accent transition-colors flex items-center gap-1'
-            >
-              <svg
-                className='w-4 h-4'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2}
-                  d='M6 18L18 6M6 6l12 12'
-                />
-              </svg>
-              Limpiar
-            </button>
-          )}
+          <button
+            onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+            className='w-full sm:w-auto justify-center px-3 py-2 border border-border rounded-lg hover:bg-accent transition-colors flex items-center gap-2 text-sm'
+          >
+            {sortOrder === 'asc' ? (
+              <ChevronUp className='w-4 h-4' />
+            ) : (
+              <ChevronDown className='w-4 h-4' />
+            )}
+            <span className='sm:hidden'>Invertir orden</span>
+          </button>
         </div>
       </div>
-
-      {/* Lista de pedidos - Vista Tarjetas */}
+      {/* Leyenda de Estados - Grid para mejor lectura en móvil */}
+      <div className='bg-card border border-border rounded-lg p-3'>
+        <div className='flex items-center gap-2 mb-2'>
+          <Info className='w-4 h-4 text-foreground' />
+          <h3 className='text-xs font-semibold uppercase tracking-wider text-muted-foreground'>
+            Estados:
+          </h3>
+          {/* <span className='text-xs tracking-wide'>
+            click estado para mas detalles
+          </span> */}
+        </div>
+        <div className='gap-2 flex'>
+          <div className='flex items-center gap-1.5'>
+            <div className='w-2.5 h-2.5 rounded-full bg-amber-400'></div>
+            <span className='text-[10px] md:text-xs font-medium flex'>
+              Pendiente{' '}
+              <span className='text-[10px] text-muted-foreground sm:hidden'>
+                {'>'}
+              </span>
+            </span>
+            <span className='text-xs text-muted-foreground max-sm:hidden'>
+              - Pedido recibido, en espera de pago
+            </span>
+          </div>
+          <div className='flex items-center gap-1.5'>
+            <div className='w-2.5 h-2.5 rounded-full bg-sky-400'></div>
+            <span className='text-[10px] md:text-xs font-medium'>
+              Pagado{' '}
+              <span className='text-[10px] text-muted-foreground sm:hidden'>
+                {'>'}
+              </span>
+            </span>
+            <span className='text-xs text-muted-foreground max-sm:hidden'>
+              - Pago confirmado, preparando pedido
+            </span>
+          </div>
+          <div className='flex items-center gap-1.5'>
+            <div className='w-2.5 h-2.5 rounded-full bg-blue-500'></div>
+            <span className='text-[10px] md:text-xs font-medium'>
+              Enviado{' '}
+              <span className='text-[10px] text-muted-foreground sm:hidden'>
+                {'>'}
+              </span>
+            </span>
+            <span className='text-xs text-muted-foreground max-sm:hidden'>
+              - Pedido en camino
+            </span>
+          </div>
+          <div className='flex items-center gap-1.5'>
+            <div className='w-2.5 h-2.5 rounded-full bg-emerald-500'></div>
+            <span className='text-[10px] md:text-xs font-medium'>
+              Entregado
+            </span>
+            <span className='text-xs text-muted-foreground max-sm:hidden'>
+              - Pedido recibido por el cliente
+            </span>
+          </div>
+        </div>
+      </div>
+      {/* Lista de pedidos - Vista Tarjetas (Móvil) */}
       <div className='lg:hidden'>
         {!isSignedIn ? (
           [...Array(3)].map((_, i) => <OrderSkeleton key={i} />)
         ) : filteredAndSortedOrders.length === 0 ? (
-          <div className='text-center py-12 border border-dashed border-border rounded-lg'>
-            <p className='text-muted-foreground'>
-              {searchTerm || statusFilter !== 'todos'
-                ? 'No hay pedidos que coincidan con los filtros aplicados'
-                : 'No hay pedidos para mostrar'}
-            </p>
-            {(searchTerm || statusFilter !== 'todos') && (
-              <button
-                onClick={() => {
-                  setSearchTerm('')
-                  setStatusFilter('todos')
-                }}
-                className='mt-4 px-4 py-2 text-sm bg-foreground text-background rounded-lg hover:opacity-90 transition-opacity'
-              >
-                Limpiar filtros
-              </button>
-            )}
+          <div className='text-center py-10 border border-dashed border-border rounded-lg'>
+            <p className='text-sm text-muted-foreground'>No hay pedidos</p>
           </div>
         ) : (
-          <div className='space-y-4'>
+          <div className='space-y-3'>
             {filteredAndSortedOrders.map((order) => (
               <div
                 key={order.id}
-                className='bg-card border border-border rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow'
+                className='bg-card border border-border rounded-xl p-4 shadow-sm active:scale-[0.98] transition-transform'
               >
-                <div className='flex justify-between items-start mb-4'>
-                  <div>
-                    <h3 className='font-semibold text-foreground'>
+                <div className='flex justify-between items-start gap-2 mb-3'>
+                  <div className='min-w-0'>
+                    {' '}
+                    {/* min-w-0 evita que el texto rompa el layout */}
+                    <h3 className='font-bold text-foreground text-sm truncate'>
                       {order.clientName}
                     </h3>
-                    <p className='text-sm text-muted-foreground mt-1'>
-                      {new Date(order.createdAt).toLocaleDateString('es-PE', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </p>
-                    <p className='text-xs text-muted-foreground mt-1'>
-                      ID: #{order.id}
+                    <p className='text-[10px] text-muted-foreground uppercase tracking-tight'>
+                      ID: #{order.id} •{' '}
+                      {new Date(order.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                    className={`shrink-0 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${getStatusColor(
                       order.status
                     )}`}
                   >
@@ -371,31 +358,32 @@ export default function OrdersList({
                   </span>
                 </div>
 
-                <div className='flex justify-between items-center pt-4 border-t border-border'>
+                <div className='flex items-center justify-between pt-3 border-t border-border/50'>
                   <div>
-                    <span className='text-sm text-muted-foreground'>
-                      Total:
-                    </span>
-                    <span className='ml-2 text-lg font-bold text-foreground'>
+                    <p className='text-[10px] text-muted-foreground leading-none mb-1'>
+                      Total a pagar
+                    </p>
+                    <span className='text-base font-black text-foreground'>
                       S/. {calculateTotalWithDiscount(order)}
                     </span>
                   </div>
-                  <div className='flex space-x-2'>
+                  <div className='flex gap-2 w-1/2'>
                     <button
                       onClick={() => handleViewOrder(order)}
-                      className='px-3 py-1.5 text-sm border border-border rounded-lg hover:bg-accent transition-colors flex items-center gap-1'
+                      className='flex-1 justify-center py-2 text-xs border border-border rounded-lg bg-background flex items-center gap-1'
                     >
-                      <Eye className='w-4 h-4' />
-                      Ver
+                      <Eye className='w-3.5 h-3.5' /> Ver
                     </button>
-                    <button
-                      onClick={() => handleGeneratePDF(order)}
-                      disabled={isGenerating}
-                      className='px-3 py-1.5 text-sm bg-foreground text-background rounded-lg hover:opacity-90 transition-opacity flex items-center gap-1 disabled:opacity-50'
-                    >
-                      <FileText className='w-4 h-4' />
-                      {isGenerating ? 'Generando...' : 'PDF'}
-                    </button>
+                    {order.status === 'Entregado' && (
+                      <button
+                        onClick={() => handleGeneratePDF(order)}
+                        disabled={isGenerating}
+                        className='flex-1 justify-center py-2 text-xs bg-foreground text-background rounded-lg flex items-center gap-1'
+                      >
+                        <FileText className='w-3.5 h-3.5' />{' '}
+                        {isGenerating ? '...' : 'PDF'}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -403,7 +391,6 @@ export default function OrdersList({
           </div>
         )}
       </div>
-
       {/* Tabla de pedidos - Vista Escritorio */}
       <div className='hidden lg:block'>
         {!isSignedIn ? (
@@ -494,20 +481,22 @@ export default function OrdersList({
                         </td>
                         <td className='p-4'>
                           <div className='flex space-x-2 justify-end'>
+                            {order.status === 'Entregado' && (
+                              <button
+                                onClick={() => handleGeneratePDF(order)}
+                                disabled={isGenerating}
+                                className='px-3 py-1.5 text-sm bg-foreground text-background rounded-lg hover:opacity-90 transition-opacity flex items-center gap-1 disabled:opacity-50'
+                              >
+                                <FileText className='w-4 h-4' />
+                                PDF
+                              </button>
+                            )}
                             <button
                               onClick={() => handleViewOrder(order)}
                               className='px-3 py-1.5 text-sm border border-border rounded-lg hover:bg-accent transition-colors flex items-center gap-1'
                             >
                               <Eye className='w-4 h-4' />
                               Ver
-                            </button>
-                            <button
-                              onClick={() => handleGeneratePDF(order)}
-                              disabled={isGenerating}
-                              className='px-3 py-1.5 text-sm bg-foreground text-background rounded-lg hover:opacity-90 transition-opacity flex items-center gap-1 disabled:opacity-50'
-                            >
-                              <FileText className='w-4 h-4' />
-                              PDF
                             </button>
                           </div>
                         </td>
@@ -520,7 +509,6 @@ export default function OrdersList({
           </div>
         )}
       </div>
-
       {/* Paginación */}
       <div className='flex flex-col sm:flex-row justify-between items-center gap-4 pt-4'>
         <div className='text-sm text-muted-foreground'>

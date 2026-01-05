@@ -31,8 +31,6 @@ export default async function BestSellers() {
       ...product,
       price: Number(product.price)
     }))
-
-    console.log('data Colecciones cargada con éxito')
   } catch (error) {
     // Si la tabla no existe o está vacía, mostramos el error en consola pero NO rompemos la web
     console.error(

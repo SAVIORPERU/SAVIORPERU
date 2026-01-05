@@ -41,7 +41,7 @@ export function usePDFGenerator() {
       // Crear enlace para descarga
       const a = document.createElement('a')
       a.href = url
-      a.download = `pedido-${orderData.orderId}.pdf`
+      a.download = `Comprabante de compra - ${orderData.orderId}.pdf`
       document.body.appendChild(a)
       a.click()
 

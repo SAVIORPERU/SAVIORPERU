@@ -17,9 +17,7 @@ export default function CleanupPage() {
       if (typeof window !== 'undefined') {
         try {
           localStorage.removeItem('dataDeliverySend') // ⬅️ **TU CLAVE DE LOCALSTORAGE**
-          console.log('LocalStorage del carrito limpiado.')
         } catch (error) {
-          console.error('Error al limpiar localStorage:', error)
           setMessage(
             'Ocurrió un error al Cerrar Sesión. Redirigiendo igualmente...'
           )

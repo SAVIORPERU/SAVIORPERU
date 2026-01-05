@@ -45,15 +45,16 @@ export default function OrderDetailsModal({
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'completado':
       case 'entregado':
-        return 'bg-green-500/10 text-green-600 dark:text-green-400'
-      case 'pendiente':
-        return 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400'
+        return 'bg-emerald-100 text-green-500 dark:bg-green-600 dark:text-emerald-200'
+      case 'enviado':
+        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+      case 'pagado':
+        return 'bg-sky-100 text-sky-700 dark:bg-sky-700/30 dark:text-sky-400'
       case 'cancelado':
-        return 'bg-red-500/10 text-red-600 dark:text-red-400'
+        return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
       default:
-        return 'bg-muted text-muted-foreground'
+        return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
     }
   }
 
@@ -292,18 +293,20 @@ export default function OrderDetailsModal({
           >
             Cerrar
           </button>
-          <button
-            onClick={() => {
-              // Llamar a la función para generar PDF
-              window.dispatchEvent(
-                new CustomEvent('generate-pdf', { detail: order.id })
-              )
-              onClose()
-            }}
-            className='px-4 py-2 bg-foreground text-background rounded-lg hover:opacity-90 transition-opacity'
-          >
-            Generar PDF
-          </button>
+          {order.status === 'Entregado' && (
+            <button
+              onClick={() => {
+                // Llamar a la función para generar PDF
+                window.dispatchEvent(
+                  new CustomEvent('generate-pdf', { detail: order.id })
+                )
+                onClose()
+              }}
+              className='px-4 py-2 bg-foreground text-background rounded-lg hover:opacity-90 transition-opacity'
+            >
+              Generar PDF
+            </button>
+          )}
         </div>
       </div>
     </div>

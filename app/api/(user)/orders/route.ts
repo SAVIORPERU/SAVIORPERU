@@ -82,47 +82,48 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
-    // 🔹 Leer parámetros de query
     const { searchParams } = new URL(req.url)
 
     const page = parseInt(searchParams.get('page') || '1', 10)
     const limit = parseInt(searchParams.get('limit') || '10', 10)
 
     // Filtros opcionales
-    const status = searchParams.get('status') // ejemplo: "Pendiente", "Completado"
+    const status = searchParams.get('status')
     const clientName = searchParams.get('clientName')
     const email = searchParams.get('email')
-    console.log('email to response ==>', email)
     const minTotal = searchParams.get('minTotal')
     const maxTotal = searchParams.get('maxTotal')
 
-    // 🔹 Construir objeto where dinámico
     const where: any = {}
 
     if (status) {
       where.status = status
     }
-
     if (clientName) {
       where.clientName = { contains: clientName, mode: 'insensitive' }
     }
-
     if (email) {
       where.user = { email: { contains: email, mode: 'insensitive' } }
     }
-
     if (minTotal || maxTotal) {
       where.totalPrice = {}
       if (minTotal) where.totalPrice.gte = parseFloat(minTotal)
       if (maxTotal) where.totalPrice.lte = parseFloat(maxTotal)
     }
 
-    // 🔹 Calcular skip y take para paginación
     const skip = (page - 1) * limit
     const take = limit
 
-    // 🔹 Consultar órdenes con Prisma
-    const [orders, total] = await Promise.all([
+    // 🔹 Ejecutamos todas las consultas en paralelo para optimizar rendimiento
+    const [
+      orders,
+      total,
+      activeOrdersCount,
+      soldItemsData,
+      pendientesCount,
+      totalAmountData
+    ] = await Promise.all([
+      // 1. Órdenes paginadas
       prisma.orders.findMany({
         where,
         skip,
@@ -130,14 +131,37 @@ export async function GET(req: NextRequest) {
         orderBy: { createdAt: 'desc' },
         include: {
           user: true,
-          orderItems: {
-            include: {
-              producto: true
-            }
-          }
+          orderItems: { include: { producto: true } }
         }
       }),
-      prisma.orders.count({ where })
+      // 2. Total de registros bajo el filtro actual
+      prisma.orders.count({ where }),
+      // 3. Órdenes activas (NO Cancelado)
+      prisma.orders.count({
+        where: { status: { not: 'Cancelado' } }
+      }),
+      // 4. Ítems vendidos (solo órdenes completadas)
+      prisma.orders.aggregate({
+        where: {
+          status: { in: ['Pagado', 'Enviado', 'Entregado'] }
+        },
+        _sum: {
+          totalProducts: true
+        }
+      }),
+      // 5. NUEVO: Órdenes con status "Pendiente"
+      prisma.orders.count({
+        where: { status: 'Pendiente' }
+      }),
+      // 6. NUEVO: Suma total de totalPrice de órdenes completadas
+      prisma.orders.aggregate({
+        where: {
+          status: { in: ['Pagado', 'Enviado', 'Entregado'] }
+        },
+        _sum: {
+          totalPrice: true
+        }
+      })
     ])
 
     return NextResponse.json({
@@ -146,7 +170,11 @@ export async function GET(req: NextRequest) {
         total,
         page,
         limit,
-        totalPages: Math.ceil(total / limit)
+        totalPages: Math.ceil(total / limit),
+        activeOrders: activeOrdersCount,
+        soldItems: soldItemsData._sum.totalProducts || 0,
+        pendientes: pendientesCount, // ✅ nuevo
+        totalAmount: Number(totalAmountData._sum.totalPrice?.toFixed(2)) || 0 // ✅ nuevo
       }
     })
   } catch (error) {
