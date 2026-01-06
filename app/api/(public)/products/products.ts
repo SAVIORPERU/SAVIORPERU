@@ -8,7 +8,8 @@ export const products = [
     price: 45.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105696/Polo_Fire_Blanco_kjlxx3.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 2,
@@ -19,7 +20,8 @@ export const products = [
     price: 45.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105694/Polo_Heaven_Negro_zlfuln.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 3,
@@ -30,7 +32,8 @@ export const products = [
     price: 45.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105695/Polo_Forgiven_Jade_ffghlh.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 4,
@@ -41,7 +44,8 @@ export const products = [
     price: 45.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105695/Polo_Hope_Amarillo_larrbx.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 5,
@@ -52,7 +56,8 @@ export const products = [
     price: 45.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105698/Polo_God_s_club_Celeste_nrl0nw.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 6,
@@ -63,7 +68,8 @@ export const products = [
     price: 45.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745105697/Polo_Peace_Verde_Acero_bamazm.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 9,
@@ -73,7 +79,8 @@ export const products = [
     price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235208/Gorro_Verde_Faith_iz5nbj.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 10,
@@ -83,7 +90,8 @@ export const products = [
     price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235205/Gorro_Beige_Faith_pxfsp0.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 11,
@@ -93,7 +101,8 @@ export const products = [
     price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235208/Gorro_Negro_Faith_arid6q.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 12,
@@ -103,7 +112,8 @@ export const products = [
     price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235204/Gorro_Azul_Blessed_ljhzkx.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 13,
@@ -113,7 +123,8 @@ export const products = [
     price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235205/Gorro_Blanco_Blessed_vf7udu.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 14,
@@ -123,7 +134,8 @@ export const products = [
     price: 39.9,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235207/Gorro_Negro_Choosen_ychlsz.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 15,
@@ -133,7 +145,8 @@ export const products = [
     price: 39.9,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235206/Gorro_Blanco_Choosen_xmxwrz.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 16,
@@ -143,7 +156,8 @@ export const products = [
     price: 39.9,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235206/Gorro_Marron_Choosen_zklfe8.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 17,
@@ -153,7 +167,8 @@ export const products = [
     price: 39.9,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235206/Gorro_Celeste_Choosen_uzjttp.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 18,
@@ -163,7 +178,8 @@ export const products = [
     price: 39.9,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235208/Gorro_Negro_Savior_rs8vw6.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 19,
@@ -173,7 +189,8 @@ export const products = [
     price: 39.9,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235206/Gorro_Blanco_Savior_rce4tq.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 20,
@@ -183,7 +200,8 @@ export const products = [
     price: 39.9,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235208/Gorro_Rojo_Savior_htnzzg.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 21,
@@ -193,7 +211,8 @@ export const products = [
     price: 39.9,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235203/Gorro_Azul_Acero_Savior_ctxbhj.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 26,
@@ -203,7 +222,8 @@ export const products = [
     price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235203/Bucket_Azul_l8b18p.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 27,
@@ -213,7 +233,8 @@ export const products = [
     price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235203/Bucket_Negro_qyhbcg.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 28,
@@ -223,7 +244,8 @@ export const products = [
     price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235204/Bucket_Rosado_fw14ia.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 29,
@@ -233,7 +255,8 @@ export const products = [
     price: 42.5,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746235203/Bucket_Verde_Choosen_qnxijc.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 22,
@@ -244,7 +267,8 @@ export const products = [
     price: 95.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1745107452/Casaca_vintage_lsanbz.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 23,
@@ -255,7 +279,8 @@ export const products = [
     price: 75.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746329534/Photoroom_20250503_223113_chca5s.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 25,
@@ -266,7 +291,8 @@ export const products = [
     price: 119.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746491948/Photoroom_20250505_174643_lslkxr.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 30,
@@ -277,7 +303,8 @@ export const products = [
     price: 38.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746322735/Polo_Basico_Blanco_c8nrmt.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 31,
@@ -288,7 +315,8 @@ export const products = [
     price: 38.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746322735/Polo_Basico_Negro_qedvhh.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 32,
@@ -299,7 +327,8 @@ export const products = [
     price: 65.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746413100/Photoroom_20250504_214159_en2f0h.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 33,
@@ -310,7 +339,8 @@ export const products = [
     price: 65.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1746413100/Photoroom_20250504_214334_cznzus.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 34,
@@ -321,7 +351,8 @@ export const products = [
     price: 69.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1747941536/Photoroom_20250522_130625_udpqhc.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 35,
@@ -332,7 +363,8 @@ export const products = [
     price: 69.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1747941537/Photoroom_20250522_130926_zgpmx5.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 36,
@@ -343,7 +375,8 @@ export const products = [
     price: 69.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1748624403/Photoroom_20250530_112356_jbz80g.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 37,
@@ -354,7 +387,8 @@ export const products = [
     price: 69.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1748624403/Photoroom_20250530_112554_rau9ih.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   },
   {
     id: 38,
@@ -365,6 +399,7 @@ export const products = [
     price: 69.0,
     image:
       'https://res.cloudinary.com/dkw7q1u6z/image/upload/v1748624403/Photoroom_20250530_112450_ci4gr1.webp',
-    image2: ''
+    image2: '',
+    stock: 1
   }
 ]

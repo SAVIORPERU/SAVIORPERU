@@ -22,8 +22,6 @@ import {
 } from 'react-icons/md'
 import { toast } from 'sonner'
 import KpiCard from './KpiCard'
-
-// --- Interfaces ---
 interface Order {
   id: number
   clientName: string
@@ -65,8 +63,7 @@ interface ApiResponse {
   }
 }
 
-// --- Main Component ---
-const AdminDashboard: React.FC = () => {
+const OdersManagement: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -119,15 +116,15 @@ const AdminDashboard: React.FC = () => {
   )
 
   useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      fetchOrders(1, searchTerm) // Reset to page 1 when searching
-    }, 500)
-    return () => clearTimeout(delayDebounceFn)
-  }, [searchTerm, fetchOrders])
+    const delayDebounceFn = setTimeout(
+      () => {
+        fetchOrders(currentPage, searchTerm, true)
+      },
+      searchTerm ? 500 : 0
+    ) // Sin delay para carga inicial
 
-  useEffect(() => {
-    fetchOrders(currentPage, searchTerm)
-  }, [currentPage, fetchOrders, searchTerm])
+    return () => clearTimeout(delayDebounceFn)
+  }, [currentPage, searchTerm, fetchOrders])
 
   // --- Lógica de Cambio de Estado con Confirmación ---
   const handleStatusChange = async (id: number, newStatus: string) => {
@@ -724,4 +721,4 @@ const AdminDashboard: React.FC = () => {
   )
 }
 
-export default AdminDashboard
+export default OdersManagement

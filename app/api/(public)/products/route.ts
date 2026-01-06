@@ -34,6 +34,20 @@ export async function GET(req: NextRequest) {
         take: pageSize
       })
 
+      // Calcular estadísticas para productos iniciales
+      const initialProductsDetails = {
+        totalInventoryAmount: products.reduce((sum, product) => {
+          return sum + (Number(product.price) || 0) * (product.stock || 0)
+        }, 0),
+        notAvailable: products.filter((p) => p.estado === 'NO DISPONIBLE')
+          .length,
+        totalStock: products.reduce(
+          (sum, product) => sum + (product.stock || 0),
+          0
+        ),
+        totalProducts: products.length
+      }
+
       return NextResponse.json(
         {
           message: 'Initial products created',
@@ -43,7 +57,8 @@ export async function GET(req: NextRequest) {
             pageSize,
             totalPages: Math.ceil(products.length / pageSize),
             totalCount: products.length
-          }
+          },
+          productsDetails: initialProductsDetails
         },
         { status: 201 }
       )
@@ -62,6 +77,35 @@ export async function GET(req: NextRequest) {
       take: pageSize
     })
 
+    // Obtener estadísticas de TODOS los productos (sin paginación)
+    const allProducts = await prisma.productos.findMany({
+      where: {
+        OR: [
+          { name: { contains: filter, mode: 'insensitive' } },
+          { category: { contains: filter, mode: 'insensitive' } }
+        ]
+      }
+    })
+
+    // Calcular las estadísticas
+    const productsDetails = {
+      totalInventoryAmount: allProducts.reduce((sum, product) => {
+        // Solo sumar productos DISPONIBLES al valor del inventario
+        if (product.estado === 'DISPONIBLE') {
+          return sum + (Number(product.price) || 0) * (product.stock || 0)
+        }
+        return sum
+      }, 0),
+      notAvailable: allProducts.filter((p) => p.estado === 'NO DISPONIBLE')
+        .length,
+      totalStock: allProducts.reduce(
+        (sum, product) => sum + (product.stock || 0),
+        0
+      ),
+      totalProducts: allProducts.length
+    }
+
+    // Contador para paginación (solo productos que coinciden con el filtro)
     const totalCount = await prisma.productos.count({
       where: {
         OR: [
@@ -80,7 +124,8 @@ export async function GET(req: NextRequest) {
           pageSize,
           totalPages: Math.ceil(totalCount / pageSize),
           totalCount
-        }
+        },
+        productsDetails // Nueva propiedad añadida
       },
       { status: 200 }
     )
@@ -164,190 +209,6 @@ export async function POST(req: NextRequest) {
     console.error('Error creando producto:', error)
     return NextResponse.json(
       { message: 'Error interno al crear producto' },
-      { status: 500 }
-    )
-  }
-}
-
-// Esquema de validación para actualizar producto
-const updateProductSchema = z.object({
-  name: z.string().min(1).optional(),
-  category: z.string().min(1).optional(),
-  estado: z.string().optional(),
-  size: z.string().optional().nullable(),
-  price: z.number().positive().optional(),
-  image: z.string().url().optional(),
-  image2: z.string().url().optional().nullable(),
-  stock: z.number().int().min(0).optional(),
-  destacado: z.boolean().optional()
-})
-
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const id = parseInt(params.id)
-
-    if (isNaN(id)) {
-      return NextResponse.json(
-        { message: 'ID de producto inválido' },
-        { status: 400 }
-      )
-    }
-
-    // Verificar si el producto existe
-    const existingProduct = await prisma.productos.findUnique({
-      where: { id }
-    })
-
-    if (!existingProduct) {
-      return NextResponse.json(
-        { message: 'Producto no encontrado' },
-        { status: 404 }
-      )
-    }
-
-    // Obtener y validar datos
-    const body = await req.json()
-    const validatedData = updateProductSchema.parse(body)
-
-    // Actualizar producto
-    const updatedProduct = await prisma.productos.update({
-      where: { id },
-      data: {
-        name: validatedData.name,
-        category: validatedData.category,
-        estado: validatedData.estado,
-        size: validatedData.size,
-        price: validatedData.price,
-        image: validatedData.image,
-        image2: validatedData.image2,
-        stock: validatedData.stock,
-        updatedAt: new Date()
-      }
-    })
-
-    // Manejar producto destacado
-    if (validatedData.destacado !== undefined) {
-      const existingDestacado = await prisma.productosDestacados.findUnique({
-        where: { productoId: id }
-      })
-
-      if (validatedData.destacado && !existingDestacado) {
-        // Agregar a destacados
-        await prisma.productosDestacados.create({
-          data: { productoId: id }
-        })
-      } else if (!validatedData.destacado && existingDestacado) {
-        // Quitar de destacados
-        await prisma.productosDestacados.delete({
-          where: { productoId: id }
-        })
-      }
-    }
-
-    return NextResponse.json({
-      message: 'Producto actualizado exitosamente',
-      data: updatedProduct
-    })
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { message: 'Datos inválidos', errors: error.errors },
-        { status: 400 }
-      )
-    }
-
-    console.error('Error actualizando producto:', error)
-    return NextResponse.json(
-      { message: 'Error interno al actualizar producto' },
-      { status: 500 }
-    )
-  }
-}
-
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const id = parseInt(params.id)
-
-    if (isNaN(id)) {
-      return NextResponse.json(
-        { message: 'ID de producto inválido' },
-        { status: 400 }
-      )
-    }
-
-    // Verificar si el producto existe
-    const existingProduct = await prisma.productos.findUnique({
-      where: { id },
-      include: {
-        orderItems: {
-          take: 1 // Solo necesitamos saber si hay al menos una
-        },
-        destacados: true
-      }
-    })
-
-    if (!existingProduct) {
-      return NextResponse.json(
-        { message: 'Producto no encontrado' },
-        { status: 404 }
-      )
-    }
-
-    // Verificar si el producto tiene órdenes asociadas
-    if (existingProduct.orderItems.length > 0) {
-      return NextResponse.json(
-        {
-          message:
-            'No se puede eliminar el producto porque tiene órdenes asociadas',
-          suggestion:
-            'En su lugar, puedes marcarlo como "No disponible" cambiando el estado'
-        },
-        { status: 400 }
-      )
-    }
-
-    // Si el producto está en destacados, eliminar esa relación primero
-    if (existingProduct.destacados.length > 0) {
-      await prisma.productosDestacados.delete({
-        where: { productoId: id }
-      })
-    }
-
-    // Eliminar producto
-    await prisma.productos.delete({
-      where: { id }
-    })
-
-    return NextResponse.json({
-      message: 'Producto eliminado exitosamente',
-      deletedId: id
-    })
-  } catch (error) {
-    console.error('Error eliminando producto:', error)
-
-    // Manejar errores de integridad referencial
-    if (
-      error instanceof Error &&
-      error.message.includes('Foreign key constraint')
-    ) {
-      return NextResponse.json(
-        {
-          message:
-            'No se puede eliminar el producto porque está referenciado en otras tablas',
-          suggestion: 'Considera desactivarlo en lugar de eliminarlo'
-        },
-        { status: 400 }
-      )
-    }
-
-    return NextResponse.json(
-      { message: 'Error interno al eliminar producto' },
       { status: 500 }
     )
   }

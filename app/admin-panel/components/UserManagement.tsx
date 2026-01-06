@@ -7,20 +7,16 @@ import {
   MdBadge,
   MdEmail,
   MdPhone,
-  MdLocationOn,
   MdShoppingCart,
   MdCalendarToday,
-  MdEdit,
   MdOutlineAdminPanelSettings,
   MdOutlinePerson,
-  MdOutlineEditNote,
   MdChevronLeft,
   MdChevronRight,
   MdFirstPage,
   MdLastPage,
   MdOutlineVerifiedUser,
-  MdOutlineWarning,
-  MdShoppingBag
+  MdOutlineWarning
 } from 'react-icons/md'
 import { toast } from 'sonner'
 import KpiCard from './KpiCard'
@@ -136,15 +132,19 @@ const UserManagement: React.FC = () => {
   }
 
   useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      fetchUsers(1, searchTerm)
-    }, 500)
-    return () => clearTimeout(delayDebounceFn)
-  }, [searchTerm, fetchUsers])
+    const delayDebounceFn = setTimeout(
+      () => {
+        fetchUsers(currentPage, searchTerm)
+      },
+      searchTerm ? 500 : 0
+    ) // Sin delay para búsqueda vacía
 
-  useEffect(() => {
-    fetchUsers(currentPage, searchTerm)
-  }, [currentPage, fetchUsers, searchTerm])
+    return () => clearTimeout(delayDebounceFn)
+  }, [currentPage, searchTerm, fetchUsers])
+
+  // useEffect(() => {
+  //   fetchUsers(currentPage, searchTerm)
+  // }, [currentPage, fetchUsers, searchTerm])
 
   // --- Funciones de Paginación ---
   const goToPage = (page: number) => {

@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 import { Role } from '@/app/generated/prisma/enums'
 import { z } from 'zod'
+import { clerkClient } from '@clerk/nextjs/server'
 
 // En Next.js 15, params es una Promise que debe ser awaited
 export async function GET(
@@ -249,6 +250,7 @@ export async function DELETE(
   try {
     const { id: idParam } = await params
     const id = parseInt(idParam)
+    const client = await clerkClient()
 
     if (isNaN(id)) {
       return NextResponse.json(
@@ -275,6 +277,8 @@ export async function DELETE(
         { status: 404 }
       )
     }
+
+    await client.users.deleteUser(existingUser.clerkId as string)
 
     // Validaciones antes de eliminar
 

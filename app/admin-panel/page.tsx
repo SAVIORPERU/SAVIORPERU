@@ -1,11 +1,12 @@
 'use client'
 
 import React, { useState } from 'react'
-import AdminDashboard from './components/Orders'
+import OdersManagement from './components/Orders'
 import { MdInventory2, MdShoppingBag, MdGroups2 } from 'react-icons/md'
 import { IoGridSharp } from 'react-icons/io5'
 import { Toaster } from 'sonner'
 import UserManagement from './components/UserManagement'
+import ProductsManagement from './components/ProductsManagement'
 
 const paths = [
   { name: 'Órdenes', path: 'orders', icon: MdShoppingBag },
@@ -15,7 +16,7 @@ const paths = [
 
 const AdminPanel = () => {
   // Estados para Funcionalidad
-  const [panel, setPanel] = useState('Órdenes')
+  const [panel, setPanel] = useState('orders')
 
   return (
     <>
@@ -39,11 +40,11 @@ const AdminPanel = () => {
                 <button
                   key={item.name}
                   className={`flex items-center gap-3 rounded-lg px-4 py-3 transition-colors ${
-                    item.name === panel
+                    item.path === panel
                       ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
                       : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50'
                   }`}
-                  onClick={() => setPanel(item.name)}
+                  onClick={() => setPanel(item.path)}
                 >
                   <item.icon size={20} />
                   <span className='text-sm font-medium'>{item.name}</span>
@@ -52,7 +53,13 @@ const AdminPanel = () => {
             </nav>
           </div>
         </aside>
-        {panel === 'Usuarios' ? <UserManagement /> : <AdminDashboard />}
+        {panel === 'users' ? (
+          <UserManagement />
+        ) : panel === 'products' ? (
+          <ProductsManagement />
+        ) : (
+          <OdersManagement />
+        )}
       </div>
     </>
   )

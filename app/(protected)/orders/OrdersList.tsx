@@ -64,39 +64,50 @@ export default function OrdersList({
   const { user, isSignedIn } = useUser()
   const { generatePDF, isGenerating } = usePDFGenerator()
 
+  console.log('page =>', page)
+
   // Estados para filtros y ordenamiento
   const [statusFilter, setStatusFilter] = useState<string>('todos')
   const [searchTerm, setSearchTerm] = useState<string>('')
   const [sortField, setSortField] = useState<'date' | 'total' | 'name'>('date')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
 
-  // 🔹 Fetch cuando cambia la página
+  // OrdersList.tsx - MODIFICAR el useEffect
   useEffect(() => {
-    const fetchOrders = async () => {
-      setLoading(true)
-      try {
-        const res = await fetch(
-          `/api/orders?page=${page}&limit=${pagination.limit}&email=${user?.emailAddresses[0].emailAddress}`,
-          {
-            cache: 'no-store'
+    // Solo hacer fetch si NO tenemos datos iniciales (first page)
+    // o si el usuario cambia de página
+    if (page !== initialPagination.page) {
+      const fetchOrders = async () => {
+        setLoading(true)
+        try {
+          const res = await fetch(
+            `/api/orders?page=${page}&limit=${pagination.limit}&email=${user?.emailAddresses[0].emailAddress}`,
+            {
+              cache: 'no-store'
+            }
+          )
+          if (res.ok) {
+            const { data, pagination: newPagination } = await res.json()
+            setOrders(data)
+            setPagination(newPagination)
           }
-        )
-        if (res.ok) {
-          const { data, pagination: newPagination } = await res.json()
-          setOrders(data)
-          setPagination(newPagination)
-        } else {
-          console.error('Error al cargar órdenes')
+        } catch (error) {
+          console.error('Error en fetch:', error)
+        } finally {
+          setLoading(false)
         }
-      } catch (error) {
-        console.error('Error en fetch:', error)
-      } finally {
-        setLoading(false)
+      }
+
+      if (isSignedIn) {
+        fetchOrders()
       }
     }
-
-    fetchOrders()
-  }, [page, isSignedIn])
+  }, [
+    page,
+    isSignedIn,
+    user?.emailAddresses[0].emailAddress,
+    initialPagination.page
+  ])
 
   // Función para filtrar y ordenar los pedidos
   const filteredAndSortedOrders = useMemo(() => {
@@ -213,11 +224,11 @@ export default function OrdersList({
   }
 
   return (
-    <div className='space-y-4 md:space-y-6'>
+    <div className='space-y-4 md:space-y-6 max-w-screen-2xl w-full'>
       {' '}
       {/* Menor espacio superior en móvil */}
       {/* Encabezado */}
-      <div className='flex flex-col xs:flex-row justify-between items-start xs:items-center gap-3'>
+      <div className='flex xs:flex-row justify-between items-start xs:items-center gap-3'>
         <div>
           <h1 className='text-xl md:text-2xl font-bold text-foreground leading-tight'>
             Historial de Pedidos
@@ -536,11 +547,11 @@ export default function OrdersList({
           </div>
         </div>
 
-        <div className='flex items-center space-x-2'>
+        <div className='flex items-center space-x-2 text-xs'>
           <button
             disabled={page <= 1 || loading}
             onClick={() => setPage(page - 1)}
-            className='px-4 py-2 border border-border rounded-lg hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2'
+            className='px-2 py-2 border border-border rounded-lg hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center'
           >
             <svg
               className='w-4 h-4'
@@ -579,8 +590,8 @@ export default function OrdersList({
                   <button
                     key={pageNum}
                     onClick={() => setPage(pageNum)}
-                    className={`w-10 h-10 rounded-lg transition-colors ${
-                      page === pageNum
+                    className={`w-8 h-8 rounded-lg transition-colors ${
+                      (page === 0 && pageNum === 1) || page === pageNum
                         ? 'bg-foreground text-background'
                         : 'hover:bg-accent text-foreground'
                     }`}
@@ -602,8 +613,8 @@ export default function OrdersList({
 
           <button
             disabled={page >= pagination.totalPages || loading}
-            onClick={() => setPage(page + 1)}
-            className='px-4 py-2 border border-border rounded-lg hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2'
+            onClick={() => setPage(page === 0 ? page + 2 : page + 1)}
+            className='px-2 py-2 border border-border rounded-lg hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center'
           >
             Siguiente
             <svg
