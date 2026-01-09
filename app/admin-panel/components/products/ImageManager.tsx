@@ -16,6 +16,7 @@ interface ImageManagerProps {
   secondaryImage?: string
   onMainImageChange: (url: string) => void
   onSecondaryImageChange?: (url: string) => void
+  imageFrom?: string
 }
 
 interface CloudinaryImage {
@@ -30,7 +31,8 @@ const ImageManager: React.FC<ImageManagerProps> = ({
   mainImage,
   secondaryImage,
   onMainImageChange,
-  onSecondaryImageChange
+  onSecondaryImageChange,
+  imageFrom
 }) => {
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
   const [uploadingToCloudinary, setUploadingToCloudinary] = useState(false)
@@ -112,12 +114,16 @@ const ImageManager: React.FC<ImageManagerProps> = ({
   return (
     <>
       <div>
-        <label className='mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300'>
-          Imágenes del Producto
-        </label>
-        <p className='mb-3 text-xs text-gray-500 dark:text-gray-400'>
-          Sube hasta 2 imágenes (primera imagen es obligatoria)
-        </p>
+        {!imageFrom && (
+          <>
+            <label className='mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300'>
+              Imágenes del Producto
+            </label>
+            <p className='mb-3 text-xs text-gray-500 dark:text-gray-400'>
+              Sube hasta 2 imágenes (primera imagen es obligatoria)
+            </p>
+          </>
+        )}
 
         {/* Botones para subir imágenes */}
         <div className='flex gap-3 mb-4'>
@@ -125,7 +131,7 @@ const ImageManager: React.FC<ImageManagerProps> = ({
             <input
               type='file'
               id='image-upload'
-              accept='image/*'
+              accept='.jpg, .jpeg, .png, .webp'
               onChange={handleImageUpload}
               className='hidden'
               disabled={uploadingToCloudinary}
@@ -153,7 +159,11 @@ const ImageManager: React.FC<ImageManagerProps> = ({
         </div>
 
         {/* Vista previa de imágenes */}
-        <div className='grid grid-cols-2 gap-4'>
+        <div
+          className={`grid grid-cols-2 gap-4 ${
+            imageFrom === 'systemImages' ? 'w-56' : ''
+          }`}
+        >
           {/* Imagen principal */}
           <ImagePreview
             imageUrl={mainImage}
@@ -172,7 +182,7 @@ const ImageManager: React.FC<ImageManagerProps> = ({
         </div>
 
         {/* Imágenes recién subidas */}
-        {uploadedImages.length > 0 && (
+        {uploadedImages.length > 0 && !imageFrom && (
           <div className='mt-4'>
             <p className='mb-2 text-xs font-medium text-gray-500 dark:text-gray-400'>
               Imágenes subidas recientemente:

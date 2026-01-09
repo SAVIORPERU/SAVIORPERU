@@ -617,45 +617,20 @@ const SettingsManagement: React.FC = () => {
                             : 'Foto de Tienda'}
                         </label>
                         <div className='flex gap-2'>
-                          <input
-                            type='text'
-                            value={settingsForm[key] || ''}
-                            onChange={(e) =>
-                              handleSettingChange(key, e.target.value)
-                            }
-                            disabled={!editingSettings}
-                            className={`flex-1 rounded-lg border px-3 py-2 ${
-                              settingsErrors[key]
-                                ? 'border-red-500'
-                                : 'border-gray-300 dark:border-gray-600'
-                            } bg-white dark:bg-gray-700 disabled:opacity-50`}
-                            placeholder='https://...'
+                          <ImageManager
+                            mainImage={settingsForm[key] || ''}
+                            onMainImageChange={async (url) => {
+                              handleSettingChange(key, url)
+                            }}
+                            imageFrom={'systemImages'}
                           />
-                          {editingSettings && (
-                            <>
-                              <input
-                                type='file'
-                                id={`upload-${key}`}
-                                accept='image/*'
-                                onChange={(e) => handleImageUpload(e, key)}
-                                className='hidden'
-                                disabled={uploadingImage}
-                              />
-                              <label
-                                htmlFor={`upload-${key}`}
-                                className='flex items-center gap-1 rounded-lg bg-blue-50 px-3 py-2 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 cursor-pointer text-sm'
-                              >
-                                <MdAdd /> Subir
-                              </label>
-                            </>
-                          )}
                         </div>
                         {settingsErrors[key] && (
                           <p className='mt-1 text-xs text-red-500'>
                             {settingsErrors[key]}
                           </p>
                         )}
-                        {settingsForm[key] && (
+                        {/* {settingsForm[key] && (
                           <div className='mt-2'>
                             <img
                               src={settingsForm[key]}
@@ -663,7 +638,7 @@ const SettingsManagement: React.FC = () => {
                               className='h-20 w-20 rounded-lg object-cover border'
                             />
                           </div>
-                        )}
+                        )} */}
                       </div>
                     )
                   )}
@@ -1022,6 +997,7 @@ const SettingsManagement: React.FC = () => {
                         image: url
                       }))
                     }}
+                    imageFrom={'colection'}
                   />
                 </div>
 
