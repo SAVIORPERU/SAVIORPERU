@@ -1,6 +1,6 @@
 export const products = [
   {
-    id: 1,
+    // id: 1,
     name: 'Polo Blanco Fire',
     category: 'polos',
     estado: 'DISPONIBLE',
@@ -12,7 +12,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 2,
+    // id: 2,
     name: 'Polo Negro Heaven',
     category: 'polos',
     estado: 'SOLO DISPONIBLE',
@@ -24,7 +24,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 3,
+    // id: 3,
     name: 'Polo Jade Forgiven',
     category: 'polos',
     estado: 'DISPONIBLE',
@@ -36,7 +36,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 4,
+    // id: 4,
     name: 'Polo Amarillo Hope',
     category: 'polos',
     estado: 'DISPONIBLE',
@@ -48,7 +48,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 5,
+    // id: 5,
     name: "Polo Celeste God's Club",
     category: 'polos',
     estado: 'DISPONIBLE',
@@ -60,7 +60,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 6,
+    // id: 6,
     name: 'Polo Verde Peace',
     category: 'polos',
     estado: 'DISPONIBLE',
@@ -72,7 +72,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 9,
+    // id: 9,
     name: 'Gorro Verde Faith',
     category: 'gorros',
     estado: 'DISPONIBLE',
@@ -83,7 +83,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 10,
+    // id: 10,
     name: 'Gorro Beige Faith',
     category: 'gorros',
     estado: 'DISPONIBLE',
@@ -94,7 +94,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 11,
+    // id: 11,
     name: 'Gorro Negro Faith',
     category: 'gorros',
     estado: 'DISPONIBLE',
@@ -105,7 +105,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 12,
+    // id: 12,
     name: 'Gorro Azul Blessed',
     category: 'gorros',
     estado: 'DISPONIBLE',
@@ -116,7 +116,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 13,
+    // id: 13,
     name: 'Gorro Blanco Blessed',
     category: 'gorros',
     estado: 'DISPONIBLE',
@@ -127,7 +127,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 14,
+    // id: 14,
     name: 'Gorro Negro Choosen',
     category: 'gorros',
     estado: 'DISPONIBLE',
@@ -138,7 +138,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 15,
+    // id: 15,
     name: 'Gorro Blanco Choosen',
     category: 'gorros',
     estado: 'DISPONIBLE',
@@ -149,7 +149,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 16,
+    // id: 16,
     name: 'Gorro Marron Choosen',
     category: 'gorros',
     estado: 'DISPONIBLE',
@@ -160,7 +160,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 17,
+    // id: 17,
     name: 'Gorro Celeste Choosen',
     category: 'gorros',
     estado: 'DISPONIBLE',
@@ -171,7 +171,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 18,
+    // id: 18,
     name: 'Gorro Negro Savior',
     category: 'gorros',
     estado: 'DISPONIBLE',
@@ -182,7 +182,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 19,
+    // id: 19,
     name: 'Gorro Blanco Savior',
     category: 'gorros',
     estado: 'DISPONIBLE',
@@ -193,7 +193,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 20,
+    // id: 20,
     name: 'Gorro Rojo Savior',
     category: 'gorros',
     estado: 'DISPONIBLE',
@@ -204,7 +204,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 21,
+    // id: 21,
     name: 'Gorro Azul Acero Savior',
     category: 'gorros',
     estado: 'NO DISPONIBLE',
@@ -215,7 +215,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 26,
+    // id: 26,
     name: 'Bucket Azul',
     category: 'gorros',
     estado: 'DISPONIBLE',
@@ -226,7 +226,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 27,
+    // id: 27,
     name: 'Bucket Negro',
     category: 'gorros',
     estado: 'DISPONIBLE',
@@ -237,7 +237,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 28,
+    // id: 28,
     name: 'Bucket Rosado',
     category: 'gorros',
     estado: 'DISPONIBLE',
@@ -248,7 +248,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 29,
+    // id: 29,
     name: 'Bucket Verde',
     category: 'gorros',
     estado: 'DISPONIBLE',
@@ -259,7 +259,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 22,
+    // id: 22,
     name: 'Casaca Negra Vintage',
     category: 'casacas',
     estado: 'SOLO DISPONIBLE',
@@ -271,7 +271,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 23,
+    // id: 23,
     name: 'Buso Negro Vintage',
     category: 'pantalones',
     estado: 'SOLO DISPONIBLE',
@@ -283,7 +283,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 25,
+    // id: 25,
     name: 'Hoodie Negro Faith',
     category: 'casacas',
     estado: 'DISPONIBLE',
@@ -295,7 +295,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 30,
+    // id: 30,
     name: 'Polo Blanco Basico',
     category: 'polos',
     estado: 'DISPONIBLE',
@@ -307,7 +307,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 31,
+    // id: 31,
     name: 'Polo Negro Basico',
     category: 'polos',
     estado: 'DISPONIBLE',
@@ -319,7 +319,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 32,
+    // id: 32,
     name: 'Jogger Melange',
     category: 'Pantalones',
     estado: 'DISPONIBLE',
@@ -331,7 +331,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 33,
+    // id: 33,
     name: 'Jogger Negro',
     category: 'Pantalones',
     estado: 'DISPONIBLE',
@@ -343,7 +343,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 34,
+    // id: 34,
     name: 'Polera Negra',
     category: 'casacas',
     estado: 'DISPONIBLE',
@@ -355,7 +355,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 35,
+    // id: 35,
     name: 'Polera Melange',
     category: 'casacas',
     estado: 'DISPONIBLE',
@@ -367,7 +367,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 36,
+    // id: 36,
     name: 'Polera Verde Acero',
     category: 'casacas',
     estado: 'DISPONIBLE',
@@ -379,7 +379,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 37,
+    // id: 37,
     name: 'Polera Verde Hoja',
     category: 'casacas',
     estado: 'DISPONIBLE',
@@ -391,7 +391,7 @@ export const products = [
     stock: 1
   },
   {
-    id: 38,
+    // id: 38,
     name: 'Polera Marron',
     category: 'casacas',
     estado: 'DISPONIBLE',

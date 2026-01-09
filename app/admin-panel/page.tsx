@@ -1,22 +1,46 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import OdersManagement from './components/Orders'
-import { MdInventory2, MdShoppingBag, MdGroups2 } from 'react-icons/md'
+import {
+  MdInventory2,
+  MdShoppingBag,
+  MdGroups2,
+  MdSettings
+} from 'react-icons/md'
 import { IoGridSharp } from 'react-icons/io5'
 import { Toaster } from 'sonner'
 import UserManagement from './components/UserManagement'
 import ProductsManagement from './components/ProductsManagement'
+import SettingsManagement from './components/SettingsManagement'
 
 const paths = [
   { name: 'Órdenes', path: 'orders', icon: MdShoppingBag },
   { name: 'Productos', path: 'products', icon: MdInventory2 },
-  { name: 'Usuarios', path: 'users', icon: MdGroups2 }
+  { name: 'Usuarios', path: 'users', icon: MdGroups2 },
+  { name: 'Configuracion', path: 'settings', icon: MdSettings }
 ]
 
 const AdminPanel = () => {
-  // Estados para Funcionalidad
-  const [panel, setPanel] = useState('orders')
+  // Estado inicial basado en localStorage o por defecto 'orders'
+  const [panel, setPanel] = useState<string>('')
+
+  // Efecto para cargar el panel guardado al montar
+  useEffect(() => {
+    const savedPanel = sessionStorage.getItem('admin-panel')
+    if (savedPanel && paths.some((p) => p.path === savedPanel)) {
+      setPanel(savedPanel)
+    } else {
+      setPanel('orders')
+    }
+    return () => sessionStorage.setItem('admin-panel', '')
+  }, [])
+
+  // Función para cambiar panel y guardar en localStorage
+  const handleSetPanel = (newPanel: string) => {
+    setPanel(newPanel)
+    sessionStorage.setItem('admin-panel', newPanel)
+  }
 
   return (
     <>
@@ -44,7 +68,7 @@ const AdminPanel = () => {
                       ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
                       : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50'
                   }`}
-                  onClick={() => setPanel(item.path)}
+                  onClick={() => handleSetPanel(item.path)}
                 >
                   <item.icon size={20} />
                   <span className='text-sm font-medium'>{item.name}</span>
@@ -57,6 +81,8 @@ const AdminPanel = () => {
           <UserManagement />
         ) : panel === 'products' ? (
           <ProductsManagement />
+        ) : panel === 'settings' ? (
+          <SettingsManagement />
         ) : (
           <OdersManagement />
         )}

@@ -22,6 +22,8 @@ import {
 } from 'react-icons/md'
 import { toast } from 'sonner'
 import KpiCard from './KpiCard'
+import { useUser } from '@clerk/nextjs'
+import OrdersSkeleton from './skeleton/OrdersSkeleton'
 interface Order {
   id: number
   clientName: string
@@ -64,6 +66,7 @@ interface ApiResponse {
 }
 
 const OdersManagement: React.FC = () => {
+  const { isLoaded } = useUser()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -246,80 +249,86 @@ const OdersManagement: React.FC = () => {
     <>
       <main className='flex flex-1 flex-col bg-gray-50 dark:bg-gray-900  pb-12'>
         <div className='mx-auto flex w-full max-w-7xl flex-col gap-8 p-4 lg:p-8'>
-          {/* Header & Search */}
-          <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
-            <div>
-              <h2 className='text-2xl font-bold tracking-tight text-gray-900 dark:text-white lg:text-3xl'>
-                Panel de Órdenes
-              </h2>
-              <p className='text-sm text-gray-600 dark:text-gray-400'>
-                Gestiona las ventas y envíos de tu tienda.
-              </p>
-            </div>
-            <div className='relative w-full sm:w-80'>
-              <MdSearch className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl dark:text-gray-500' />
-              <input
-                type='text'
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className='h-11 w-full rounded-xl border border-gray-200 bg-white pl-10 pr-10 text-sm shadow-sm outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-500 dark:focus:ring-blue-500/30'
-                placeholder='Buscar por cliente o email...'
-              />
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm('')}
-                  className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400'
-                >
-                  <MdClose />
-                </button>
-              )}
-            </div>
-          </div>
+          {!isLoaded ? (
+            <OrdersSkeleton />
+          ) : (
+            <>
+              {/* Header & Search */}
+              <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
+                <div>
+                  <h2 className='text-2xl font-bold tracking-tight text-gray-900 dark:text-white lg:text-3xl'>
+                    Panel de Órdenes
+                  </h2>
+                  <p className='text-sm text-gray-600 dark:text-gray-400'>
+                    Gestiona las ventas y envíos de tu tienda.
+                  </p>
+                </div>
+                <div className='relative w-full sm:w-80'>
+                  <MdSearch className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl dark:text-gray-500' />
+                  <input
+                    type='text'
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className='h-11 w-full rounded-xl border border-gray-200 bg-white pl-10 pr-10 text-sm shadow-sm outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-500 dark:focus:ring-blue-500/30'
+                    placeholder='Buscar por cliente o email...'
+                  />
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm('')}
+                      className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400'
+                    >
+                      <MdClose />
+                    </button>
+                  )}
+                </div>
+              </div>
 
-          {/* KPI Cards */}
-          <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-            <KpiCard
-              title='Pedidos'
-              value={pagination.activeOrders.toString()}
-              trend='+5%'
-              Icon={MdLocalShipping}
-              color='indigo'
-            />
-            <KpiCard
-              title='Pendientes'
-              value={pagination.pendientes.toString()}
-              trend='Estable'
-              Icon={MdProductionQuantityLimits}
-              color='orange'
-            />
-            <KpiCard
-              title='Items Vendidos'
-              value={pagination.soldItems.toString()}
-              trend='+2%'
-              Icon={MdShoppingCart}
-              color='purple'
-            />
-            <KpiCard
-              title='Ingresos'
-              value={`S/ ${pagination.totalAmount.toFixed(2)}`}
-              trend='+12%'
-              Icon={MdAttachMoney}
-              color='blue'
-            />
-          </div>
+              {/* KPI Cards */}
+              <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+                <KpiCard
+                  title='Pedidos'
+                  value={pagination.activeOrders.toString()}
+                  trend='+5%'
+                  Icon={MdLocalShipping}
+                  color='indigo'
+                />
+                <KpiCard
+                  title='Pendientes'
+                  value={pagination.pendientes.toString()}
+                  trend='Estable'
+                  Icon={MdProductionQuantityLimits}
+                  color='orange'
+                />
+                <KpiCard
+                  title='Items Vendidos'
+                  value={pagination.soldItems.toString()}
+                  trend='+2%'
+                  Icon={MdShoppingCart}
+                  color='purple'
+                />
+                <KpiCard
+                  title='Ingresos'
+                  value={`S/ ${pagination.totalAmount.toFixed(2)}`}
+                  trend='+12%'
+                  Icon={MdAttachMoney}
+                  color='blue'
+                />
+              </div>
 
-          {/* Contador de Resultados */}
-          <div className='flex items-center justify-between'>
-            <div className='text-sm text-gray-600 dark:text-gray-400'>
-              Mostrando <span className='font-bold'>{orders.length}</span> de{' '}
-              <span className='font-bold'>{pagination.total}</span> órdenes
-              totales
-            </div>
-            <div className='text-sm text-gray-600 dark:text-gray-400'>
-              Página <span className='font-bold'>{currentPage}</span> de{' '}
-              <span className='font-bold'>{pagination.totalPages}</span>
-            </div>
-          </div>
+              {/* Contador de Resultados */}
+              <div className='flex items-center justify-between'>
+                <div className='text-sm text-gray-600 dark:text-gray-400'>
+                  Mostrando <span className='font-bold'>{orders.length}</span>{' '}
+                  de <span className='font-bold'>{pagination.total}</span>{' '}
+                  órdenes totales
+                </div>
+                <div className='text-sm text-gray-600 dark:text-gray-400'>
+                  Página <span className='font-bold'>{currentPage}</span> de{' '}
+                  <span className='font-bold'>{pagination.totalPages}</span>
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Table */}
           <div className='flex flex-col gap-4'>

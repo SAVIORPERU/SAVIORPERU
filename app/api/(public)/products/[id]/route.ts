@@ -47,14 +47,15 @@ export async function GET(
 
 const updateProductSchema = z.object({
   name: z.string().min(1).optional(),
-  category: z.string().min(1).optional(),
+  category: z.string().min(1),
   estado: z.string().optional(),
   size: z.string().optional().nullable(),
   price: z.number().positive().optional(),
   image: z.string().url().optional(),
   image2: z.string().url().optional().nullable(),
   stock: z.number().int().min(0).optional(),
-  destacado: z.boolean().optional()
+  destacado: z.boolean().optional(),
+  newCategory: z.string().optional()
 })
 
 // PUT - Actualizar producto
@@ -85,7 +86,18 @@ export async function PUT(
     }
 
     const body = await req.json()
+    console.log('body', body)
     const validatedData = updateProductSchema.parse(body)
+
+    const findCategory = await prisma.categories.findFirst({
+      where: { name: validatedData.category }
+    })
+
+    if (!findCategory) {
+      await prisma.categories.create({
+        data: { name: validatedData.category }
+      })
+    }
 
     const updatedProduct = await prisma.productos.update({
       where: { id },

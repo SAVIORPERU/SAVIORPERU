@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback } from 'react'
 import {
   MdSearch,
   MdInventory2,
-  MdRemoveRedEye,
   MdEdit,
   MdDelete,
   MdClose,
@@ -12,20 +11,20 @@ import {
   MdStar,
   MdStarBorder,
   MdFilterList,
-  MdSort,
   MdImage,
   MdCloudUpload,
   MdPhotoLibrary,
   MdCheckCircle,
-  MdCancel,
   MdWarning,
   MdAttachMoney,
   MdLocalShipping,
   MdChevronLeft,
   MdChevronRight,
   MdFirstPage,
-  MdLastPage
+  MdLastPage,
+  MdCalendarToday
 } from 'react-icons/md'
+import { GoSortAsc, GoSortDesc } from 'react-icons/go'
 import { toast } from 'sonner'
 import KpiCard from './KpiCard'
 
@@ -40,9 +39,10 @@ interface Producto {
   image: string
   image2: string | null
   stock: number
-  destacados: Array<{ id: number; productoId: number }>
+  destacado: boolean
   createdAt: string
   updatedAt: string
+  newCategory: string
 }
 
 interface CloudinaryImage {
@@ -67,6 +67,8 @@ interface ApiResponse {
     notAvailable: number
     totalStock: number
     totalProducts: number
+    destacados: number
+    categories: [{ name: string }]
   }
 }
 
@@ -81,6 +83,8 @@ interface KpiData {
   totalStock: number
   noDisponibleCount: number
   inventoryValue: number
+  destacadosCount: number
+  categoreis: [{ name: string }]
 }
 
 const ProductsManagement: React.FC = () => {
@@ -101,12 +105,14 @@ const ProductsManagement: React.FC = () => {
     totalProducts: 0,
     totalStock: 0,
     noDisponibleCount: 0,
-    inventoryValue: 0
+    inventoryValue: 0,
+    destacadosCount: 0,
+    categoreis: [{ name: '' }]
   })
 
   // Estados para filtros y ordenamiento
   const [filter, setFilter] = useState<string>('')
-  const [sort, setSort] = useState<string>('')
+  const [sort, setSort] = useState<string>('created-desc')
   const [showFilters, setShowFilters] = useState<boolean>(false)
 
   // Estados para modales
@@ -114,6 +120,7 @@ const ProductsManagement: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false)
   const [showEditModal, setShowEditModal] = useState<boolean>(false)
   const [isDeleting, setIsDeleting] = useState<number | null>(null)
+  const [selectorCategory, setSelectorCategory] = useState('')
 
   // Estados para Cloudinary
   const [showCloudinaryGallery, setShowCloudinaryGallery] =
@@ -136,10 +143,11 @@ const ProductsManagement: React.FC = () => {
     estado: 'DISPONIBLE',
     size: '',
     price: 0,
-    stock: 1,
+    stock: 0,
     destacado: false,
     image: '',
-    image2: ''
+    image2: '',
+    newCategory: ''
   })
 
   // Estados para subida de imágenes
@@ -162,12 +170,14 @@ const ProductsManagement: React.FC = () => {
       setProducts(result.data)
       setPagination(result.pagination)
 
-      // Usar las estadísticas del backend en lugar de calcularlas
+      // Usar las estadísticas del backend
       setKpiData({
         totalProducts: result.productsDetails.totalProducts,
         totalStock: result.productsDetails.totalStock,
         noDisponibleCount: result.productsDetails.notAvailable,
-        inventoryValue: result.productsDetails.totalInventoryAmount
+        inventoryValue: result.productsDetails.totalInventoryAmount,
+        destacadosCount: result.productsDetails.destacados, // ← Nueva propiedad
+        categoreis: result.productsDetails.categories
       })
     } catch (error) {
       console.error('Error fetching products:', error)
@@ -191,30 +201,6 @@ const ProductsManagement: React.FC = () => {
     } finally {
       setLoadingCloudinaryImages(false)
     }
-  }
-
-  // Calcular KPIs
-  const calculateKPIs = (productsList: Producto[]) => {
-    let totalStock = 0
-    let noDisponibleCount = 0
-    let inventoryValue = 0
-
-    productsList.forEach((product) => {
-      totalStock += product.stock
-      if (product.estado === 'NO DISPONIBLE') {
-        noDisponibleCount++
-      }
-      if (product.estado === 'DISPONIBLE') {
-        inventoryValue += product.price * product.stock
-      }
-    })
-
-    setKpiData({
-      totalProducts: productsList.length,
-      totalStock,
-      noDisponibleCount,
-      inventoryValue
-    })
   }
 
   useEffect(() => {
@@ -386,16 +372,29 @@ const ProductsManagement: React.FC = () => {
       return
     }
 
+    console.log('formData', formData)
+
     try {
+      const formDataToSend = {
+        name: formData.name,
+        category: formData.category,
+        estado: formData.estado,
+        image: formData.image,
+        destacado: formData.destacado,
+        price: Number(formData.price),
+        stock: Number(formData.stock),
+        image2: formData.image2 || null,
+        size: formData.size
+          .toUpperCase()
+          .split(' ')
+          .join('')
+          .split('-')
+          .join(' - ')
+      }
       const response = await fetch('/api/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          price: Number(formData.price),
-          stock: Number(formData.stock),
-          image2: formData.image2 || null
-        })
+        body: JSON.stringify(formDataToSend)
       })
 
       if (!response.ok) throw new Error()
@@ -415,11 +414,11 @@ const ProductsManagement: React.FC = () => {
     if (!selectedProduct) return
 
     // Verificar límite de destacados
-    if (formData.destacado && !selectedProduct.destacados.length) {
-      const destacadosCount = products.filter(
-        (p) => p.destacados.length > 0
-      ).length
-      if (destacadosCount >= 4) {
+    if (formData.destacado && !selectedProduct.destacado) {
+      const destacadosCount = kpiData.destacadosCount
+
+      // Si quieres marcar como destacado (y antes no lo era)
+      if (formData.destacado && destacadosCount >= 4) {
         toast.warning('Solo puedes tener 4 productos destacados como máximo')
         return
       }
@@ -433,7 +432,13 @@ const ProductsManagement: React.FC = () => {
           ...formData,
           price: Number(formData.price),
           stock: Number(formData.stock),
-          image2: formData.image2 || null
+          image2: formData.image2 || null,
+          size: formData.size
+            .toUpperCase()
+            .split(' ')
+            .join('')
+            .split('-')
+            .join(' - ')
         })
       })
 
@@ -484,10 +489,11 @@ const ProductsManagement: React.FC = () => {
       estado: 'DISPONIBLE',
       size: '',
       price: 0,
-      stock: 1,
+      stock: 0,
       destacado: false,
       image: '',
-      image2: ''
+      image2: '',
+      newCategory: ''
     })
     setUploadedImages([])
   }
@@ -502,12 +508,59 @@ const ProductsManagement: React.FC = () => {
       size: product.size || '',
       price: product.price,
       stock: product.stock,
-      destacado: product.destacados?.length > 0,
+      destacado: product.destacado,
       image: product.image,
-      image2: product.image2 || ''
+      image2: product.image2 || '',
+      newCategory: product.newCategory
     })
     setShowEditModal(true)
   }
+
+  // Añade esta función cerca de las otras funciones de manejo
+  const handleToggleDestacado = async (product: Producto) => {
+    const nuevoEstado = !product.destacado
+
+    // Validar límite si quiere marcar como destacado
+    if (nuevoEstado && kpiData.destacadosCount >= 4) {
+      toast.warning('Solo puedes tener 4 productos destacados como máximo')
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/products/${product.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          destacado: nuevoEstado,
+          // Mantener otros datos iguales
+          name: product.name,
+          category: product.category,
+          estado: product.estado,
+          size: product.size,
+          price: Number(product.price),
+          stock: product.stock,
+          image: product.image,
+          image2: product.image2
+        })
+      })
+
+      if (!response.ok) throw new Error()
+
+      toast.success(
+        nuevoEstado
+          ? `"${product.name}" marcado como destacado`
+          : `"${product.name}" quitado de destacados`
+      )
+
+      // Actualizar la lista
+      fetchProducts()
+    } catch (error) {
+      console.error('Error actualizando destacado:', error)
+      toast.error('Error al actualizar el producto')
+    }
+  }
+
+  console.log('formData', formData)
 
   return (
     <>
@@ -584,23 +637,47 @@ const ProductsManagement: React.FC = () => {
                     </button>
                     <button
                       onClick={() => setSort('price-asc')}
-                      className={`px-3 py-2 rounded-lg text-sm font-medium ${
+                      className={`flex justify-center items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium ${
                         sort === 'price-asc'
                           ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
                           : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
                       }`}
                     >
+                      <GoSortAsc className='h-5 w-5' />
                       Precio: Menor a Mayor
                     </button>
                     <button
                       onClick={() => setSort('price-desc')}
-                      className={`px-3 py-2 rounded-lg text-sm font-medium ${
+                      className={`flex justify-center items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium ${
                         sort === 'price-desc'
                           ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
                           : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
                       }`}
                     >
+                      <GoSortDesc className='h-5 w-5' />
                       Precio: Mayor a Menor
+                    </button>
+                    <button
+                      onClick={() => setSort('created-desc')}
+                      className={`flex justify-center items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium ${
+                        sort === 'created-desc'
+                          ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                          : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
+                      }`}
+                    >
+                      <MdCalendarToday size={14} />
+                      Más Recientes
+                    </button>
+                    <button
+                      onClick={() => setSort('created-asc')}
+                      className={`flex justify-center items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium ${
+                        sort === 'created-asc'
+                          ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                          : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
+                      }`}
+                    >
+                      <MdCalendarToday size={14} />
+                      Más Antiguos
                     </button>
                   </div>
                 </div>
@@ -771,11 +848,25 @@ const ProductsManagement: React.FC = () => {
                             </span>
                           </td>
                           <td className='px-6 py-4'>
-                            {product.destacados?.length > 0 ? (
-                              <MdStar className='text-amber-500 text-xl' />
-                            ) : (
-                              <MdStarBorder className='text-gray-300 text-xl dark:text-gray-600' />
-                            )}
+                            <button
+                              onClick={() => handleToggleDestacado(product)}
+                              className={`p-1 rounded-lg transition-colors ${
+                                product.destacado
+                                  ? 'text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/30'
+                                  : 'text-gray-300 hover:text-amber-500 hover:bg-gray-50 dark:text-gray-600 dark:hover:bg-gray-700'
+                              }`}
+                              title={
+                                product.destacado
+                                  ? 'Quitar destacado'
+                                  : 'Marcar como destacado'
+                              }
+                            >
+                              {product.destacado ? (
+                                <MdStar size={22} />
+                              ) : (
+                                <MdStarBorder size={22} />
+                              )}
+                            </button>
                           </td>
                           <td className='px-6 py-4 text-right'>
                             <div className='flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all'>
@@ -912,15 +1003,61 @@ const ProductsManagement: React.FC = () => {
                     <label className='mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300'>
                       Categoría *
                     </label>
-                    <input
-                      type='text'
-                      value={formData.category}
-                      onChange={(e) =>
-                        setFormData({ ...formData, category: e.target.value })
-                      }
-                      className='w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-700 dark:border-gray-600 dark:text-white'
-                      placeholder='Ej: Ropa, Accesorios'
-                    />
+                    <div className='flex gap-2'>
+                      <input
+                        type='text'
+                        value={formData.category || ''}
+                        onChange={(e) => {
+                          setFormData({
+                            ...formData,
+                            category: e.target.value.toUpperCase()
+                          })
+                          setSelectorCategory('CATEGORIES')
+                        }}
+                        className='w-full rounded-lg border border-gray-300 px-4 py-2.5 text-xs focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-700 dark:border-gray-600 dark:text-white'
+                        placeholder='Ej: Ropa, Accesorios'
+                      />
+                      <select
+                        className='w-full rounded-lg border border-gray-300 px-4 py-2.5 text-xs focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-700 dark:border-gray-600 dark:text-white'
+                        name='categories'
+                        id='categories'
+                        onChange={(e) => {
+                          if (e.target.value === 'CATEGORIES') {
+                            setFormData({
+                              ...formData,
+                              category: ''
+                            })
+                            setSelectorCategory('CATEGORIES')
+                          } else {
+                            setFormData({
+                              ...formData,
+                              category: e.target.value
+                            })
+                            setSelectorCategory(e.target.value)
+                          }
+                        }}
+                        value={selectorCategory}
+                      >
+                        {kpiData.categoreis?.length ? (
+                          <>
+                            <option value='CATEGORIES'>Seleccionar</option>
+                            {kpiData.categoreis.map((ele, index) => {
+                              console.log(ele)
+
+                              return (
+                                <option key={index} value={ele.name}>
+                                  {ele.name.length
+                                    ? ele.name
+                                    : 'No hay categorias'}
+                                </option>
+                              )
+                            })}
+                          </>
+                        ) : (
+                          <option value='categories'>No hay categorias</option>
+                        )}
+                      </select>
+                    </div>
                   </div>
 
                   <div>
@@ -931,7 +1068,10 @@ const ProductsManagement: React.FC = () => {
                       type='text'
                       value={formData.size}
                       onChange={(e) =>
-                        setFormData({ ...formData, size: e.target.value })
+                        setFormData({
+                          ...formData,
+                          size: e.target.value.toUpperCase()
+                        })
                       }
                       className='w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-700 dark:border-gray-600 dark:text-white'
                       placeholder='Ej: M, 42, Única'
@@ -945,14 +1085,14 @@ const ProductsManagement: React.FC = () => {
                       </label>
                       <input
                         type='number'
-                        value={formData.price}
+                        value={formData.price === 0 ? '' : formData.price}
                         onChange={(e) =>
                           setFormData({
                             ...formData,
                             price: parseFloat(e.target.value) || 0
                           })
                         }
-                        step='0.01'
+                        step='0.1'
                         min='0'
                         className='w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-700 dark:border-gray-600 dark:text-white'
                         placeholder='0.00'
@@ -965,7 +1105,7 @@ const ProductsManagement: React.FC = () => {
                       </label>
                       <input
                         type='number'
-                        value={formData.stock}
+                        value={formData.stock === 0 ? '' : formData.stock}
                         onChange={(e) =>
                           setFormData({
                             ...formData,
@@ -989,10 +1129,10 @@ const ProductsManagement: React.FC = () => {
                         onChange={(e) =>
                           setFormData({ ...formData, estado: e.target.value })
                         }
-                        className='w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-700 dark:border-gray-600 dark:text-white'
+                        className='w-full rounded-lg border border-gray-300 px-4 py-2.5 text-xs focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-700 dark:border-gray-600 dark:text-white'
                       >
-                        <option value='DISPONIBLE'>Disponible</option>
-                        <option value='NO DISPONIBLE'>No Disponible</option>
+                        <option value='DISPONIBLE'>DISPONIBLE</option>
+                        <option value='NO DISPONIBLE'>NO DISPONIBLE</option>
                       </select>
                     </div>
 
@@ -1009,9 +1149,12 @@ const ProductsManagement: React.FC = () => {
                               })
                             }
                             className='rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700'
+                            disabled={kpiData.destacadosCount >= 4}
                           />
                           <span className='text-sm font-medium text-gray-700 dark:text-gray-300'>
-                            Destacado
+                            {kpiData.destacadosCount >= 4
+                              ? 'Destacados 4/4'
+                              : 'Destacado'}
                           </span>
                         </label>
                         {formData.destacado && (
@@ -1243,14 +1386,61 @@ const ProductsManagement: React.FC = () => {
                     <label className='mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300'>
                       Categoría *
                     </label>
-                    <input
-                      type='text'
-                      value={formData.category}
-                      onChange={(e) =>
-                        setFormData({ ...formData, category: e.target.value })
-                      }
-                      className='w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-700 dark:border-gray-600 dark:text-white'
-                    />
+                    <div className='flex gap-2'>
+                      <input
+                        type='text'
+                        value={formData.category || ''}
+                        onChange={(e) => {
+                          setFormData({
+                            ...formData,
+                            category: e.target.value.toUpperCase()
+                          })
+                          setSelectorCategory('CATEGORIES')
+                        }}
+                        className='w-full rounded-lg border border-gray-300 px-4 py-2.5 text-xs focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-700 dark:border-gray-600 dark:text-white'
+                        placeholder='Ej: Ropa, Accesorios'
+                      />
+                      <select
+                        className='w-full rounded-lg border border-gray-300 px-4 py-2.5 text-xs focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-700 dark:border-gray-600 dark:text-white'
+                        name='categories'
+                        id='categories'
+                        onChange={(e) => {
+                          if (e.target.value === 'CATEGORIES') {
+                            setFormData({
+                              ...formData,
+                              category: ''
+                            })
+                            setSelectorCategory('CATEGORIES')
+                          } else {
+                            setFormData({
+                              ...formData,
+                              category: e.target.value
+                            })
+                            setSelectorCategory(e.target.value)
+                          }
+                        }}
+                        value={selectorCategory}
+                      >
+                        {kpiData.categoreis?.length ? (
+                          <>
+                            <option value='CATEGORIES'>Seleccionar</option>
+                            {kpiData.categoreis.map((ele, index) => {
+                              console.log(ele)
+
+                              return (
+                                <option key={index} value={ele.name}>
+                                  {ele.name.length
+                                    ? ele.name
+                                    : 'No hay categorias'}
+                                </option>
+                              )
+                            })}
+                          </>
+                        ) : (
+                          <option value='categories'>No hay categorias</option>
+                        )}
+                      </select>
+                    </div>
                   </div>
 
                   <div>
@@ -1260,9 +1450,12 @@ const ProductsManagement: React.FC = () => {
                     <input
                       type='text'
                       value={formData.size}
-                      onChange={(e) =>
-                        setFormData({ ...formData, size: e.target.value })
-                      }
+                      onChange={(e) => {
+                        setFormData({
+                          ...formData,
+                          size: e.target.value.toUpperCase()
+                        })
+                      }}
                       className='w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-700 dark:border-gray-600 dark:text-white'
                     />
                   </div>
@@ -1274,14 +1467,15 @@ const ProductsManagement: React.FC = () => {
                       </label>
                       <input
                         type='number'
-                        value={formData.price}
-                        onChange={(e) =>
+                        value={formData.price === 0 ? '' : formData.price}
+                        onChange={(e) => {
+                          const value = e.target.valueAsNumber
                           setFormData({
                             ...formData,
-                            price: parseFloat(e.target.value) || 0
+                            price: isNaN(value) ? 0 : value
                           })
-                        }
-                        step='0.01'
+                        }}
+                        step='0.1'
                         min='0'
                         className='w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-700 dark:border-gray-600 dark:text-white'
                       />
@@ -1309,17 +1503,17 @@ const ProductsManagement: React.FC = () => {
                   <div className='grid grid-cols-2 gap-4'>
                     <div>
                       <label className='mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300'>
-                        Estado
+                        Estado 123
                       </label>
                       <select
                         value={formData.estado}
                         onChange={(e) =>
                           setFormData({ ...formData, estado: e.target.value })
                         }
-                        className='w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-700 dark:border-gray-600 dark:text-white'
+                        className='w-full rounded-lg border border-gray-300 px-4 py-2.5 text-xs focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-700 dark:border-gray-600 dark:text-white'
                       >
-                        <option value='DISPONIBLE'>Disponible</option>
-                        <option value='NO DISPONIBLE'>No Disponible</option>
+                        <option value='DISPONIBLE'>DISPONIBLE</option>
+                        <option value='NO DISPONIBLE'>NO DISPONIBLE</option>
                       </select>
                     </div>
 
@@ -1336,17 +1530,14 @@ const ProductsManagement: React.FC = () => {
                               })
                             }
                             className='rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700'
+                            disabled={kpiData.destacadosCount >= 4}
                           />
                           <span className='text-sm font-medium text-gray-700 dark:text-gray-300'>
                             Destacado
                           </span>
                         </label>
                         <p className='mt-1 text-xs text-gray-500 dark:text-gray-400'>
-                          {
-                            products.filter((p) => p.destacados?.length > 0)
-                              .length
-                          }
-                          /4 destacados
+                          Destacados {kpiData.destacadosCount}/4
                         </p>
                       </div>
                     </div>

@@ -18,9 +18,12 @@ export async function GET(req: NextRequest) {
         ? { price: 'asc' as Prisma.SortOrder }
         : sort === 'price-desc'
         ? { price: 'desc' as Prisma.SortOrder }
+        : sort === 'created-asc'
+        ? { createdAt: 'asc' as Prisma.SortOrder }
+        : sort === 'created-desc'
+        ? { createdAt: 'desc' as Prisma.SortOrder }
         : { name: 'asc' as Prisma.SortOrder }
 
-    // Verificar si existen productos
     const existingCount = await prisma.productos.count()
 
     if (existingCount === 0) {
@@ -42,11 +45,17 @@ export async function GET(req: NextRequest) {
         notAvailable: products.filter((p) => p.estado === 'NO DISPONIBLE')
           .length,
         totalStock: products.reduce(
-          (sum, product) => sum + (product.stock || 0),
+          (sum, product) =>
+            sum +
+            (product.estado.toUpperCase() === 'DISPONIBLE'
+              ? product.stock || 0
+              : 0),
           0
         ),
         totalProducts: products.length
       }
+
+      console.log('initialProductsDetails =>', initialProductsDetails)
 
       return NextResponse.json(
         {
@@ -64,33 +73,63 @@ export async function GET(req: NextRequest) {
       )
     }
 
-    // Filtros y paginación
-    const filteredProducts = await prisma.productos.findMany({
-      where: {
-        OR: [
-          { name: { contains: filter, mode: 'insensitive' } },
-          { category: { contains: filter, mode: 'insensitive' } }
-        ]
-      },
-      orderBy,
-      skip: (page - 1) * pageSize,
-      take: pageSize
-    })
+    // Definir condiciones WHERE comunes
+    const whereConditions: Prisma.ProductosWhereInput = {
+      OR: [
+        { name: { contains: filter, mode: 'insensitive' as Prisma.QueryMode } },
+        {
+          category: {
+            contains: filter,
+            mode: 'insensitive' as Prisma.QueryMode
+          }
+        }
+      ]
+    }
 
-    // Obtener estadísticas de TODOS los productos (sin paginación)
-    const allProducts = await prisma.productos.findMany({
-      where: {
-        OR: [
-          { name: { contains: filter, mode: 'insensitive' } },
-          { category: { contains: filter, mode: 'insensitive' } }
-        ]
-      }
-    })
+    // Ejecutar consultas en paralelo
+    const [
+      filteredProducts,
+      allProducts,
+      totalCount,
+      destacadosCount,
+      categories
+    ] = await Promise.all([
+      // 1. Productos paginados con relaciones
+      prisma.productos.findMany({
+        where: whereConditions,
+        include: {
+          destacados: true
+        },
+        orderBy,
+        skip: (page - 1) * pageSize,
+        take: pageSize
+      }),
+      // 2. Todos los productos para estadísticas
+      prisma.productos.findMany({
+        where: whereConditions
+      }),
+      // 3. Contador para paginación
+      prisma.productos.count({
+        where: whereConditions
+      }),
+      // 4. Contar productos destacados
+      prisma.productosDestacados.count(),
+      // 5. Obtener categorías
+      prisma.categories.findMany({
+        orderBy: {
+          name: 'asc'
+        }
+      })
+    ])
+
+    const transformedProducts = filteredProducts.map((product) => ({
+      ...product,
+      destacado: product.destacados.length > 0
+    }))
 
     // Calcular las estadísticas
     const productsDetails = {
       totalInventoryAmount: allProducts.reduce((sum, product) => {
-        // Solo sumar productos DISPONIBLES al valor del inventario
         if (product.estado === 'DISPONIBLE') {
           return sum + (Number(product.price) || 0) * (product.stock || 0)
         }
@@ -99,33 +138,26 @@ export async function GET(req: NextRequest) {
       notAvailable: allProducts.filter((p) => p.estado === 'NO DISPONIBLE')
         .length,
       totalStock: allProducts.reduce(
-        (sum, product) => sum + (product.stock || 0),
+        (sum, product) =>
+          sum + (product.estado === 'DISPONIBLE' ? product.stock || 0 : 0),
         0
       ),
-      totalProducts: allProducts.length
+      totalProducts: allProducts.length,
+      destacados: destacadosCount,
+      categories
     }
-
-    // Contador para paginación (solo productos que coinciden con el filtro)
-    const totalCount = await prisma.productos.count({
-      where: {
-        OR: [
-          { name: { contains: filter, mode: 'insensitive' } },
-          { category: { contains: filter, mode: 'insensitive' } }
-        ]
-      }
-    })
 
     return NextResponse.json(
       {
         message: 'Products retrieved successfully',
-        data: filteredProducts,
+        data: transformedProducts,
         pagination: {
           page,
           pageSize,
           totalPages: Math.ceil(totalCount / pageSize),
           totalCount
         },
-        productsDetails // Nueva propiedad añadida
+        productsDetails
       },
       { status: 200 }
     )
@@ -139,26 +171,41 @@ export async function GET(req: NextRequest) {
 }
 
 // Esquema de validación para producto
-const createProductSchema = z.object({
-  name: z.string().min(1, 'El nombre es requerido'),
-  category: z.string().min(1, 'La categoría es requerida'),
-  estado: z.string().default('Disponible'),
-  size: z.string().optional(),
-  price: z.number().positive('El precio debe ser mayor a 0'),
-  image: z.string().url('La imagen debe ser una URL válida'),
-  image2: z
-    .string()
-    .url('La segunda imagen debe ser una URL válida')
-    .optional()
-    .nullable(),
-  stock: z.number().int().min(0, 'El stock no puede ser negativo').default(1),
-  destacado: z.boolean().default(false) // Para marcar como destacado automáticamente
-})
+const createProductSchema = z
+  .object({
+    name: z.string().min(1, 'El nombre es requerido'),
+    category: z.string().min(1, 'La categoría es requerida'),
+    estado: z.string().default('Disponible'),
+    size: z.string().optional(),
+    price: z.number().positive('El precio debe ser mayor a 0'),
+    image: z.string().url('La imagen debe ser una URL válida'),
+    image2: z
+      .string()
+      .url('La segunda imagen debe ser una URL válida')
+      .optional()
+      .nullable(),
+    stock: z.number().int().min(0, 'El stock no puede ser negativo').default(1),
+    destacado: z.boolean().default(false), // Para marcar como destacado automáticamente
+    newCategory: z.string().optional()
+  })
+  .strip()
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const validatedData = createProductSchema.parse(body)
+
+    console.log('validatedData', validatedData)
+
+    const findCategory = await prisma.categories.findFirst({
+      where: { name: validatedData.category }
+    })
+
+    if (!findCategory) {
+      await prisma.categories.create({
+        data: { name: validatedData.category }
+      })
+    }
 
     // Crear producto
     const product = await prisma.productos.create({
@@ -173,6 +220,8 @@ export async function POST(req: NextRequest) {
         stock: validatedData.stock
       }
     })
+
+    console.log('product', product)
 
     // Si el producto debe ser destacado, crear relación
     if (validatedData.destacado) {
@@ -200,10 +249,7 @@ export async function POST(req: NextRequest) {
 
     // Verificar si es error de duplicado (aunque no tienes unique en name)
     if (error instanceof Error && error.message.includes('Unique constraint')) {
-      return NextResponse.json(
-        { message: 'Ya existe un producto con ese nombre' },
-        { status: 409 }
-      )
+      return NextResponse.json({ message: error }, { status: 409 })
     }
 
     console.error('Error creando producto:', error)
