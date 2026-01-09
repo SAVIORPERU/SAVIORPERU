@@ -11,7 +11,7 @@ import {
 import { IoGridSharp } from 'react-icons/io5'
 import { Toaster } from 'sonner'
 import UserManagement from './components/UserManagement'
-import ProductsManagement from './components/ProductsManagement'
+import ProductsManagement from './components/products/ProductsManagement'
 import SettingsManagement from './components/SettingsManagement'
 
 const paths = [

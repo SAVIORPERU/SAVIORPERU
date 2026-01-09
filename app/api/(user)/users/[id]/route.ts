@@ -278,8 +278,6 @@ export async function DELETE(
       )
     }
 
-    await client.users.deleteUser(existingUser.clerkId as string)
-
     // Validaciones antes de eliminar
 
     // 1. No permitir eliminar al usuario con ID 1 (admin principal)
@@ -328,6 +326,8 @@ export async function DELETE(
     await prisma.user.delete({
       where: { id }
     })
+
+    await client.users.deleteUser(existingUser.clerkId as string)
 
     return NextResponse.json({
       message: 'Usuario eliminado exitosamente',

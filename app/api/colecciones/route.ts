@@ -122,7 +122,7 @@ const createColeccionSchema = z.object({
     .string()
     .min(1, 'El nombre es requerido')
     .max(100, 'Nombre muy largo'),
-  price: z.number().positive('El precio debe ser mayor a 0'),
+  price: z.number().positive('El precio debe ser mayor a 0').optional(),
   image: z.string().url('La imagen debe ser una URL válida')
 })
 
@@ -161,7 +161,9 @@ export async function POST(req: NextRequest) {
     const coleccion = await prisma.coleccion.create({
       data: {
         name: validatedData.name,
-        price: validatedData.price,
+        ...(validatedData.price
+          ? { price: validatedData.price }
+          : { price: 0 }),
         image: validatedData.image
       }
     })

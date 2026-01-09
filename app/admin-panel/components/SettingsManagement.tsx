@@ -26,13 +26,15 @@ import {
 } from 'react-icons/md'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import CloudinaryGallery from './products/CloudinaryGallery'
+import ImageManager from './products/ImageManager'
 
 // --- Interfaces ---
 interface Coleccion {
   id: number
   name: string
   image: string
-  price: number
+  price?: number
   createdAt: string
   updatedAt: string
 }
@@ -769,9 +771,9 @@ const SettingsManagement: React.FC = () => {
                     <tr>
                       <th className='px-6 py-4 font-bold'>Imagen</th>
                       <th className='px-6 py-4 font-bold'>Nombre</th>
-                      <th className='px-6 py-4 font-bold'>Precio</th>
+                      <th className='px-6 py-4 font-bold'>Actualizado</th>
                       <th className='px-6 py-4 font-bold'>Creado</th>
-                      <th className='px 6 py-4 text-right font-bold'>
+                      <th className='px-6 py-4 text-right font-bold'>
                         Acciones
                       </th>
                     </tr>
@@ -815,10 +817,11 @@ const SettingsManagement: React.FC = () => {
                             </span>
                           </td>
                           <td className='px-6 py-4'>
-                            <div className='flex items-center gap-1 text-gray-700 dark:text-gray-300'>
-                              <MdAttachMoney />
-                              <span>S/ {coleccion.price.toFixed(2)}</span>
-                            </div>
+                            <span className='text-sm'>
+                              {new Date(
+                                coleccion.updatedAt
+                              ).toLocaleDateString()}
+                            </span>
                           </td>
                           <td className='px-6 py-4'>
                             <span className='text-sm'>
@@ -963,7 +966,7 @@ const SettingsManagement: React.FC = () => {
                   )}
                 </div>
 
-                <div>
+                {/* <div>
                   <label className='mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300'>
                     Imagen URL *
                   </label>
@@ -987,7 +990,9 @@ const SettingsManagement: React.FC = () => {
                       placeholder='https://res.cloudinary.com/...'
                     />
                     <button
-                      onClick={() => setShowCloudinaryGallery(true)}
+                      onClick={() => {
+                        setShowCloudinaryGallery(true)
+                      }}
                       className='flex items-center gap-1 rounded-lg bg-blue-50 px-3 py-2 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 text-sm'
                     >
                       <MdImage /> Galería
@@ -1007,6 +1012,17 @@ const SettingsManagement: React.FC = () => {
                       />
                     </div>
                   )}
+                </div> */}
+                <div className='space-y-4'>
+                  <ImageManager
+                    mainImage={coleccionForm.image}
+                    onMainImageChange={async (url) => {
+                      setColeccionForm((prev) => ({
+                        ...prev,
+                        image: url
+                      }))
+                    }}
+                  />
                 </div>
 
                 {colecciones.length >= 4 && !selectedColeccion && (
@@ -1053,60 +1069,13 @@ const SettingsManagement: React.FC = () => {
 
       {/* Galería Cloudinary */}
       {showCloudinaryGallery && (
-        <div className='fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm'>
-          <div className='w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl bg-white shadow-2xl flex flex-col animate-in fade-in zoom-in duration-200 dark:bg-gray-800'>
-            <div className='flex items-center justify-between border-b p-6 dark:border-gray-700'>
-              <h3 className='text-xl font-bold dark:text-white'>
-                Galería de Imágenes
-              </h3>
-              <div className='flex items-center gap-4'>
-                <span className='text-sm text-gray-500 dark:text-gray-400'>
-                  0/1 seleccionada
-                </span>
-                <button
-                  onClick={() => setShowCloudinaryGallery(false)}
-                  className='rounded-full p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-500 dark:text-gray-400'
-                >
-                  <MdClose size={24} />
-                </button>
-              </div>
-            </div>
-
-            <div className='overflow-y-auto p-6 flex-1'>
-              <div className='text-center py-12 text-gray-500 dark:text-gray-400'>
-                {cloudinaryImages.length === 0
-                  ? 'No hay imágenes en la galería'
-                  : 'Selecciona una imagen'}
-              </div>
-            </div>
-
-            <div className='border-t p-6 bg-gray-50 dark:bg-gray-700/30 dark:border-gray-700 flex justify-between items-center'>
-              <button
-                onClick={fetchCloudinaryImages}
-                className='px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white'
-              >
-                Actualizar galería
-              </button>
-              <div className='flex gap-3'>
-                <button
-                  onClick={() => setShowCloudinaryGallery(false)}
-                  className='px-6 py-2.5 rounded-lg font-medium border border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors'
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={() => {
-                    // Aquí puedes manejar la selección de imagen
-                    setShowCloudinaryGallery(false)
-                  }}
-                  className='px-6 py-2.5 rounded-lg font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors'
-                >
-                  Usar Imagen Seleccionada
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <CloudinaryGallery
+          onClose={() => setShowCloudinaryGallery(false)}
+          onSelectImages={(e) => {
+            console.log('esto es E', e)
+          }}
+          maxSeleted={1}
+        />
       )}
     </>
   )
