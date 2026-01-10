@@ -76,6 +76,7 @@ const ImageManager: React.FC<ImageManagerProps> = ({
     return optimizedUrl
   }
 
+  // console.log('imagenmainImage y subida', mainImage)
   // Manejar subida de imagen
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -86,7 +87,11 @@ const ImageManager: React.FC<ImageManagerProps> = ({
     setUploadingToCloudinary(true)
     try {
       const imageUrl = await uploadImageToCloudinary(file)
+
       setUploadedImages((prev) => [...prev, imageUrl])
+
+      console.log('imagen principal', mainImage)
+      console.log('imagen imageFrom', imageFrom)
 
       // Asignar automáticamente si falta alguna imagen
       if (!mainImage) {
@@ -95,6 +100,10 @@ const ImageManager: React.FC<ImageManagerProps> = ({
         if (onSecondaryImageChange) {
           onSecondaryImageChange(imageUrl)
         }
+      } else if (imageFrom === 'systemImages') {
+        console.log('entro en else if')
+
+        onMainImageChange(imageUrl)
       }
 
       toast.success('Imagen subida exitosamente')
@@ -301,7 +310,7 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({
           <MdClose size={14} />
         </button>
       )
-    ) : showIconRemove ? (
+    ) : showIconRemove && imageUrl ? (
       <button
         onClick={onRemove}
         className='absolute -top-2 -right-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600'

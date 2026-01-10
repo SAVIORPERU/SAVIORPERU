@@ -22,6 +22,10 @@ interface Pagination {
   totalCount: number
 }
 
+interface Categories {
+  name: string
+}
+
 export default function Collection() {
   const searchParams = useSearchParams()
   const category = searchParams.get('category')
@@ -32,6 +36,7 @@ export default function Collection() {
   const [products, setProducts] = useState<ProductsProps[]>([])
   const [pagination, setPagination] = useState<Pagination | null>(null)
   const [page, setPage] = useState(1)
+  const [categories, setCategories] = useState<Categories[]>([])
 
   // Fetch productos desde el backend con filtros y paginación
   const getProducts = async () => {
@@ -45,6 +50,7 @@ export default function Collection() {
       const productos = await response.json()
       setProducts(productos.data)
       setPagination(productos.pagination)
+      setCategories(productos.productsDetails.categories)
     } catch (error) {
       console.log('Error fetching products:', error)
     }
@@ -104,10 +110,15 @@ export default function Collection() {
             <SelectValue placeholder='Ver todos' />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value='casacas'>Casacas</SelectItem>
-            <SelectItem value='gorros'>Gorros</SelectItem>
-            <SelectItem value='pantalones'>Pantalones</SelectItem>
-            <SelectItem value='polos'>Polos</SelectItem>
+            {categories.length >= 1
+              ? categories.map((ele) => {
+                  return (
+                    <SelectItem key={ele.name} value={ele.name}>
+                      {ele.name}
+                    </SelectItem>
+                  )
+                })
+              : null}
           </SelectContent>
         </Select>
         <Select value={sort} onValueChange={setSort}>

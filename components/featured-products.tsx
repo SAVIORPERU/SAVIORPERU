@@ -1,8 +1,9 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import ProductCard from './product-card'
 import styles from './featured-products.module.css'
-import prisma from '@/lib/prisma'
 
-// Definimos la interfaz localmente o la importamos
 interface Product {
   id: number
   name: string
@@ -13,28 +14,112 @@ interface Product {
   estado?: string
 }
 
-export default async function FeaturedProducts() {
-  // 1. Traemos la relación de destacados incluyendo los datos del producto
-  const destacadosData = await prisma.productosDestacados.findMany({
-    orderBy: {
-      id: 'asc'
-    },
-    include: {
-      producto: true // Trae todos los campos de la tabla 'Productos'
-    }
-  })
+// Array para skeletons
+const skeletonItems = [1, 2, 3, 4]
 
-  // 2. Aplanamos y formateamos el objeto para que coincida con la interfaz 'Product'
-  // y para evitar errores con el tipo Decimal de Prisma.
-  const data: Product[] = destacadosData.map((item) => ({
-    id: item.producto.id,
-    name: item.producto.name,
-    price: Number(item.producto.price), // Convertimos Decimal a Number
-    image: item.producto.image,
-    image2: item.producto.image2 || undefined,
-    size: item.producto.size || undefined,
-    estado: item.producto.estado
-  }))
+export default function FeaturedProducts() {
+  const [data, setData] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      console.log(
+        '🔄 [CLIENT] Iniciando fetch de productos destacados -',
+        new Date().toLocaleTimeString()
+      )
+
+      try {
+        setLoading(true)
+
+        const response = await fetch('/api/productos-destacados')
+
+        if (!response.ok) {
+          throw new Error(`Error ${response.status}: ${response.statusText}`)
+        }
+
+        const result = await response.json()
+
+        console.log(
+          '📊 [CLIENT] Productos destacados recibidos:',
+          result.data?.destacados.length || 0
+        )
+
+        if (result.data.destacados) {
+          setData(result.data.destacados)
+        } else {
+          setData([])
+        }
+
+        setError(null)
+      } catch (error) {
+        console.error('❌ [CLIENT] Error cargando productos destacados:', error)
+        setError('No se pudieron cargar los productos destacados')
+        setData([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+
+    // Opcional: auto-refresh cada 2 minutos
+    const interval = setInterval(fetchData, 2 * 60 * 1000)
+    return () => clearInterval(interval)
+  }, [])
+
+  // Mostrar estado de carga CON SKELETONS
+  if (loading) {
+    return (
+      <section className={styles.customWidth}>
+        <h2 className={styles.h2}>Productos Destacados</h2>
+        <div className={styles.cardContainer}>
+          {skeletonItems.map((item) => (
+            <ProductCard
+              key={`skeleton-${item}`}
+              product={{
+                id: item,
+                image: '/CargandoImagen.png',
+                name: 'Cargando...',
+                price: 0
+              }}
+              from='featured'
+            />
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  // Mostrar error
+  if (error) {
+    return (
+      <section className={styles.customWidth}>
+        <h2 className={styles.h2}>Productos Destacados</h2>
+        <div className='text-center py-10'>
+          <p className='text-red-600 mb-2'>{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className='px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700'
+          >
+            Reintentar
+          </button>
+        </div>
+      </section>
+    )
+  }
+
+  // Si no hay datos
+  if (data.length === 0) {
+    return (
+      <section className={styles.customWidth}>
+        <h2 className={styles.h2}>Productos Destacados</h2>
+        <p className='text-center py-10'>
+          No hay productos destacados disponibles.
+        </p>
+      </section>
+    )
+  }
 
   return (
     <section className={styles.customWidth}>

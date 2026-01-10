@@ -203,7 +203,7 @@ export async function POST(req: NextRequest) {
 
     if (!findCategory) {
       await prisma.categories.create({
-        data: { name: validatedData.category }
+        data: { name: validatedData.category.toUpperCase() }
       })
     }
 

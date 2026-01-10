@@ -189,6 +189,8 @@ const SettingsManagement: React.FC = () => {
   }
 
   const handleSettingChange = (key: string, value: string) => {
+    console.log(key, value)
+
     setSettingsForm((prev) => ({ ...prev, [key]: value }))
     if (settingsErrors[key]) {
       setSettingsErrors((prev) => ({ ...prev, [key]: '' }))
@@ -482,7 +484,9 @@ const SettingsManagement: React.FC = () => {
                         <div className='flex gap-2'>
                           <ImageManager
                             mainImage={settingsForm[key] || ''}
-                            onMainImageChange={async (url) => {
+                            onMainImageChange={(url) => {
+                              console.log('488', settingsForm[key], url)
+
                               handleSettingChange(key, url)
                             }}
                             imageFrom={'systemImages'}

@@ -26,5 +26,5 @@ export default async function AdminLayout({
   }
 
   // 5. Solo si pasa todas las verificaciones, mostrar el layout
-  return <div className='min-h-screen bg-gray-50'>{children}</div>
+  return <div className='bg-gray-50 dark:bg-gray-900'>{children}</div>
 }

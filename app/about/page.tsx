@@ -1,7 +1,28 @@
+'use client'
+
 import Image from 'next/image'
 import { fotoTienda } from '../../data/nosotros'
+import { useEffect, useState } from 'react'
 
 export default function About() {
+  const [settings, setSettings] = useState({ fotoTienda: '' })
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch('/api/settings')
+
+        if (!response.ok) throw new Error(`Error ${response.status}`)
+
+        const data = await response.json()
+        setSettings(data.data || {})
+      } catch (error) {
+        console.error('Error cargando settings:', error)
+        setSettings({ fotoTienda: '' })
+      }
+    }
+
+    fetchSettings()
+  }, [])
   return (
     <div className='container mx-auto px-4 py-8'>
       <h1 className='text-3xl font-bold mb-8'>Sobre Nosotros</h1>
@@ -23,10 +44,9 @@ export default function About() {
           </p>
         </div>
         <div className='relative min-h-96 md:h-full'>
-          <Image
-            src={fotoTienda}
+          <img
+            src={settings.fotoTienda || '/CargandoImagen.png'}
             alt='Savior Showroom'
-            fill
             className='object-cover rounded-lg'
           />
         </div>
