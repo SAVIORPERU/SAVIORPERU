@@ -8,25 +8,17 @@ import {
   MdClose,
   MdAdd,
   MdImage,
-  MdAttachMoney,
   MdPhone,
-  MdEmail,
   MdLink,
   MdLocalShipping,
   MdCollections,
   MdSettings,
-  MdChevronLeft,
-  MdChevronRight,
-  MdFirstPage,
-  MdLastPage,
   MdSave,
   MdCancel,
-  MdWarning,
-  MdCheckCircle
+  MdWarning
 } from 'react-icons/md'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import CloudinaryGallery from './products/CloudinaryGallery'
 import ImageManager from './products/ImageManager'
 
 // --- Interfaces ---
@@ -34,24 +26,12 @@ interface Coleccion {
   id: number
   name: string
   image: string
-  price?: number
   createdAt: string
   updatedAt: string
 }
 
 interface Pagination {
   total: number
-  page: number
-  limit: number
-  totalPages: number
-}
-
-interface CloudinaryImage {
-  public_id: string
-  secure_url: string
-  created_at: string
-  bytes: number
-  format: string
 }
 
 // --- Esquemas de Validación ---
@@ -112,20 +92,9 @@ const SettingsManagement: React.FC = () => {
     image: ''
   })
 
-  // Estados para Cloudinary
-  const [showCloudinaryGallery, setShowCloudinaryGallery] = useState(false)
-  const [cloudinaryImages, setCloudinaryImages] = useState<CloudinaryImage[]>(
-    []
-  )
-  const [uploadingImage, setUploadingImage] = useState(false)
-
   // Estados para Paginación
-  const [currentPage, setCurrentPage] = useState(1)
   const [pagination, setPagination] = useState<Pagination>({
-    total: 0,
-    page: 1,
-    limit: 10,
-    totalPages: 0
+    total: 0
   })
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -147,70 +116,26 @@ const SettingsManagement: React.FC = () => {
   }, [])
 
   // Cargar Colecciones - CORREGIDO
-  const fetchColecciones = useCallback(
-    async (page: number = 1, search: string = '') => {
-      setLoadingColecciones(true)
-      try {
-        let queryParam = `page=${page}&limit=10`
-        if (search) queryParam += `&search=${encodeURIComponent(search)}`
-
-        const response = await fetch(`/api/colecciones?${queryParam}`)
-        if (!response.ok) throw new Error('Error al obtener colecciones')
-        const result = await response.json()
-
-        // Estructura corregida según tu endpoint
-        setColecciones(result.data.colecciones)
-        setPagination(result.pagination) // Cambiado de result.data.pagination a result.pagination
-        setCurrentPage(result.pagination.page)
-      } catch (error) {
-        console.error('Error fetching colecciones:', error)
-        toast.error('No se pudieron cargar las colecciones')
-      } finally {
-        setLoadingColecciones(false)
-      }
-    },
-    []
-  )
-
-  // Cargar Imágenes de Cloudinary
-  const fetchCloudinaryImages = async () => {
+  const fetchColecciones = useCallback(async (search: string = '') => {
+    setLoadingColecciones(true)
     try {
-      const response = await fetch('/api/cloudinary-list')
-      if (!response.ok) throw new Error('Error al obtener imágenes')
+      let queryParam = `page=1&limit=10`
+      if (search) queryParam += `&search=${encodeURIComponent(search)}`
+
+      const response = await fetch(`/api/colecciones?${queryParam}`)
+      if (!response.ok) throw new Error('Error al obtener colecciones')
       const result = await response.json()
-      setCloudinaryImages(result.resources)
+
+      // Estructura corregida según tu endpoint
+      setColecciones(result.data.colecciones)
+      setPagination(result.pagination)
     } catch (error) {
-      console.error('Error fetching cloudinary images:', error)
-      toast.error('No se pudieron cargar las imágenes')
+      console.error('Error fetching colecciones:', error)
+      toast.error('No se pudieron cargar las colecciones')
+    } finally {
+      setLoadingColecciones(false)
     }
-  }
-
-  // Subir imagen a Cloudinary
-  const uploadImageToCloudinary = async (file: File): Promise<string> => {
-    if (!file.type.startsWith('image/')) {
-      throw new Error('Solo se permiten archivos de imagen')
-    }
-
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('upload_preset', 'prueba_preset')
-    formData.append('folder', 'ecommerce-settings')
-
-    const response = await fetch(
-      'https://api.cloudinary.com/v1_1/dniekrmqb/image/upload',
-      {
-        method: 'POST',
-        body: formData
-      }
-    )
-
-    if (!response.ok) {
-      throw new Error(`Error al subir imagen: ${response.statusText}`)
-    }
-
-    const data = await response.json()
-    return data.secure_url
-  }
+  }, [])
 
   // Inicializar
   useEffect(() => {
@@ -222,7 +147,7 @@ const SettingsManagement: React.FC = () => {
   useEffect(() => {
     const delayDebounceFn = setTimeout(
       () => {
-        fetchColecciones(1, searchTerm)
+        fetchColecciones(searchTerm)
       },
       searchTerm ? 500 : 0
     )
@@ -270,34 +195,6 @@ const SettingsManagement: React.FC = () => {
     }
   }
 
-  const handleImageUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-    settingKey: string
-  ) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-
-    setUploadingImage(true)
-    try {
-      const imageUrl = await uploadImageToCloudinary(file)
-      handleSettingChange(settingKey, imageUrl)
-      toast.success('Imagen subida exitosamente')
-      fetchCloudinaryImages() // Actualizar la galería
-    } catch (error) {
-      console.error('Error uploading image:', error)
-      toast.error('Error al subir la imagen')
-    } finally {
-      setUploadingImage(false)
-    }
-  }
-
-  const handleSelectFromGallery = (images: string[], settingKey: string) => {
-    if (images[0]) {
-      handleSettingChange(settingKey, images[0])
-    }
-    setShowCloudinaryGallery(false)
-  }
-
   // --- Funciones para Colecciones ---
   const handleSaveColeccion = async () => {
     try {
@@ -336,7 +233,7 @@ const SettingsManagement: React.FC = () => {
         `Colección ${selectedColeccion ? 'actualizada' : 'creada'} exitosamente`
       )
       resetColeccionForm()
-      fetchColecciones(currentPage, searchTerm)
+      fetchColecciones(searchTerm)
     } catch (error) {
       if (error instanceof z.ZodError) {
         const errors: { name: string; image: string } = { name: '', image: '' }
@@ -367,7 +264,7 @@ const SettingsManagement: React.FC = () => {
       if (!response.ok) throw new Error()
 
       toast.success('Colección eliminada exitosamente')
-      fetchColecciones(currentPage, searchTerm)
+      fetchColecciones(searchTerm)
     } catch (error) {
       toast.error('Error al eliminar la colección')
     }
@@ -389,52 +286,6 @@ const SettingsManagement: React.FC = () => {
     })
   }
 
-  // --- Paginación ---
-  const goToPage = (page: number) => {
-    if (page >= 1 && page <= pagination.totalPages) {
-      fetchColecciones(page, searchTerm)
-    }
-  }
-
-  const goToFirstPage = () => goToPage(1)
-  const goToLastPage = () => goToPage(pagination.totalPages)
-  const goToNextPage = () => goToPage(currentPage + 1)
-  const goToPrevPage = () => goToPage(currentPage - 1)
-
-  const getPageNumbers = () => {
-    const totalPages = pagination.totalPages
-    const current = currentPage
-    const delta = 2
-    const range: number[] = []
-    const rangeWithDots: (number | string)[] = []
-    let l: number
-
-    for (let i = 1; i <= totalPages; i++) {
-      if (
-        i === 1 ||
-        i === totalPages ||
-        (i >= current - delta && i <= current + delta)
-      ) {
-        range.push(i)
-      }
-    }
-
-    range.forEach((i) => {
-      if (l) {
-        if (i - l === 2) {
-          rangeWithDots.push(l + 1)
-        } else if (i - l !== 1) {
-          rangeWithDots.push('...')
-        }
-      }
-      rangeWithDots.push(i)
-      l = i
-    })
-
-    return rangeWithDots
-  }
-
-  // --- Renderizado ---
   return (
     <>
       <main className='flex flex-1 flex-col bg-gray-50 dark:bg-gray-900 pb-12'>
@@ -490,7 +341,11 @@ const SettingsManagement: React.FC = () => {
             {/* Formulario de Configuraciones */}
             <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
               {/* Delivery */}
-              <div className='space-y-4 rounded-xl border border-gray-200 bg-white p-6 dark:bg-gray-800 dark:border-gray-700'>
+              <div
+                className={`${
+                  loadingSettings ? 'animate-pulse' : ''
+                } space-y-4 rounded-xl border border-gray-200 bg-white p-6 dark:bg-gray-800 dark:border-gray-700`}
+              >
                 <h4 className='flex items-center gap-2 font-bold text-gray-700 dark:text-gray-300'>
                   <MdLocalShipping /> Configuración de Delivery
                 </h4>
@@ -545,7 +400,11 @@ const SettingsManagement: React.FC = () => {
               </div>
 
               {/* Contacto */}
-              <div className='space-y-4 rounded-xl border border-gray-200 bg-white p-6 dark:bg-gray-800 dark:border-gray-700'>
+              <div
+                className={`${
+                  loadingSettings ? 'animate-pulse' : ''
+                } space-y-4 rounded-xl border border-gray-200 bg-white p-6 dark:bg-gray-800 dark:border-gray-700`}
+              >
                 <h4 className='flex items-center gap-2 font-bold text-gray-700 dark:text-gray-300'>
                   <MdPhone /> Información de Contacto
                 </h4>
@@ -601,11 +460,15 @@ const SettingsManagement: React.FC = () => {
               </div>
 
               {/* Imágenes */}
-              <div className='space-y-4 rounded-xl border border-gray-200 bg-white p-6 dark:bg-gray-800 dark:border-gray-700'>
+              <div
+                className={`${
+                  loadingSettings ? 'animate-pulse' : ''
+                } space-y-4 rounded-xl border border-gray-200 bg-white p-6 dark:bg-gray-800 dark:border-gray-700`}
+              >
                 <h4 className='flex items-center gap-2 font-bold text-gray-700 dark:text-gray-300'>
                   <MdImage /> Imágenes del Sistema
                 </h4>
-                <div className='space-y-3'>
+                <div className='grid grid-cols-2 gap-4'>
                   {['imagenIzquierda', 'imagenDerecha', 'fotoTienda'].map(
                     (key) => (
                       <div key={key}>
@@ -623,6 +486,7 @@ const SettingsManagement: React.FC = () => {
                               handleSettingChange(key, url)
                             }}
                             imageFrom={'systemImages'}
+                            editImage={editingSettings}
                           />
                         </div>
                         {settingsErrors[key] && (
@@ -630,15 +494,6 @@ const SettingsManagement: React.FC = () => {
                             {settingsErrors[key]}
                           </p>
                         )}
-                        {/* {settingsForm[key] && (
-                          <div className='mt-2'>
-                            <img
-                              src={settingsForm[key]}
-                              alt='Preview'
-                              className='h-20 w-20 rounded-lg object-cover border'
-                            />
-                          </div>
-                        )} */}
                       </div>
                     )
                   )}
@@ -646,7 +501,11 @@ const SettingsManagement: React.FC = () => {
               </div>
 
               {/* Redes Sociales */}
-              <div className='space-y-4 rounded-xl border border-gray-200 bg-white p-6 dark:bg-gray-800 dark:border-gray-700'>
+              <div
+                className={`${
+                  loadingSettings ? 'animate-pulse' : ''
+                } space-y-4 rounded-xl border border-gray-200 bg-white p-6 dark:bg-gray-800 dark:border-gray-700`}
+              >
                 <h4 className='flex items-center gap-2 font-bold text-gray-700 dark:text-gray-300'>
                   <MdLink /> Redes Sociales
                 </h4>
@@ -831,64 +690,6 @@ const SettingsManagement: React.FC = () => {
                   </tbody>
                 </table>
               </div>
-
-              {/* Paginación */}
-              {pagination.totalPages > 1 && !loadingColecciones && (
-                <div className='flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700'>
-                  <div className='flex items-center gap-2'>
-                    <button
-                      onClick={goToFirstPage}
-                      disabled={currentPage === 1}
-                      className='flex items-center justify-center h-9 w-9 rounded-lg border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700 transition-colors'
-                    >
-                      <MdFirstPage size={20} />
-                    </button>
-                    <button
-                      onClick={goToPrevPage}
-                      disabled={currentPage === 1}
-                      className='flex items-center justify-center h-9 w-9 rounded-lg border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700 transition-colors'
-                    >
-                      <MdChevronLeft size={20} />
-                    </button>
-                  </div>
-
-                  <div className='flex items-center gap-1'>
-                    {getPageNumbers().map((pageNum, index) => (
-                      <button
-                        key={index}
-                        onClick={() =>
-                          typeof pageNum === 'number' && goToPage(pageNum)
-                        }
-                        disabled={pageNum === '...'}
-                        className={`h-9 w-9 rounded-lg text-sm font-medium transition-colors ${
-                          currentPage === pageNum
-                            ? 'bg-blue-600 text-white border border-blue-600'
-                            : 'border border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700'
-                        } ${pageNum === '...' ? 'cursor-default' : ''}`}
-                      >
-                        {pageNum}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className='flex items-center gap-2'>
-                    <button
-                      onClick={goToNextPage}
-                      disabled={currentPage === pagination.totalPages}
-                      className='flex items-center justify-center h-9 w-9 rounded-lg border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700 transition-colors'
-                    >
-                      <MdChevronRight size={20} />
-                    </button>
-                    <button
-                      onClick={goToLastPage}
-                      disabled={currentPage === pagination.totalPages}
-                      className='flex items-center justify-center h-9 w-9 rounded-lg border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700 transition-colors'
-                    >
-                      <MdLastPage size={20} />
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -941,53 +742,6 @@ const SettingsManagement: React.FC = () => {
                   )}
                 </div>
 
-                {/* <div>
-                  <label className='mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300'>
-                    Imagen URL *
-                  </label>
-                  <div className='flex gap-2'>
-                    <input
-                      type='text'
-                      value={coleccionForm.image}
-                      onChange={(e) => {
-                        setColeccionForm((prev) => ({
-                          ...prev,
-                          image: e.target.value
-                        }))
-                        if (coleccionErrors.image)
-                          setColeccionErrors((prev) => ({ ...prev, image: '' }))
-                      }}
-                      className={`flex-1 rounded-lg border px-3 py-2 ${
-                        coleccionErrors.image
-                          ? 'border-red-500'
-                          : 'border-gray-300 dark:border-gray-600'
-                      } bg-white dark:bg-gray-700`}
-                      placeholder='https://res.cloudinary.com/...'
-                    />
-                    <button
-                      onClick={() => {
-                        setShowCloudinaryGallery(true)
-                      }}
-                      className='flex items-center gap-1 rounded-lg bg-blue-50 px-3 py-2 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 text-sm'
-                    >
-                      <MdImage /> Galería
-                    </button>
-                  </div>
-                  {coleccionErrors.image && (
-                    <p className='mt-1 text-xs text-red-500'>
-                      {coleccionErrors.image}
-                    </p>
-                  )}
-                  {coleccionForm.image && (
-                    <div className='mt-3'>
-                      <img
-                        src={coleccionForm.image}
-                        alt='Preview'
-                        className='h-32 w-full rounded-lg object-cover border'
-                      />
-                    </div>
-                  )}
-                </div> */}
                 <div className='space-y-4'>
                   <ImageManager
                     mainImage={coleccionForm.image}
@@ -1023,35 +777,17 @@ const SettingsManagement: React.FC = () => {
               </button>
               <button
                 onClick={handleSaveColeccion}
-                disabled={uploadingImage}
-                className='px-6 py-2.5 rounded-lg font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center gap-2'
+                disabled={!coleccionForm.image || !coleccionForm.name}
+                className='px-6 py-2.5 rounded-lg font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 disabled:bg-blue-700'
               >
-                {uploadingImage ? (
-                  <>
-                    <div className='h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent'></div>
-                    Subiendo...
-                  </>
-                ) : (
-                  <>
-                    <MdSave />
-                    {selectedColeccion ? 'Actualizar' : 'Crear'} Colección
-                  </>
-                )}
+                <>
+                  <MdSave />
+                  Aceptar
+                </>
               </button>
             </div>
           </div>
         </div>
-      )}
-
-      {/* Galería Cloudinary */}
-      {showCloudinaryGallery && (
-        <CloudinaryGallery
-          onClose={() => setShowCloudinaryGallery(false)}
-          onSelectImages={(e) => {
-            console.log('esto es E', e)
-          }}
-          maxSeleted={1}
-        />
       )}
     </>
   )

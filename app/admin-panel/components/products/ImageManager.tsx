@@ -17,6 +17,7 @@ interface ImageManagerProps {
   onMainImageChange: (url: string) => void
   onSecondaryImageChange?: (url: string) => void
   imageFrom?: string
+  editImage?: boolean
 }
 
 interface CloudinaryImage {
@@ -32,7 +33,8 @@ const ImageManager: React.FC<ImageManagerProps> = ({
   secondaryImage,
   onMainImageChange,
   onSecondaryImageChange,
-  imageFrom
+  imageFrom,
+  editImage
 }) => {
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
   const [uploadingToCloudinary, setUploadingToCloudinary] = useState(false)
@@ -62,7 +64,16 @@ const ImageManager: React.FC<ImageManagerProps> = ({
     }
 
     const data = await response.json()
-    return data.secure_url
+
+    // --- TRANSFORMACIÓN AQUÍ ---
+    // Insertamos f_auto (formato) y q_auto (compresión inteligente)
+    // Esto hará que si el navegador soporta WebP, Cloudinary lo envíe así.
+    const optimizedUrl = data.secure_url.replace(
+      '/upload/',
+      '/upload/f_auto,q_auto/'
+    )
+
+    return optimizedUrl
   }
 
   // Manejar subida de imagen
@@ -111,9 +122,51 @@ const ImageManager: React.FC<ImageManagerProps> = ({
     setUploadedImages((prev) => prev.filter((img) => img !== url))
   }
 
+  const uploadAndGalery = (
+    <div
+      className={`${
+        imageFrom === 'systemImages' ? 'flex-col' : ''
+      } flex gap-3 mb-4`}
+    >
+      <div>
+        <input
+          type='file'
+          id='image-upload'
+          accept='.jpg, .jpeg, .png, .webp'
+          onChange={handleImageUpload}
+          className='hidden'
+          disabled={uploadingToCloudinary}
+        />
+        <label
+          htmlFor='image-upload'
+          className={`flex items-center gap-1 rounded-lg px-2 py-2.5 text-sm font-medium cursor-pointer transition-colors ${
+            uploadingToCloudinary
+              ? 'bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500'
+              : 'bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50'
+          }`}
+        >
+          <MdCloudUpload />
+          {uploadingToCloudinary ? 'Subiendo...' : 'Subir Imagen'}
+        </label>
+      </div>
+
+      <button
+        onClick={() => setShowCloudinaryGallery(true)}
+        className='flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 transition-colors'
+      >
+        <MdPhotoLibrary />
+        Galería
+      </button>
+    </div>
+  )
+
   return (
     <>
-      <div>
+      <div
+        className={`${
+          imageFrom === 'systemImages' ? 'grid grid-cols-2 gap-1' : ''
+        }`}
+      >
         {!imageFrom && (
           <>
             <label className='mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300'>
@@ -126,42 +179,18 @@ const ImageManager: React.FC<ImageManagerProps> = ({
         )}
 
         {/* Botones para subir imágenes */}
-        <div className='flex gap-3 mb-4'>
-          <div>
-            <input
-              type='file'
-              id='image-upload'
-              accept='.jpg, .jpeg, .png, .webp'
-              onChange={handleImageUpload}
-              className='hidden'
-              disabled={uploadingToCloudinary}
-            />
-            <label
-              htmlFor='image-upload'
-              className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium cursor-pointer transition-colors ${
-                uploadingToCloudinary
-                  ? 'bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500'
-                  : 'bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50'
-              }`}
-            >
-              <MdCloudUpload />
-              {uploadingToCloudinary ? 'Subiendo...' : 'Subir Imagen'}
-            </label>
-          </div>
-
-          <button
-            onClick={() => setShowCloudinaryGallery(true)}
-            className='flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 transition-colors'
-          >
-            <MdPhotoLibrary />
-            Galería
-          </button>
-        </div>
+        {editImage === undefined
+          ? uploadAndGalery
+          : editImage === true
+          ? uploadAndGalery
+          : null}
 
         {/* Vista previa de imágenes */}
         <div
-          className={`grid grid-cols-2 gap-4 ${
-            imageFrom === 'systemImages' ? 'w-56' : ''
+          className={`${
+            imageFrom === 'systemImages'
+              ? 'w-32 pb-2 grid row-start-1'
+              : 'grid grid-cols-2 gap-4'
           }`}
         >
           {/* Imagen principal */}
@@ -169,6 +198,8 @@ const ImageManager: React.FC<ImageManagerProps> = ({
             imageUrl={mainImage}
             label='Imagen Principal'
             onRemove={() => onMainImageChange('')}
+            showIconRemove={editImage}
+            onSecondaryImageChange={onSecondaryImageChange === undefined}
           />
 
           {/* Imagen secundaria */}
@@ -177,6 +208,7 @@ const ImageManager: React.FC<ImageManagerProps> = ({
               imageUrl={secondaryImage || ''}
               label='Imagen Secundaria (Opcional)'
               onRemove={() => onSecondaryImageChange('')}
+              showIconRemove={editImage}
             />
           )}
         </div>
@@ -230,12 +262,16 @@ interface ImagePreviewProps {
   imageUrl: string
   label: string
   onRemove: () => void
+  showIconRemove?: boolean
+  onSecondaryImageChange?: boolean
 }
 
 const ImagePreview: React.FC<ImagePreviewProps> = ({
   imageUrl,
   label,
-  onRemove
+  onRemove,
+  showIconRemove,
+  onSecondaryImageChange
 }) => (
   <div className='relative'>
     <div className='aspect-square rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 overflow-hidden bg-gray-50 dark:bg-gray-700/50'>
@@ -251,17 +287,28 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({
         </div>
       )}
     </div>
-    <div className='mt-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400'>
-      {label}
-    </div>
-    {imageUrl && (
+    {!onSecondaryImageChange && (
+      <div className='mt-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400'>
+        {label}
+      </div>
+    )}
+    {showIconRemove === undefined ? (
+      imageUrl && (
+        <button
+          onClick={onRemove}
+          className='absolute -top-2 -right-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600'
+        >
+          <MdClose size={14} />
+        </button>
+      )
+    ) : showIconRemove ? (
       <button
         onClick={onRemove}
         className='absolute -top-2 -right-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600'
       >
         <MdClose size={14} />
       </button>
-    )}
+    ) : null}
   </div>
 )
 

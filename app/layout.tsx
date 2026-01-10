@@ -10,6 +10,7 @@ import { ClerkProvider } from '@clerk/nextjs'
 import { ThemeProvider } from '@/components/theme-provider'
 import { esMX } from '@clerk/localizations'
 import { Toaster } from '@/components/ui/toaster'
+import { AuthProvider } from '@/contexts/AuthContext'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -80,11 +81,13 @@ export default function RootLayout({
         <body className={`${inter.className} body`}>
           <ThemeProvider attribute='class' defaultTheme='light' enableSystem>
             <CartProvider>
-              <Header />
-              <Suspense>
-                <main className='pt-[72px]'>{children}</main>
-              </Suspense>
-              <Footer />
+              <AuthProvider>
+                <Header />
+                <Suspense>
+                  <main className='pt-[72px]'>{children}</main>
+                </Suspense>
+                <Footer />
+              </AuthProvider>
             </CartProvider>
           </ThemeProvider>
           <Toaster />

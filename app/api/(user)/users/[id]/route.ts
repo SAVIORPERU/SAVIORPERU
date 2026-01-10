@@ -1,7 +1,7 @@
 import prisma from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 import { Role } from '@/app/generated/prisma/enums'
-import { z } from 'zod'
+import { string, z } from 'zod'
 import { clerkClient } from '@clerk/nextjs/server'
 
 // En Next.js 15, params es una Promise que debe ser awaited
@@ -12,17 +12,26 @@ export async function GET(
   try {
     // Await params antes de acceder a sus propiedades
     const { id: idParam } = await params
-    const id = parseInt(idParam)
 
-    if (isNaN(id)) {
-      return NextResponse.json(
-        { message: 'ID de usuario inválido' },
-        { status: 400 }
-      )
+    let id
+    let where
+
+    if (idParam.split('_')[0] === 'user') {
+      id = idParam
+      where = { clerkId: idParam }
+    } else {
+      id = parseInt(idParam)
+      if (isNaN(id)) {
+        return NextResponse.json(
+          { message: 'ID de usuario inválido' },
+          { status: 400 }
+        )
+      }
+      where = { id }
     }
 
     const user = await prisma.user.findUnique({
-      where: { id },
+      where,
       include: {
         orders: {
           take: 10,
@@ -57,23 +66,23 @@ export async function GET(
     // Calcular estadísticas del usuario
     const userStats = {
       totalOrders: await prisma.orders.count({
-        where: { userId: id }
+        where: { userId: user.id }
       }),
       totalSpent: await prisma.orders
         .aggregate({
-          where: { userId: id },
+          where: { userId: user.id },
           _sum: { totalPrice: true }
         })
         .then((result) => Number(result._sum.totalPrice || 0)),
       averageOrderValue: await prisma.orders
         .aggregate({
-          where: { userId: id },
+          where: { userId: user.id },
           _avg: { totalPrice: true }
         })
         .then((result) => Number(result._avg.totalPrice || 0)),
       lastOrderDate: await prisma.orders
         .findFirst({
-          where: { userId: id },
+          where: { userId: user.id },
           orderBy: { createdAt: 'desc' },
           select: { createdAt: true }
         })

@@ -11,19 +11,20 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const nextCursor = searchParams.get('next_cursor')
+    const maxResults = searchParams.get('max_results') || '30'
 
-    // Lista todas las imágenes de tu cuenta
     const result = await cloudinary.search
-      .expression('resource_type:image') // Solo imágenes
-      .sort_by('created_at', 'desc') // Más recientes primero
-      .max_results(30) // Límite por página
+      .expression('resource_type:image')
+      .sort_by('created_at', 'desc')
+      .max_results(parseInt(maxResults))
       .next_cursor(nextCursor || undefined)
       .execute()
 
     return NextResponse.json({
       resources: result.resources,
       next_cursor: result.next_cursor,
-      total_count: result.total_count
+      total_count: result.total_count,
+      has_more: !!result.next_cursor // Para facilitar el frontend
     })
   } catch (error) {
     console.error('Error listing images:', error)

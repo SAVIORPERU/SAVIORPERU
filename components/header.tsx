@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ClipboardList, Menu } from 'lucide-react'
 import { MdOutlineShoppingCart, MdAdminPanelSettings } from 'react-icons/md'
@@ -18,11 +18,12 @@ import {
 } from '@/components/ui/sheet'
 import { usePathname } from 'next/navigation'
 import Image from 'next/image'
-import { SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs'
+import { SignedIn, UserButton, useUser } from '@clerk/nextjs'
 import { codigoCupon } from '@/data/cupon'
 import './header.css'
-import { dark, neobrutalism } from '@clerk/themes'
+import { dark } from '@clerk/themes'
 import { useTheme } from 'next-themes'
+import { useUserRole } from '@/hooks/useUserRole'
 
 interface ProsItemsProduct {
   id: number
@@ -38,9 +39,10 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const { cartItems, removeFromCart, clearCart, getCartTotal } = useCart()
   const pathname = usePathname()
-  const { isSignedIn, isLoaded } = useUser()
+  const { isSignedIn, isLoaded, user } = useUser()
   const [disctount, setDiscount] = useState('')
   const { theme } = useTheme()
+  const { isAdmin } = useUserRole()
 
   const getDiscount = () => {
     if (disctount === codigoCupon) {
@@ -53,6 +55,34 @@ export default function Header() {
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen)
   }
+
+  // useEffect(() => {
+  //   const controller = new AbortController()
+
+  //   if (isSignedIn) {
+  //     fetch(`/api/users/${user.id}`, { signal: controller.signal })
+  //       .then((response) => {
+  //         if (!response.ok) throw new Error('Error en la respuesta')
+  //         return response.json()
+  //       })
+  //       .then((data) => {
+  //         console.log('esto es data user', data)
+
+  //         if (data.data.role === 'ADMIN') {
+  //           setIsAdmin('ADMIN')
+  //         }
+  //       })
+  //       .catch((error) => {
+  //         // Ignoramos el error si fue causado por la cancelación de la petición
+  //         if (error.name !== 'AbortError') {
+  //           console.error('Error fetching user:', error)
+  //         }
+  //       })
+  //   }
+
+  //   // 2. Función de limpieza (cleanup)
+  //   return () => controller.abort()
+  // }, [isSignedIn])
 
   return (
     <header className='header'>
@@ -155,13 +185,15 @@ export default function Header() {
                       }
                       href='/orders'
                     />
-                    <UserButton.Link
-                      label='Admin Savior'
-                      labelIcon={
-                        <GrUserAdmin className='w-6 h-5 pb-1 mr-3 justify-center items-center' />
-                      }
-                      href='/admin-panel'
-                    />
+                    {isAdmin && (
+                      <UserButton.Link
+                        label='Admin Savior'
+                        labelIcon={
+                          <GrUserAdmin className='w-6 h-5 pb-1 mr-3 justify-center items-center' />
+                        }
+                        href='/admin-panel'
+                      />
+                    )}
                   </UserButton.MenuItems>
                   {/* <UserButton.UserProfilePage
                     label='Custom Page'

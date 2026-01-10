@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { MdClose, MdDelete, MdCheckCircle } from 'react-icons/md'
+import React, { useState, useEffect, useCallback } from 'react'
+import { MdClose, MdDelete, MdCheckCircle, MdExpandMore } from 'react-icons/md'
 import { toast } from 'sonner'
 
 interface CloudinaryGalleryProps {
@@ -28,27 +28,84 @@ const CloudinaryGallery: React.FC<CloudinaryGalleryProps> = ({
   )
   const [selectedImages, setSelectedImages] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [nextCursor, setNextCursor] = useState<string | null>(null)
+  const [hasMoreImages, setHasMoreImages] = useState(true)
 
-  // Fetch imágenes de Cloudinary
-  const fetchCloudinaryImages = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch('/api/cloudinary-list')
-      if (!response.ok) throw new Error('Error al obtener imágenes')
-      const result = await response.json()
-      setCloudinaryImages(result.resources)
-    } catch (error) {
-      console.error('Error fetching cloudinary images:', error)
-      toast.error('No se pudieron cargar las imágenes')
-    } finally {
-      setLoading(false)
+  // Fetch imágenes de Cloudinary con paginación
+  const fetchCloudinaryImages = useCallback(
+    async (cursor: string | null = null, isLoadMore: boolean = false) => {
+      if (isLoadMore) {
+        setLoadingMore(true)
+      } else {
+        setLoading(true)
+      }
+
+      try {
+        const url = cursor
+          ? `/api/cloudinary-list?next_cursor=${cursor}&max_results=30`
+          : '/api/cloudinary-list?max_results=30'
+
+        const response = await fetch(url)
+        if (!response.ok) throw new Error('Error al obtener imágenes')
+
+        const result = await response.json()
+
+        if (isLoadMore) {
+          // Agregar nuevas imágenes a las existentes
+          setCloudinaryImages((prev) => [...prev, ...result.resources])
+        } else {
+          // Reemplazar todas las imágenes
+          setCloudinaryImages(result.resources)
+        }
+
+        setNextCursor(result.next_cursor)
+        setHasMoreImages(result.has_more)
+      } catch (error) {
+        console.error('Error fetching cloudinary images:', error)
+        if (!isLoadMore) {
+          toast.error('No se pudieron cargar las imágenes')
+        }
+      } finally {
+        if (isLoadMore) {
+          setLoadingMore(false)
+        } else {
+          setLoading(false)
+        }
+      }
+    },
+    []
+  )
+
+  // Cargar más imágenes
+  const handleLoadMore = () => {
+    if (nextCursor && !loadingMore && hasMoreImages) {
+      fetchCloudinaryImages(nextCursor, true)
     }
   }
 
-  console.log('se abro galeria')
+  // Verificar si estamos cerca del final del scroll
+  const handleScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      const container = e.currentTarget
+      const scrollThreshold = 100 // px desde el fondo
+
+      if (
+        container.scrollHeight - container.scrollTop <=
+          container.clientHeight + scrollThreshold &&
+        !loadingMore &&
+        hasMoreImages &&
+        nextCursor
+      ) {
+        handleLoadMore()
+      }
+    },
+    [loadingMore, hasMoreImages, nextCursor]
+  )
+
   useEffect(() => {
     fetchCloudinaryImages()
-  }, [])
+  }, [fetchCloudinaryImages])
 
   // Seleccionar/deseleccionar imagen
   const toggleImageSelection = (imageUrl: string) => {
@@ -57,7 +114,7 @@ const CloudinaryGallery: React.FC<CloudinaryGalleryProps> = ({
     } else if (selectedImages.length < maxSeleted) {
       setSelectedImages((prev) => [...prev, imageUrl])
     } else {
-      toast.warning('Solo puedes seleccionar hasta 2 imágenes')
+      toast.warning(`Solo puedes seleccionar hasta ${maxSeleted} imágenes`)
     }
   }
 
@@ -75,6 +132,7 @@ const CloudinaryGallery: React.FC<CloudinaryGalleryProps> = ({
 
       if (!response.ok) throw new Error()
 
+      // Eliminar imagen de la lista local
       setCloudinaryImages((prev) =>
         prev.filter((img) => img.secure_url !== imageUrl)
       )
@@ -88,8 +146,6 @@ const CloudinaryGallery: React.FC<CloudinaryGalleryProps> = ({
 
   // Usar imágenes seleccionadas
   const handleUseSelectedImages = () => {
-    console.log('boton seleccionar', selectedImages)
-
     if (selectedImages.length === 0) {
       toast.warning('Selecciona al menos una imagen')
       return
@@ -99,16 +155,19 @@ const CloudinaryGallery: React.FC<CloudinaryGalleryProps> = ({
     toast.success('Imágenes seleccionadas')
   }
 
-  console.log('maxSeleted', maxSeleted)
-
   return (
     <div className='fixed inset-0 z-[60] flex items-center justify-center p-4 backdrop-blur-sm'>
       <div className='w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl bg-white shadow-2xl flex flex-col animate-in fade-in zoom-in duration-200 dark:bg-gray-800'>
         {/* Header */}
         <div className='flex items-center justify-between border-b p-6 dark:border-gray-700'>
-          <h3 className='text-xl font-bold dark:text-white'>
-            Galería de Imágenes
-          </h3>
+          <div>
+            <h3 className='text-xl font-bold dark:text-white'>
+              Galería de Imágenes
+            </h3>
+            <p className='text-sm text-gray-500 dark:text-gray-400 mt-1'>
+              {cloudinaryImages.length} imágenes cargadas
+            </p>
+          </div>
           <div className='flex items-center gap-4'>
             <span className='text-sm text-gray-500 dark:text-gray-400'>
               {selectedImages.length}/{maxSeleted} seleccionadas
@@ -123,38 +182,75 @@ const CloudinaryGallery: React.FC<CloudinaryGalleryProps> = ({
         </div>
 
         {/* Contenido */}
-        <div className='overflow-y-auto p-6 flex-1'>
-          {loading ? (
+        <div className='overflow-y-auto p-6 flex-1' onScroll={handleScroll}>
+          {loading && !loadingMore ? (
             <div className='flex justify-center py-12'>
               <div className='h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent'></div>
             </div>
-          ) : cloudinaryImages.length === 0 ? (
+          ) : cloudinaryImages.length === 0 && !loadingMore ? (
             <div className='text-center py-12 text-gray-500 dark:text-gray-400'>
-              No hay imágenes en la galería 123
+              No hay imágenes en la galería
             </div>
           ) : (
-            <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
-              {cloudinaryImages.map((image) => (
-                <ImageCard
-                  key={image.public_id}
-                  image={image}
-                  isSelected={selectedImages.includes(image.secure_url)}
-                  onSelect={() => toggleImageSelection(image.secure_url)}
-                  onDelete={() => deleteImage(image.secure_url)}
-                />
-              ))}
-            </div>
+            <>
+              <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
+                {cloudinaryImages.map((image) => (
+                  <ImageCard
+                    key={image.public_id}
+                    image={image}
+                    isSelected={selectedImages.includes(image.secure_url)}
+                    onSelect={() => toggleImageSelection(image.secure_url)}
+                    onDelete={() => deleteImage(image.secure_url)}
+                  />
+                ))}
+              </div>
+
+              {/* Indicador de carga para más imágenes */}
+              {loadingMore && (
+                <div className='flex justify-center py-6'>
+                  <div className='h-6 w-6 animate-spin rounded-full border-2 border-blue-500 border-t-transparent'></div>
+                </div>
+              )}
+
+              {/* Botón para cargar más (si no hay infinite scroll) */}
+              {!loadingMore && hasMoreImages && nextCursor && (
+                <div className='flex justify-center py-4'>
+                  <button
+                    onClick={handleLoadMore}
+                    className='flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 transition-colors'
+                  >
+                    <MdExpandMore />
+                    Cargar más imágenes
+                  </button>
+                </div>
+              )}
+
+              {/* Mensaje cuando no hay más imágenes */}
+              {!hasMoreImages && cloudinaryImages.length > 0 && (
+                <div className='text-center py-4 text-sm text-gray-500 dark:text-gray-400'>
+                  No hay más imágenes por cargar
+                </div>
+              )}
+            </>
           )}
         </div>
 
         {/* Footer */}
         <div className='border-t p-6 bg-gray-50 dark:bg-gray-700/30 dark:border-gray-700 flex justify-between items-center'>
-          <button
-            onClick={fetchCloudinaryImages}
-            className='px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white'
-          >
-            Actualizar galería
-          </button>
+          <div className='flex gap-3'>
+            <button
+              onClick={() => fetchCloudinaryImages()}
+              className='px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed'
+              disabled={loading}
+            >
+              {loading ? 'Actualizando...' : 'Actualizar galería'}
+            </button>
+            {hasMoreImages && (
+              <span className='text-xs text-gray-500 dark:text-gray-400 self-center'>
+                Usa scroll para cargar más
+              </span>
+            )}
+          </div>
           <div className='flex gap-3'>
             <button
               onClick={onClose}
@@ -176,7 +272,7 @@ const CloudinaryGallery: React.FC<CloudinaryGalleryProps> = ({
   )
 }
 
-// Componente interno para tarjeta de imagen
+// Componente interno para tarjeta de imagen (sin cambios)
 interface ImageCardProps {
   image: CloudinaryImage
   isSelected: boolean
