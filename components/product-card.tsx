@@ -86,7 +86,7 @@ export default function ProductCard({
             ? styles.fromFeatured
             : from === 'bestSellers'
             ? styles.fromBestSellers
-            : 'lg:h-64 max-[400px]:h-[300px] max-[460px]:h-[400px] h-[450px] 2xl:h-[450px]'
+            : 'lg:h-80 max-[400px]:h-[400px] max-[460px]:h-[400px] h-[450px] 2xl:h-[450px]'
         }`}
       >
         <Image
@@ -104,7 +104,7 @@ export default function ProductCard({
         className={`${
           from === 'bestSellers' || from === 'featured'
             ? 'px-2 pt-2 pb-0'
-            : 'p-4'
+            : 'pt-1 pb-2 px-2'
         }`}
       >
         <h3
@@ -112,16 +112,16 @@ export default function ProductCard({
             from === 'featured' || from === 'bestSellers'
               ? 'text-sm'
               : 'text-lg'
-          } font-medium mb-1 text-[#31302e]`}
+          } font-semibold text-sm mb-0 text-[#31302e]`}
         >
           {product.name}
         </h3>
         {from !== 'bestSellers' && (
-          <div className='text-gray-600 mb-3 w-full'>
-            <p>S/ {Number(product.price).toFixed(2)}</p>
+          <div className='text-gray-600 mb-1 w-full flex justify-between'>
+            <p className='text-sm'>S/ {Number(product.price).toFixed(2)}</p>
 
-            <div className='flex justify-between mt-1'>
-              <div className='flex gap-2'>
+            <div className='flex justify-between mt-0'>
+              {/* <div className='flex gap-2'>
                 <button
                   className='hover:text-gray-950'
                   onClick={() =>
@@ -137,31 +137,32 @@ export default function ProductCard({
                 >
                   <FiPlusCircle className='h-4 w-4' />
                 </button>
-              </div>
+              </div> */}
               <form className='flex gap-2'>
-                {product.size?.split(' - ').map((ele, index) => (
-                  <div
-                    className='radio-container gap-[2px] flex items-center'
-                    key={index}
-                  >
-                    <input
-                      type='radio'
-                      id={ele}
-                      value={ele}
-                      name='size'
-                      onChange={() => setSelectedSize(ele)}
-                      checked={selectedSize === ele}
-                      className="appearance-none w-3 h-3 border-2 border-gray-400 rounded-full checked:border-4 checked:border-blue-800 focus:outline-none transition duration-200 relative after:content-[''] after:absolute after:hidden checked:after:block after:w-0 after:h-0 after:bg-blue-800 after:rounded-full after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 cursor-pointer"
-                    />
-                    <label className='m-0'>{ele}</label>
-                  </div>
-                ))}
+                {product.size &&
+                  product.size?.split(' - ').map((ele, index) => (
+                    <div
+                      className='radio-container gap-[2px] flex items-center'
+                      key={index}
+                    >
+                      <input
+                        type='radio'
+                        id={ele}
+                        value={ele}
+                        name='size'
+                        onChange={() => setSelectedSize(ele)}
+                        checked={selectedSize === ele}
+                        className="appearance-none w-3 h-3 border-2 border-gray-400 rounded-full checked:border-4 checked:border-blue-800 focus:outline-none transition duration-200 relative after:content-[''] after:absolute after:hidden checked:after:block after:w-0 after:h-0 after:bg-blue-800 after:rounded-full after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 cursor-pointer"
+                      />
+                      <label className='m-0 text-sm'>{ele}</label>
+                    </div>
+                  ))}
               </form>
             </div>
           </div>
         )}
         <Button
-          className='w-full mb-2 flex items-center justify-center gap-2 text-white bg-black hover:bg-gray-700'
+          className='w-full mb-0 flex items-center justify-center gap-2 text-white bg-black hover:bg-gray-700'
           onClick={handleAddToCart}
           disabled={
             product.estado === 'NO DISPONIBLE'
@@ -184,7 +185,13 @@ export default function ProductCard({
           )}
           {buttonState === 'idle' && (
             <>
-              Añadir al carrito <MdOutlineShoppingCart />
+              {product.estado === 'NO DISPONIBLE' ? (
+                product.estado
+              ) : (
+                <>
+                  Añadir al carrito <MdOutlineShoppingCart />
+                </>
+              )}
             </>
           )}
         </Button>
