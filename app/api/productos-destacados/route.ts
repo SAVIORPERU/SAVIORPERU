@@ -56,31 +56,32 @@ export async function GET(req: NextRequest) {
     ])
 
     // Obtener todos los productos para sugerencias (excluyendo ya destacados)
-    const allProducts = await prisma.productos.findMany({
-      where: {
-        NOT: {
-          destacados: {
-            some: {}
-          }
-        },
-        stock: { gt: 0 } // Solo productos con stock
-      },
-      orderBy: [
-        { stock: 'desc' }, // Primero los con más stock
-        { createdAt: 'desc' }
-      ],
-      take: 20,
-      select: {
-        id: true,
-        name: true,
-        category: true,
-        price: true,
-        image: true,
-        stock: true,
-        estado: true,
-        image2: true
-      }
-    })
+    // const allProducts = await prisma.productos.findMany({
+    //   where: {
+    //     NOT: {
+    //       destacados: {
+    //         some: {}
+    //       }
+    //     },
+    //     stock: { gt: 0 } // Solo productos con stock
+    //   },
+    //   orderBy: [
+    //     { stock: 'desc' }, // Primero los con más stock
+    //     { createdAt: 'desc' }
+    //   ],
+    //   take: 20,
+    //   select: {
+    //     id: true,
+    //     name: true,
+    //     category: true,
+    //     price: true,
+    //     image: true,
+    //     stock: true,
+    //     estado: true,
+    //     image2: true,
+    //     size: true
+    //   }
+    // })
 
     // Formatear productos destacados
     const formattedDestacados = destacados.map((product) => {
@@ -105,7 +106,8 @@ export async function GET(req: NextRequest) {
         performanceScore: calculatePerformanceScore(
           totalSoldLast30Days,
           product.stock
-        )
+        ),
+        size: product.size
       }
     })
 
@@ -125,7 +127,7 @@ export async function GET(req: NextRequest) {
       message: 'Productos destacados obtenidos exitosamente',
       data: {
         destacados: formattedDestacados,
-        suggestions: allProducts, // Productos sugeridos para destacar
+        // suggestions: allProducts, // Productos sugeridos para destacar
         stats
       },
       pagination: {

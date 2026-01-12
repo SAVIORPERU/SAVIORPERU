@@ -56,7 +56,7 @@ export default function ProductCard({
 
   if (from === 'bestSellers') {
     return (
-      <div className='bg-white overflow-hidden w-full'>
+      <div className='bg-white overflow-hidden w-full dark:bg-[#0a0a0a]'>
         <Link href={`/collection?category=${product.name.toLowerCase()}`}>
           <div className={styles.fromBestSellers}>
             <Image
@@ -71,7 +71,13 @@ export default function ProductCard({
             />
           </div>
           <div className='px-2 pt-4 pb-0 flex mb-2'>
-            <h3 className={styles.fromBestSellersh3}>Ver {product.name}</h3>
+            <h3
+              className={
+                'text-sm text-[#787671] border-b border-[#787671] flex dark:text-white'
+              }
+            >
+              Ver {product.name}
+            </h3>
           </div>
         </Link>
       </div>
@@ -84,8 +90,6 @@ export default function ProductCard({
         className={`relative ${
           from === 'featured'
             ? styles.fromFeatured
-            : from === 'bestSellers'
-            ? styles.fromBestSellers
             : 'lg:h-80 max-[400px]:h-[400px] max-[460px]:h-[400px] h-[450px] 2xl:h-[450px]'
         }`}
       >
@@ -102,42 +106,21 @@ export default function ProductCard({
       </div>
       <div
         className={`${
-          from === 'bestSellers' || from === 'featured'
-            ? 'px-2 pt-2 pb-0'
-            : 'pt-1 pb-2 px-2'
+          from === 'featured' ? 'px-2 pt-2 pb-0' : 'pt-1 pb-2 px-2'
         }`}
       >
         <h3
           className={`${
-            from === 'featured' || from === 'bestSellers'
-              ? 'text-sm'
-              : 'text-lg'
+            from === 'featured' ? 'text-sm' : 'text-lg'
           } font-semibold text-sm mb-0 text-[#31302e]`}
         >
           {product.name}
         </h3>
-        {from !== 'bestSellers' && (
+        {
           <div className='text-gray-600 mb-1 w-full flex justify-between'>
             <p className='text-sm'>S/ {Number(product.price).toFixed(2)}</p>
 
             <div className='flex justify-between mt-0'>
-              {/* <div className='flex gap-2'>
-                <button
-                  className='hover:text-gray-950'
-                  onClick={() =>
-                    setQuantity((prev) => (prev > 1 ? prev - 1 : prev))
-                  }
-                >
-                  <FiMinusCircle className='h-4 w-4' />
-                </button>
-                <span>{quantity}</span>
-                <button
-                  className='hover:text-gray-950'
-                  onClick={() => setQuantity((prev) => prev + 1)}
-                >
-                  <FiPlusCircle className='h-4 w-4' />
-                </button>
-              </div> */}
               <form className='flex gap-2'>
                 {product.size &&
                   product.size?.split(' - ').map((ele, index) => (
@@ -160,9 +143,11 @@ export default function ProductCard({
               </form>
             </div>
           </div>
-        )}
+        }
         <Button
-          className='w-full mb-0 flex items-center justify-center gap-2 text-white bg-black hover:bg-gray-700'
+          className={`w-full ${
+            from === 'featured' ? 'mb-2' : 'mb-0'
+          } flex items-center justify-center gap-2 text-white bg-black hover:bg-gray-700`}
           onClick={handleAddToCart}
           disabled={
             product.estado === 'NO DISPONIBLE'

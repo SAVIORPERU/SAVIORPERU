@@ -264,7 +264,7 @@ export default function OrderDetailsModal({
                     <span>
                       S/.{' '}
                       {(
-                        Math.round(
+                        Math.floor(
                           (parseFloat(order.totalPrice) +
                             (order.deliveryCost
                               ? parseFloat(order.deliveryCost)

@@ -1,28 +1,23 @@
 'use client'
 
-import Image from 'next/image'
-import { fotoTienda } from '../../data/nosotros'
+// import { useEffect, useState } from 'react'
+import { useConfigData } from '@/hooks/useConfigData'
 import { useEffect, useState } from 'react'
 
 export default function About() {
-  const [settings, setSettings] = useState({ fotoTienda: '' })
+  const { getFotoTienda, isMounted } = useConfigData()
+  const [imageSrc, setImageSrc] = useState('/CargandoImagen.png')
+
+  // 🟢 Actualizar la imagen solo cuando esté montado y disponible
   useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const response = await fetch('/api/settings')
-
-        if (!response.ok) throw new Error(`Error ${response.status}`)
-
-        const data = await response.json()
-        setSettings(data.data || {})
-      } catch (error) {
-        console.error('Error cargando settings:', error)
-        setSettings({ fotoTienda: '' })
+    if (isMounted) {
+      const newSrc = getFotoTienda()
+      if (newSrc && newSrc !== '/CargandoImagen.png') {
+        setImageSrc(newSrc)
       }
     }
+  }, [isMounted, getFotoTienda])
 
-    fetchSettings()
-  }, [])
   return (
     <div className='container mx-auto px-4 py-8'>
       <h1 className='text-3xl font-bold mb-8'>Sobre Nosotros</h1>
@@ -43,11 +38,11 @@ export default function About() {
             esencia.
           </p>
         </div>
-        <div className='relative min-h-96 md:h-full'>
+        <div className='relative min-h-96 max-h-[500px] md:h-full flex justify-center'>
           <img
-            src={settings.fotoTienda || '/CargandoImagen.png'}
+            src={imageSrc || '/CargandoImagen.png'}
             alt='Savior Showroom'
-            className='object-cover rounded-lg'
+            className='object-cover rounded-lg max-h-[500px]'
           />
         </div>
       </div>

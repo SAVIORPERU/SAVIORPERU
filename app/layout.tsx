@@ -11,6 +11,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { esMX } from '@clerk/localizations'
 import { Toaster } from '@/components/ui/toaster'
 import { AuthProvider } from '@/contexts/AuthContext'
+import { ConfigProvider } from '@/contexts/ConfigContext'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -82,11 +83,13 @@ export default function RootLayout({
           <ThemeProvider attribute='class' defaultTheme='light' enableSystem>
             <CartProvider>
               <AuthProvider>
-                <Header />
-                <Suspense>
-                  <main className='pt-[72px]'>{children}</main>
-                </Suspense>
-                <Footer />
+                <ConfigProvider>
+                  <Header />
+                  <Suspense>
+                    <main className='pt-[72px]'>{children}</main>
+                  </Suspense>
+                  <Footer />
+                </ConfigProvider>
               </AuthProvider>
             </CartProvider>
           </ThemeProvider>

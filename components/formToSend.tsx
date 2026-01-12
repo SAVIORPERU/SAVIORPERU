@@ -27,11 +27,12 @@ interface ProsItemsProduct {
 }
 
 interface IProps {
-  getDiscount: () => string | number
+  subTotal: string
   setShowCardClientName: (value: boolean) => void
   itemsProducts: ProsItemsProduct[]
   disctount: string
   onClose: () => void
+  descuento: number
 }
 
 interface DeliveryData {
@@ -73,11 +74,12 @@ const INITIAL_DELIVERY_STATE: DeliveryData = {
 // --- Componente FormToSend ---
 
 const FormToSend = ({
-  getDiscount,
+  subTotal,
   setShowCardClientName,
   itemsProducts,
   disctount,
-  onClose
+  onClose,
+  descuento
 }: IProps) => {
   const router = useRouter() // Inicializamos router
   const { toast } = useToast() // Extraemos toast
@@ -152,7 +154,7 @@ const FormToSend = ({
             (total, item) => total + item.quantity,
             0
           ),
-          discount: disctount === codigoCupon ? 15 : 0,
+          discount: descuento,
           deliveryCost:
             Number(getCartTotal()) < 150 ? deliveryData.deliveryCost : 0
         })
@@ -207,7 +209,7 @@ const FormToSend = ({
 
   // Lógica de cálculo de Total
   const calculateTotal = useCallback((): string => {
-    const discountAmount = Number(getDiscount())
+    const discountAmount = Number(subTotal)
     const { locationToSend, deliveryCost } = deliveryData
 
     // Si el descuento es superior a 150 (asumiendo que esto significa envío gratis o un total fijo)
@@ -238,12 +240,12 @@ const FormToSend = ({
     }
     // Sumar el costo de delivery al subtotal
     return (discountAmount + finalDeliveryCost).toFixed(2)
-  }, [getDiscount, deliveryData])
+  }, [subTotal, deliveryData])
 
   // Lógica de cálculo del Costo de Envío a mostrar
   const calculateDelivery = useCallback((): string | number => {
     const { locationToSend, deliveryCost } = deliveryData
-    const discountAmount = Number(getDiscount())
+    const discountAmount = Number(subTotal)
 
     if (locationToSend === 'provincia') {
       // Mensaje fijo para provincia
@@ -267,7 +269,7 @@ const FormToSend = ({
 
     // Usar el costo calculado (puede ser 0 si aún no marca ubicación)
     return deliveryCost
-  }, [getDiscount, deliveryData])
+  }, [subTotal, deliveryData])
 
   // Lógica de validación del formulario
   const isFormValid = useCallback((): boolean => {
@@ -281,9 +283,9 @@ const FormToSend = ({
       clientPhone
     } = deliveryData
 
-    // if (clientName.length < 3 || address.length < 3) {
-    //   return false // Requisito mínimo para ambos casos
-    // }
+    if (address.length < 3) {
+      return false // Requisito mínimo para ambos casos
+    }
 
     if (locationToSend === 'provincia') {
       // Requisitos adicionales para provincia
@@ -299,7 +301,7 @@ const FormToSend = ({
     // Requisitos para Lima Metropolitana
     if (locationToSend === 'lima_metropolitana') {
       // Si el subtotal es mayor a 150, el costo de delivery es 0 (gratis), entonces el único requisito es el nombre y la dirección
-      if (Number(getDiscount()) > 150) {
+      if (Number(subTotal) > 150) {
         return true
       }
       // De lo contrario, se requiere un costo de delivery (significa que marcó ubicación)
@@ -308,7 +310,7 @@ const FormToSend = ({
 
     // Si no se ha seleccionado ubicación, el formulario no es válido
     return true
-  }, [deliveryData, getDiscount])
+  }, [deliveryData, subTotal])
 
   const deliveryDisplay = calculateDelivery()
 
@@ -355,8 +357,8 @@ ${
     const discountInfo =
       disctount === codigoCupon
         ? `🏷️Descuento:15%
-💰Subtotal: S/ ${getDiscount()}.`
-        : `💰Subtotal: S/ ${getDiscount()}`
+💰Subtotal: S/ ${subTotal}.`
+        : `💰Subtotal: S/ ${subTotal}`
 
     const totalInfo = `✅TOTAL: S/ ${calculateTotal()}`
 
@@ -374,7 +376,7 @@ ${totalInfo}${locationLink}
     deliveryData,
     itemsProducts,
     disctount,
-    getDiscount,
+    subTotal,
     calculateTotal,
     deliveryDisplay
   ])
@@ -574,7 +576,7 @@ ${totalInfo}${locationLink}
         >
           <div
             className={
-              Number(getDiscount()) > 150
+              Number(subTotal) > 150
                 ? 'text-green-500'
                 : !isFormValid()
                 ? 'text-orange-500'
@@ -597,7 +599,7 @@ ${totalInfo}${locationLink}
           </div>
           <div>
             <span>Subtotal: </span>
-            <span>S/ {getDiscount()}</span>
+            <span>S/ {subTotal}</span>
           </div>
           <div className='font-bold text-lg'>
             <span>Total: </span>

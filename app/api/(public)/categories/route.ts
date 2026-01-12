@@ -1,45 +1,57 @@
-import prisma from '@/lib/prisma'
+// app/api/categories/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
-import { categoriesData } from './categories'
+import prisma from '@/lib/prisma'
 
-const createCategoriesSchema = z
-  .object({
-    name: z.string().min(1, 'El nombre es requerido')
-  })
-  .strip()
-
-export async function POST(req: NextRequest) {
-  const body = await req.json()
-
-  // Caso 1: No se envía name → crear categorías por defecto
-  if (!body.name) {
-    const categories = await prisma.categories.createMany({
-      data: categoriesData
+export async function GET(request: NextRequest) {
+  try {
+    const categories = await prisma.categories.findMany({
+      orderBy: {
+        id: 'desc'
+      }
     })
 
+    return NextResponse.json(categories, { status: 200 })
+  } catch (error) {
     return NextResponse.json(
-      {
-        message: 'Categorías creadas exitosamente',
-        data: categories
-      },
-      { status: 201 }
+      { error: 'Error al obtener las categorías' },
+      { status: 500 }
     )
   }
+}
 
-  // Caso 2: Se envía name → validar y crear una categoría
-  const validateData = createCategoriesSchema.parse(body)
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const { name } = body
 
-  await prisma.categories.create({
-    data: {
-      name: validateData.name
+    if (!name) {
+      return NextResponse.json(
+        { error: 'El nombre es requerido' },
+        { status: 400 }
+      )
     }
-  })
 
-  return NextResponse.json(
-    {
-      message: 'Nueva categoría creada' // ✅ arreglado typo
-    },
-    { status: 201 }
-  )
+    // Verificar si ya existe
+    const existingCategory = await prisma.categories.findUnique({
+      where: { name }
+    })
+
+    if (existingCategory) {
+      return NextResponse.json(
+        { error: 'La categoría ya existe' },
+        { status: 409 }
+      )
+    }
+
+    const category = await prisma.categories.create({
+      data: { name }
+    })
+
+    return NextResponse.json(category, { status: 201 })
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Error al crear la categoría' },
+      { status: 500 }
+    )
+  }
 }

@@ -8,17 +8,20 @@ import {
   MdGroups2,
   MdSettings
 } from 'react-icons/md'
+import { BiSolidCoupon } from 'react-icons/bi'
 import { IoGridSharp } from 'react-icons/io5'
 import { Toaster } from 'sonner'
 import UserManagement from './components/UserManagement'
 import ProductsManagement from './components/products/ProductsManagement'
 import SettingsManagement from './components/SettingsManagement'
+import CuponesCRUD from './components/CuponesCRUD'
 
 const paths = [
   { name: 'Órdenes', path: 'orders', icon: MdShoppingBag },
   { name: 'Productos', path: 'products', icon: MdInventory2 },
   { name: 'Usuarios', path: 'users', icon: MdGroups2 },
-  { name: 'Configuracion', path: 'settings', icon: MdSettings }
+  { name: 'Configuracion', path: 'settings', icon: MdSettings },
+  { name: 'Cupones', path: 'coupon', icon: BiSolidCoupon }
 ]
 
 const AdminPanel = () => {
@@ -83,6 +86,8 @@ const AdminPanel = () => {
           <ProductsManagement />
         ) : panel === 'settings' ? (
           <SettingsManagement />
+        ) : panel === 'coupon' ? (
+          <CuponesCRUD />
         ) : (
           <OdersManagement />
         )}

@@ -1,113 +1,131 @@
-import prisma from '@/lib/prisma'
+// app/api/cupones/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
+import prisma from '@/lib/prisma'
 
-// Esquema de validación
-const updateCuponSchema = z.object({
-  codigoCupon: z
-    .string()
-    .min(3)
-    .max(50)
-    .regex(/^[a-zA-Z0-9-_]+$/)
-    .optional(),
-  mostrarCupon: z.boolean().optional()
-})
-
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id)
+    const { id: idParam } = await params
+    const id = parseInt(idParam)
 
-    if (isNaN(id)) {
+    if (isNaN(id) || id <= 0) {
+      return NextResponse.json({ error: 'ID inválido' }, { status: 400 })
+    }
+
+    const cupon = await prisma.cupon.findUnique({
+      where: { id }
+    })
+
+    if (!cupon) {
       return NextResponse.json(
-        { message: 'ID de cupón inválido' },
-        { status: 400 }
+        { error: 'Cupón no encontrado' },
+        { status: 404 }
       )
     }
 
-    // Verificar si el cupón existe
+    return NextResponse.json(cupon, { status: 200 })
+  } catch (error) {
+    console.error('Error al obtener cupón:', error)
+    return NextResponse.json(
+      { error: 'Error al obtener el cupón' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id: idParam } = await params
+    const id = parseInt(idParam)
+
+    if (isNaN(id) || id <= 0) {
+      return NextResponse.json({ error: 'ID inválido' }, { status: 400 })
+    }
+
+    const body = await request.json()
+    const { codigoCupon, mostrarCupon, descuento } = body
+
+    // Validar si el cupón existe
     const existingCupon = await prisma.cupon.findUnique({
       where: { id }
     })
 
     if (!existingCupon) {
       return NextResponse.json(
-        { message: 'Cupón no encontrado' },
+        { error: 'Cupón no encontrado' },
         { status: 404 }
       )
     }
 
-    // Obtener y validar datos
-    const body = await req.json()
-    const validatedData = updateCuponSchema.parse(body)
+    // Validaciones
+    if (codigoCupon && typeof codigoCupon !== 'string') {
+      return NextResponse.json(
+        { error: 'El código debe ser una cadena de texto' },
+        { status: 400 }
+      )
+    }
 
-    // Verificar duplicado de código (si se está actualizando el código)
     if (
-      validatedData.codigoCupon &&
-      validatedData.codigoCupon !== existingCupon.codigoCupon
+      descuento !== undefined &&
+      (typeof descuento !== 'number' || descuento < 0 || descuento > 100)
     ) {
-      const duplicate = await prisma.cupon.findFirst({
+      return NextResponse.json(
+        { error: 'El descuento debe ser un número entre 0 y 100' },
+        { status: 400 }
+      )
+    }
+
+    // Verificar si el nuevo código ya existe en otro cupón
+    if (codigoCupon && codigoCupon !== existingCupon.codigoCupon) {
+      const duplicateCode = await prisma.cupon.findFirst({
         where: {
-          codigoCupon: {
-            equals: validatedData.codigoCupon,
-            mode: 'insensitive'
-          },
-          NOT: { id }
+          codigoCupon,
+          id: { not: id }
         }
       })
 
-      if (duplicate) {
+      if (duplicateCode) {
         return NextResponse.json(
-          { message: 'Ya existe otro cupón con ese código' },
+          { error: 'El código de cupón ya está en uso' },
           { status: 409 }
         )
       }
     }
 
-    // Actualizar cupón
     const updatedCupon = await prisma.cupon.update({
       where: { id },
       data: {
-        codigoCupon: validatedData.codigoCupon,
-        mostrarCupon: validatedData.mostrarCupon,
-        updatedAt: new Date()
+        ...(codigoCupon !== undefined && { codigoCupon }),
+        ...(mostrarCupon !== undefined && { mostrarCupon }),
+        ...(descuento !== undefined && { descuento })
       }
     })
 
-    return NextResponse.json({
-      message: 'Cupón actualizado exitosamente',
-      data: updatedCupon
-    })
+    return NextResponse.json(updatedCupon, { status: 200 })
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { message: 'Datos inválidos', errors: error.errors },
-        { status: 400 }
-      )
-    }
-
-    console.error('Error actualizando cupón:', error)
+    console.error('Error al actualizar cupón:', error)
     return NextResponse.json(
-      { message: 'Error interno al actualizar cupón' },
+      { error: 'Error al actualizar el cupón' },
       { status: 500 }
     )
   }
 }
 
 export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id)
+    const { id: idParam } = await params
+    const id = parseInt(idParam)
 
-    if (isNaN(id)) {
-      return NextResponse.json(
-        { message: 'ID de cupón inválido' },
-        { status: 400 }
-      )
+    if (isNaN(id) || id <= 0) {
+      return NextResponse.json({ error: 'ID inválido' }, { status: 400 })
     }
 
     // Verificar si el cupón existe
@@ -117,25 +135,23 @@ export async function DELETE(
 
     if (!existingCupon) {
       return NextResponse.json(
-        { message: 'Cupón no encontrado' },
+        { error: 'Cupón no encontrado' },
         { status: 404 }
       )
     }
 
-    // Eliminar cupón
     await prisma.cupon.delete({
       where: { id }
     })
 
-    return NextResponse.json({
-      message: 'Cupón eliminado exitosamente',
-      deletedId: id,
-      deletedCode: existingCupon.codigoCupon
-    })
-  } catch (error) {
-    console.error('Error eliminando cupón:', error)
     return NextResponse.json(
-      { message: 'Error interno al eliminar cupón' },
+      { message: 'Cupón eliminado correctamente' },
+      { status: 200 }
+    )
+  } catch (error) {
+    console.error('Error al eliminar cupón:', error)
+    return NextResponse.json(
+      { error: 'Error al eliminar el cupón' },
       { status: 500 }
     )
   }

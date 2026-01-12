@@ -20,6 +20,8 @@ import {
 import { toast } from 'sonner'
 import { z } from 'zod'
 import ImageManager from './products/ImageManager'
+import CategoriesCRUD from './CategoriesCRUD'
+import CuponesCRUD from './CuponesCRUD'
 
 // --- Interfaces ---
 interface Coleccion {
@@ -545,6 +547,9 @@ const SettingsManagement: React.FC = () => {
             </div>
           </div>
 
+          {/* Seccion de Categorias */}
+          <CategoriesCRUD />
+
           {/* Sección de Colecciones */}
           <div className='flex flex-col gap-6'>
             <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
@@ -559,13 +564,13 @@ const SettingsManagement: React.FC = () => {
               <div className='flex gap-4'>
                 <div className='relative w-full sm:w-64'>
                   <MdSearch className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl dark:text-gray-500' />
-                  <input
+                  {/* <input
                     type='text'
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className='h-10 w-full rounded-xl border border-gray-200 bg-white pl-10 pr-10 text-sm shadow-sm outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-500 dark:focus:ring-blue-500/30'
                     placeholder='Buscar colecciones...'
-                  />
+                  /> */}
                   {searchTerm && (
                     <button
                       onClick={() => setSearchTerm('')}

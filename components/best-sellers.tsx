@@ -55,8 +55,8 @@ export default function BestSellers() {
 
     fetchData()
 
-    const interval = setInterval(fetchData, 60000)
-    return () => clearInterval(interval)
+    // const interval = setInterval(fetchData, 60000)
+    // return () => clearInterval(interval)
   }, [])
 
   // Mostrar estado de carga CON 4 SKELETONS

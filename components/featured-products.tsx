@@ -64,8 +64,8 @@ export default function FeaturedProducts() {
     fetchData()
 
     // Opcional: auto-refresh cada 2 minutos
-    const interval = setInterval(fetchData, 2 * 60 * 1000)
-    return () => clearInterval(interval)
+    // const interval = setInterval(fetchData, 2 * 60 * 1000)
+    // return () => clearInterval(interval)
   }, [])
 
   // Mostrar estado de carga CON SKELETONS

@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button'
 import { X } from 'lucide-react'
 import './ShoppingCartPanel.css'
 import { useEffect, useState } from 'react'
-import { codigoCupon, mostrarCupon } from '../data/cupon'
+// import { codigoCupon, mostrarCupon } from '../data/cupon'
+import { LuLoaderCircle } from 'react-icons/lu'
 
 import { LatLng } from 'leaflet'
 import FormToSend from './formToSend'
@@ -31,8 +32,34 @@ export default function ShoppingCartPanel({
   const { cartItems, removeFromCart, clearCart, getCartTotal } = useCart()
   const [itemsProducts, setItemsProducts] = useState<ProsItemsProduct[]>([])
   const [showCardClientName, setShowCardClientName] = useState(false)
-  const [disctount, setDiscount] = useState('')
-  const [location, setLocation] = useState<LatLng | null>(null)
+  const [discount, setDiscount] = useState('')
+  // const [location, setLocation] = useState<LatLng | null>(null)
+  const [cuponCode, setCuponCode] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [codigoCupon, setCodigoCupon] = useState('')
+  const [descuento, setDescuento] = useState(0)
+  const [cuponError, setCuponError] = useState('')
+  const [subTotal, setSubTotal] = useState('')
+
+  const getDiscount = (discount?: string, descuento?: number) => {
+    if (discount && descuento) {
+      // convertimos el total a entero sin decimal multiplicando por 10
+      // luego sacamos el 15 y por ulimo dividimos entre 10 y 100 = 1000
+      const calculateDiscount = (
+        (getCartTotal() * 10 * descuento) /
+        1000
+      ).toFixed(2)
+      const roundToClientFavor = Math.ceil(Number(calculateDiscount) * 10)
+      const subtotal = (
+        (getCartTotal() * 10 - roundToClientFavor) /
+        10
+      ).toFixed(2)
+      console.log('roundToClientFavor', roundToClientFavor)
+      console.log('subTotal', subtotal)
+      return setSubTotal(subtotal)
+    }
+    setSubTotal(getCartTotal().toFixed(2))
+  }
 
   useEffect(() => {
     setItemsProducts(
@@ -45,21 +72,34 @@ export default function ShoppingCartPanel({
         size: item.size
       }))
     )
+    getDiscount()
+    return () => {
+      setCuponError('')
+      setDescuento(0)
+      setCodigoCupon('')
+      setDiscount('')
+      setLoading(false)
+    }
   }, [cartItems])
 
   if (!isOpen) return null
 
-  const getDiscount = () => {
-    if (disctount === codigoCupon) {
-      const calculateDiscount = ((getCartTotal() * 85) / 100).toFixed(2)
-      return (Math.round(Number(calculateDiscount) * 10) / 10).toFixed(2)
+  const validateCupon = async () => {
+    setLoading(true)
+    const response = await fetch(`/api/cupones/codigo/${cuponCode}`)
+    if (!response.ok) {
+      setCuponError('Codigo de cupon invalido')
+      setDescuento(0)
+      setCodigoCupon('')
+      setDiscount('')
+      setLoading(false)
     }
-    return getCartTotal().toFixed(2)
-  }
-
-  const handleLocationSelect = (location: LatLng) => {
-    setLocation(location)
-    // Aquí puedes enviar los datos al backend o almacenarlos en el estado global.
+    const data = await response.json()
+    console.log('cupon data', data)
+    setDiscount(data.codigoCupon)
+    setDescuento(data.descuento)
+    getDiscount(data.codigoCupon, data.descuento)
+    setLoading(false)
   }
 
   return (
@@ -67,14 +107,38 @@ export default function ShoppingCartPanel({
       {/* Backdrop */}
       <div
         className='fixed inset-0 bg-black bg-opacity-50 z-auto'
-        onClick={onClose}
+        onClick={() => {
+          console.log('cuponError.length', cuponError.length)
+
+          if (cuponError.length) {
+            setCuponError('')
+            setDescuento(0)
+            setCodigoCupon('')
+            setDiscount('')
+            setLoading(false)
+          }
+          setTimeout(() => {
+            onClose()
+          }, 100)
+        }}
       >
         {/* Cart Panel */}
         <div className='cartPanel' onClick={(e) => e.stopPropagation()}>
           <div className='flex justify-between items-center mb-6'>
             <h2 className='text-xl font-semibold text-gray-800'>Tu Carrito</h2>
             <button
-              onClick={onClose}
+              onClick={() => {
+                if (cuponError.length) {
+                  setCuponError('')
+                  setDescuento(0)
+                  setCodigoCupon('')
+                  setDiscount('')
+                  setLoading(false)
+                }
+                setTimeout(() => {
+                  onClose()
+                }, 100)
+              }}
               className='text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1 rounded-full hover:bg-gray-100'
             >
               <X size={24} />
@@ -118,42 +182,55 @@ export default function ShoppingCartPanel({
                 ))}
               </ul>
               <div className='border-t border-gray-200 pt-4 mb-6'>
-                {mostrarCupon && (
-                  <>
-                    <div className='flex mb-2 justify-center'>
-                      <span className='text-gray-600'>Cupon:</span>
+                <>
+                  <div className='flex mb-2 justify-center'>
+                    <span className='text-gray-600'>Cupon:</span>
+                    <div className='relative bg-white dark:bg-gray-600 w-full rounded-md ml-2'>
                       <input
                         type='text'
                         placeholder='Cupon de descuento...'
-                        className='text-sm w-full p-1 outline outline-1 border-0 rounded ml-2 outline-gray-300'
-                        value={disctount}
+                        className='text-sm p-1 outline outline-1 border-0 rounded ml-2 outline-none px-1 bg-transparent'
+                        value={cuponCode}
                         onChange={(event) => {
-                          setDiscount(event.target.value)
+                          setCuponCode(event.target.value.toUpperCase())
+                          if (cuponError) {
+                            setCuponError('')
+                          }
                         }}
                       />
+                      <button
+                        onClick={() => validateCupon()}
+                        className='absolute right-0 top-0 h-full bg-black p-1 rounded-r-md min-w-20 flex justify-center items-center'
+                      >
+                        {loading ? (
+                          <LuLoaderCircle className='animate-spin' />
+                        ) : (
+                          'Validar'
+                        )}
+                      </button>
                     </div>
-                    <div
-                      className={`flex justify-between text-sm ${
-                        disctount === codigoCupon
-                          ? 'text-red-400'
-                          : 'text-gray-600'
-                      }`}
-                    >
-                      <span>Descuento:</span>
-                      <span>{disctount === codigoCupon ? '-15%' : '0%'}</span>
-                    </div>
-                  </>
-                )}
+                  </div>
+                  <div
+                    className={`flex justify-between text-sm ${
+                      discount === codigoCupon
+                        ? 'text-red-400'
+                        : 'text-gray-600'
+                    }`}
+                  >
+                    <span>Descuento:</span>
+                    <span>{descuento ? descuento : 0}%</span>
+                  </div>
+                </>
 
                 <div className='flex justify-between items-center mb-4'>
                   <span className='text-gray-600'>Subtotal:</span>
                   <span className='text-xl font-semibold text-gray-800'>
-                    S/ {getDiscount()}
+                    S/ {subTotal}
                   </span>
                 </div>
                 <div
                   className={`flex justify-between text-xs ${
-                    disctount === codigoCupon ? 'text-red-400' : 'text-gray-600'
+                    discount === codigoCupon ? 'text-red-400' : 'text-gray-600'
                   } bg-green-100 rounded py-2 px-4 mb-2 border border-green-300`}
                 >
                   <span>
@@ -182,11 +259,12 @@ export default function ShoppingCartPanel({
         </div>
         {showCardClientName && (
           <FormToSend
-            getDiscount={getDiscount}
+            subTotal={subTotal}
             setShowCardClientName={setShowCardClientName}
             itemsProducts={itemsProducts}
-            disctount={disctount}
+            disctount={discount}
             onClose={onClose}
+            descuento={descuento}
           />
         )}
       </div>

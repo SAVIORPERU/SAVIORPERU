@@ -3,7 +3,7 @@ import { IconType } from 'react-icons'
 interface KpiCardProps {
   title: string
   value: string
-  trend: string
+  trend?: string
   Icon: IconType
   color: 'blue' | 'indigo' | 'purple' | 'orange' | 'blue'
   isNegative?: boolean
@@ -43,14 +43,16 @@ const KpiCard: React.FC<KpiCardProps> = ({
         </div>
       </div>
       <div className='flex items-end justify-between'>
-        <h3 className='text-2xl font-black text-gray-900 dark:text-white'>
+        <h3 className='text-xl font-black text-gray-900 dark:text-white'>
           {value}
         </h3>
-        {/* <span
-          className={`text-xs font-bold px-2 py-1 rounded-lg ${trendColor}`}
-        >
-          {trend}
-        </span> */}
+        {trend && (
+          <span
+            className={`text-xs font-bold px-2 py-1 rounded-lg ${trendColor}`}
+          >
+            {trend}
+          </span>
+        )}
       </div>
     </div>
   )
