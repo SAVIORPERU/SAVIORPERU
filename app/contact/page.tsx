@@ -7,9 +7,28 @@ import Link from 'next/link'
 import { useConfigData } from '@/hooks/useConfigData'
 // import { FaFilePdf } from 'react-icons/fa6'
 import { FaFilePdf } from 'react-icons/fa'
+import { useEffect, useState } from 'react'
 
 export default function Contact() {
-  const { getCorreo, getTelefono } = useConfigData()
+  // const { getCorreo, getTelefono } = useConfigData()
+  const [settings, setSettings] = useState({ telefono: '', correo: '' })
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch('/api/settings')
+
+        if (!response.ok) throw new Error(`Error ${response.status}`)
+
+        const data = await response.json()
+        setSettings(data.data || {})
+      } catch (error) {
+        console.error('Error cargando settings:', error)
+        setSettings({ telefono: '', correo: '' })
+      }
+    }
+
+    fetchSettings()
+  }, [])
 
   return (
     <div className='container mx-auto px-4 py-8'>
@@ -20,10 +39,10 @@ export default function Contact() {
             Informacion de contacto
           </h2>
           <p className='mb-2 flex gap-2 items-center'>
-            <MdOutlineMailOutline />: {getCorreo()}
+            <MdOutlineMailOutline />: {settings.correo}
           </p>
           <p className='mb-2 flex gap-2 items-center'>
-            <MdOutlinePhoneIphone />: {getTelefono()}
+            <MdOutlinePhoneIphone />: {settings.telefono}
           </p>
           <h3 className='text-xl font-semibold mt-6 mb-2'>Horio de atencion</h3>
           <p className='mb-1'>Lunes a Viernes: 9:00 AM - 6:00 PM</p>
@@ -41,12 +60,12 @@ export default function Contact() {
             <ul className='list-disc pl-5'>
               <li>
                 Imprimirlo , rellenarlo a mano, tomarle una foto o escanearlo, y
-                enviarlo por correo a: <strong>{getCorreo()}.</strong>
+                enviarlo por correo a: <strong>{settings.correo}.</strong>
               </li>
               <li>
                 O rellenarlo digitalmente desde tu dispositivo usando cualquier
                 app de PDF, y luego enviarlo al mismo correo:{' '}
-                <strong>{getCorreo()}.</strong>
+                <strong>{settings.correo}.</strong>
               </li>
             </ul>
             <li>¡Listo! Nos pondremos en contacto contigo pronto.</li>
