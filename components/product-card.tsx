@@ -154,12 +154,7 @@ export default function ProductCard({
               ? true
               : buttonState === 'loading' ||
                 buttonState === 'success' ||
-                (selectedSize
-                  ? false
-                  : product.name.includes('Gorro') ||
-                    product.name.includes('Bucket')
-                  ? false
-                  : true)
+                (selectedSize ? false : !product.size ? false : true)
           }
         >
           {buttonState === 'loading' && (
