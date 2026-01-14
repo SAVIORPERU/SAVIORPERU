@@ -95,6 +95,7 @@ const FormToSend = ({
   const [maximoDelivery, setMaximoDelivery] = useState(15)
   const [loadingSettings, setLoadingSettings] = useState(true)
   const [isSavingOrder, setIsSavingOrder] = useState(false)
+  const [telefono, setTelefono] = useState(958284730)
 
   const subTotalNumber = useMemo(() => Number(subTotal), [subTotal])
 
@@ -133,6 +134,7 @@ const FormToSend = ({
       const data = await response.json()
       setMinimoDelivery(data?.data?.minimoDelivery || 10)
       setMaximoDelivery(data?.data?.maximoDelivery || 15)
+      setTelefono(data?.data?.maximoDelivery)
     } catch (error) {
       console.error('Error cargando settings:', error)
     } finally {
@@ -469,7 +471,7 @@ ${totalInfo}${locationLink}
   }, [user, hasFullNameOverride, deliveryData.clientName])
 
   // --- Render helpers ---
-  const whatsappHref = `https://wa.me/+${COUNTRY_CODE}${PHONE_NUMBER}?text=${encodeURIComponent(
+  const whatsappHref = `https://wa.me/+${COUNTRY_CODE}${telefono}?text=${encodeURIComponent(
     generateWhatsAppContent()
   )}`
 
