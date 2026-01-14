@@ -55,8 +55,6 @@ export async function GET(req: NextRequest) {
         totalProducts: products.length
       }
 
-      console.log('initialProductsDetails =>', initialProductsDetails)
-
       return NextResponse.json(
         {
           message: 'Initial products created',
@@ -195,8 +193,6 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const validatedData = createProductSchema.parse(body)
 
-    console.log('validatedData', validatedData)
-
     const findCategory = await prisma.categories.findFirst({
       where: { name: validatedData.category }
     })
@@ -220,8 +216,6 @@ export async function POST(req: NextRequest) {
         stock: validatedData.stock
       }
     })
-
-    console.log('product', product)
 
     // Si el producto debe ser destacado, crear relación
     if (validatedData.destacado) {

@@ -55,8 +55,6 @@ export default function ProductCard({
     }, 500)
   }
 
-  console.log('esto es product en product-card', product)
-
   if (from === 'bestSellers') {
     return (
       <div className='bg-white overflow-hidden w-full dark:bg-[#0a0a0a]'>

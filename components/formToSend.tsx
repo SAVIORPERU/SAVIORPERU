@@ -134,7 +134,7 @@ const FormToSend = ({
       const data = await response.json()
       setMinimoDelivery(data?.data?.minimoDelivery || 10)
       setMaximoDelivery(data?.data?.maximoDelivery || 15)
-      setTelefono(data?.data?.maximoDelivery)
+      setTelefono(data?.data?.telefono)
     } catch (error) {
       console.error('Error cargando settings:', error)
     } finally {
@@ -481,6 +481,8 @@ ${totalInfo}${locationLink}
     !loadingSettings && !isSavingOrder && formValidation.isValid
       ? 'auto'
       : 'none'
+
+  console.log('esto es telefono', telefono)
 
   return (
     <main

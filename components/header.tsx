@@ -66,8 +66,6 @@ export default function Header() {
   //         return response.json()
   //       })
   //       .then((data) => {
-  //         console.log('esto es data user', data)
-
   //         if (data.data.role === 'ADMIN') {
   //           setIsAdmin('ADMIN')
   //         }

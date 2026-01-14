@@ -126,8 +126,6 @@ export function InvoicePDF({ orderData }: InvoicePDFProps) {
     100
   ).toFixed(2)
 
-  console.log('orderData ==>', orderData)
-
   return (
     <Document>
       <Page size='A4' style={styles.page}>

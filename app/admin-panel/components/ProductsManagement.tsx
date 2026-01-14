@@ -373,8 +373,6 @@ const ProductsManagement: React.FC = () => {
       return
     }
 
-    console.log('formData', formData)
-
     try {
       const formDataToSend = {
         name: formData.name,
@@ -560,8 +558,6 @@ const ProductsManagement: React.FC = () => {
       toast.error('Error al actualizar el producto')
     }
   }
-
-  console.log('formData', formData)
 
   return (
     <>
@@ -1043,8 +1039,6 @@ const ProductsManagement: React.FC = () => {
                           <>
                             <option value='CATEGORIES'>Seleccionar</option>
                             {kpiData.categoreis.map((ele, index) => {
-                              console.log(ele)
-
                               return (
                                 <option key={index} value={ele.name}>
                                   {ele.name.length
@@ -1426,8 +1420,6 @@ const ProductsManagement: React.FC = () => {
                           <>
                             <option value='CATEGORIES'>Seleccionar</option>
                             {kpiData.categoreis.map((ele, index) => {
-                              console.log(ele)
-
                               return (
                                 <option key={index} value={ele.name}>
                                   {ele.name.length

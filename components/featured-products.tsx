@@ -25,11 +25,6 @@ export default function FeaturedProducts() {
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log(
-        '🔄 [CLIENT] Iniciando fetch de productos destacados -',
-        new Date().toLocaleTimeString()
-      )
-
       try {
         setLoading(true)
 
@@ -40,11 +35,6 @@ export default function FeaturedProducts() {
         }
 
         const result = await response.json()
-
-        console.log(
-          '📊 [CLIENT] Productos destacados recibidos:',
-          result.data?.destacados.length || 0
-        )
 
         if (result.data.destacados) {
           setData(result.data.destacados)

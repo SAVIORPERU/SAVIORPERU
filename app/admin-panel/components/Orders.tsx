@@ -254,13 +254,6 @@ const OdersManagement: React.FC = () => {
     const delivery = deliveryCost ? deliveryCost : 0
     const calculateDiscount = discoun ? (subtotal * discoun) / 100 : 0
     const discount = Math.ceil(calculateDiscount * 10) / 10
-    console.log(
-      'operando',
-      subtotal,
-      delivery,
-      discount,
-      (subtotal + delivery - discount).toFixed(2)
-    )
 
     return ((subtotal * 100 + delivery * 100 - discount * 100) / 100).toFixed(2)
   }
