@@ -194,6 +194,8 @@ export default function OrdersList({
       discount: order.discount
     }
 
+    console.log('pdfData 123', pdfData)
+
     await generatePDF(pdfData)
   }
 
@@ -217,10 +219,19 @@ export default function OrdersList({
   const calculateTotalWithDiscount = (order: Order) => {
     const subtotal = parseFloat(order.totalPrice) || 0
     const delivery = order.deliveryCost ? parseFloat(order.deliveryCost) : 0
-    const discount = order.discount
+    const calculateDiscount = order.discount
       ? (subtotal * parseFloat(order.discount)) / 100
       : 0
-    return (subtotal + delivery - discount).toFixed(2)
+    const discount = Math.ceil(calculateDiscount * 10) / 10
+    console.log(
+      'operando',
+      subtotal,
+      delivery,
+      discount,
+      (subtotal + delivery - discount).toFixed(2)
+    )
+
+    return ((subtotal * 100 + delivery * 100 - discount * 100) / 100).toFixed(2)
   }
 
   return (

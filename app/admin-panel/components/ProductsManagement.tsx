@@ -27,6 +27,7 @@ import {
 import { GoSortAsc, GoSortDesc } from 'react-icons/go'
 import { toast } from 'sonner'
 import KpiCard from './KpiCard'
+// import KpiCard from './KpiCard'
 
 // Interfaces
 interface Producto {
