@@ -110,7 +110,7 @@ export default function Collection() {
             <SelectValue placeholder='Ver todos' />
           </SelectTrigger>
           <SelectContent>
-            {categories.length >= 1
+            {categories && categories.length >= 1
               ? categories.map((ele) => {
                   return (
                     <SelectItem key={ele.name} value={ele.name}>
