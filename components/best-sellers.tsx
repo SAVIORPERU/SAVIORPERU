@@ -12,6 +12,7 @@ interface Product {
   image2?: string
   size?: string
   estado?: string
+  stock: number
 }
 
 // Array para skeletons
@@ -72,7 +73,8 @@ export default function BestSellers() {
                 id: item, // Usar item como ID único
                 image: '/CargandoImagen.png',
                 name: 'Cargando...',
-                price: 0
+                price: 0,
+                stock: 0
               }}
               from='bestSellers'
             />

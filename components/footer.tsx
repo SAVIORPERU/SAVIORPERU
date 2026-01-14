@@ -9,23 +9,23 @@ export default function Footer() {
     facebook: '',
     tiktok: ''
   })
-  // useEffect(() => {
-  //   const fetchSettings = async () => {
-  //     try {
-  //       const response = await fetch('/api/settings')
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch('/api/settings')
 
-  //       if (!response.ok) throw new Error(`Error ${response.status}`)
+        if (!response.ok) throw new Error(`Error ${response.status}`)
 
-  //       const data = await response.json()
-  //       setSettings(data.data || {})
-  //     } catch (error) {
-  //       console.error('Error cargando settings:', error)
-  //       setSettings({ instagram: '', facebook: '', tiktok: '' })
-  //     }
-  //   }
+        const data = await response.json()
+        setSettings(data.data || {})
+      } catch (error) {
+        console.error('Error cargando settings:', error)
+        setSettings({ instagram: '', facebook: '', tiktok: '' })
+      }
+    }
 
-  //   fetchSettings()
-  // }, [])
+    fetchSettings()
+  }, [])
   return (
     <footer className='bg-secondary text-foreground'>
       <div className='container mx-auto px-4 py-8'>
