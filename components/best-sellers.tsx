@@ -24,11 +24,6 @@ export default function BestSellers() {
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log(
-        '🔄 [CLIENT] Iniciando fetch de productos -',
-        new Date().toLocaleTimeString()
-      )
-
       try {
         setLoading(true)
 
@@ -39,11 +34,6 @@ export default function BestSellers() {
         }
 
         const collectionData = await response.json()
-
-        console.log(
-          '📊 [CLIENT] Productos recibidos:',
-          collectionData.data.colecciones.length
-        )
 
         setData(collectionData.data.colecciones)
       } catch (error) {

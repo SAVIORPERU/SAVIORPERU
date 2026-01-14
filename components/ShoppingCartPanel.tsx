@@ -54,8 +54,6 @@ export default function ShoppingCartPanel({
         (getCartTotal() * 10 - roundToClientFavor) /
         10
       ).toFixed(2)
-      console.log('roundToClientFavor', roundToClientFavor)
-      console.log('subTotal', subtotal)
       return setSubTotal(subtotal)
     }
     setSubTotal(getCartTotal().toFixed(2))
@@ -96,7 +94,6 @@ export default function ShoppingCartPanel({
         setLoading(false)
       }
       const data = await response.json()
-      console.log('cupon data', data)
       setDiscount(data.codigoCupon)
       setDescuento(data.descuento)
       getDiscount(data.codigoCupon, data.descuento)
@@ -110,8 +107,6 @@ export default function ShoppingCartPanel({
       <div
         className='fixed inset-0 bg-black bg-opacity-50 z-auto'
         onClick={() => {
-          console.log('cuponError.length', cuponError.length)
-
           if (cuponError.length) {
             setCuponError('')
             setDescuento(0)

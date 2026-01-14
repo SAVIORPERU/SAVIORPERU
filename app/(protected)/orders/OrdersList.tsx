@@ -64,8 +64,6 @@ export default function OrdersList({
   const { user, isSignedIn } = useUser()
   const { generatePDF, isGenerating } = usePDFGenerator()
 
-  console.log('page =>', page)
-
   // Estados para filtros y ordenamiento
   const [statusFilter, setStatusFilter] = useState<string>('todos')
   const [searchTerm, setSearchTerm] = useState<string>('')
@@ -194,8 +192,6 @@ export default function OrdersList({
       discount: order.discount
     }
 
-    console.log('pdfData 123', pdfData)
-
     await generatePDF(pdfData)
   }
 
@@ -223,13 +219,6 @@ export default function OrdersList({
       ? (subtotal * parseFloat(order.discount)) / 100
       : 0
     const discount = Math.ceil(calculateDiscount * 10) / 10
-    console.log(
-      'operando',
-      subtotal,
-      delivery,
-      discount,
-      (subtotal + delivery - discount).toFixed(2)
-    )
 
     return ((subtotal * 100 + delivery * 100 - discount * 100) / 100).toFixed(2)
   }
