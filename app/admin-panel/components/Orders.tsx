@@ -138,13 +138,32 @@ const OdersManagement: React.FC = () => {
 
     setIsUpdatingStatus(true)
 
+    // Creamos la promesa que manejará todo
     const updatePromise = fetch(`/api/orders/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: newStatus })
     }).then(async (res) => {
-      if (!res.ok) throw new Error()
-      fetchOrders(currentPage, searchTerm, false)
+      if (!res.ok) {
+        // Intentamos obtener el mensaje de error del backend
+        let errorMessage = 'Error desconocido del servidor'
+        try {
+          // Asumimos que el backend devuelve JSON con un campo "message"
+          const errorData = await res.json()
+          errorMessage = errorData.message || errorData.error || errorMessage
+        } catch (e) {
+          // Si no es JSON, intentamos como texto
+          try {
+            errorMessage = (await res.text()) || errorMessage
+          } catch {
+            // Si falla todo, mantenemos el mensaje genérico
+          }
+        }
+        throw new Error(errorMessage)
+      }
+
+      // Si todo va bien, actualizamos la lista de órdenes
+      await fetchOrders(currentPage, searchTerm, false)
 
       return res
     })
@@ -160,7 +179,12 @@ const OdersManagement: React.FC = () => {
         )
         return `Orden #${id} actualizada a ${newStatus}`
       },
-      error: 'Error al actualizar el estado',
+      error: (err) => {
+        // Ahora err.message contiene el mensaje real del backend
+        return `Error: ${err.message}`
+      },
+      duration: 7000,
+      dismissible: true,
       finally: () => setIsUpdatingStatus(false)
     })
   }
