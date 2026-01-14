@@ -1,6 +1,5 @@
 'use client'
 
-// import { useConfigData } from '@/hooks/useConfigData'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { FaFacebook, FaInstagram, FaTiktok } from 'react-icons/fa'
@@ -10,23 +9,23 @@ export default function Footer() {
     facebook: '',
     tiktok: ''
   })
-  useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const response = await fetch('/api/settings')
+  // useEffect(() => {
+  //   const fetchSettings = async () => {
+  //     try {
+  //       const response = await fetch('/api/settings')
 
-        if (!response.ok) throw new Error(`Error ${response.status}`)
+  //       if (!response.ok) throw new Error(`Error ${response.status}`)
 
-        const data = await response.json()
-        setSettings(data.data || {})
-      } catch (error) {
-        console.error('Error cargando settings:', error)
-        setSettings({ instagram: '', facebook: '', tiktok: '' })
-      }
-    }
+  //       const data = await response.json()
+  //       setSettings(data.data || {})
+  //     } catch (error) {
+  //       console.error('Error cargando settings:', error)
+  //       setSettings({ instagram: '', facebook: '', tiktok: '' })
+  //     }
+  //   }
 
-    fetchSettings()
-  }, [])
+  //   fetchSettings()
+  // }, [])
   return (
     <footer className='bg-secondary text-foreground'>
       <div className='container mx-auto px-4 py-8'>
@@ -59,27 +58,33 @@ export default function Footer() {
           <div>
             <h3 className='font-bold mb-2'>Follow Us</h3>
             <div className='flex flex-col'>
-              <Link
-                href={settings.facebook}
-                className='hover:text-primary flex items-center gap-1 mb-2'
-                target='_blank'
-              >
-                <FaFacebook className='h-8 w-7' /> Facebook
-              </Link>
-              <Link
-                href={settings.instagram}
-                className='hover:text-primary flex items-center gap-1 mb-2'
-                target='_blank'
-              >
-                <FaInstagram className='h-8 w-7' /> Instagram
-              </Link>
-              <Link
-                href={settings.tiktok}
-                className='hover:text-primary flex items-center gap-1 mb-2'
-                target='_blank'
-              >
-                <FaTiktok className='h-8 w-7' /> Tiktok
-              </Link>
+              {settings.facebook && (
+                <Link
+                  href={settings.facebook}
+                  className='hover:text-primary flex items-center gap-1 mb-2'
+                  target='_blank'
+                >
+                  <FaFacebook className='h-8 w-7' /> Facebook
+                </Link>
+              )}
+              {settings.instagram && (
+                <Link
+                  href={settings.instagram}
+                  className='hover:text-primary flex items-center gap-1 mb-2'
+                  target='_blank'
+                >
+                  <FaInstagram className='h-8 w-7' /> Instagram
+                </Link>
+              )}
+              {settings.tiktok && (
+                <Link
+                  href={settings.tiktok}
+                  className='hover:text-primary flex items-center gap-1 mb-2'
+                  target='_blank'
+                >
+                  <FaTiktok className='h-8 w-7' /> Tiktok
+                </Link>
+              )}
             </div>
           </div>
         </div>
