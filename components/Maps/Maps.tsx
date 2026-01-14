@@ -351,7 +351,10 @@ export default function InteractiveMap({
       )
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        alert(
+          'No se pudo calcular la ruta desde tu ubicación actual. Verifica que estés en una zona con acceso a calles o intenta mover el marcador a una vía cercana.'
+        )
+        console.log(`HTTP error! status: ${response}`)
       }
 
       const data = await response.json()

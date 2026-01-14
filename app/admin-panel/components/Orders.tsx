@@ -245,6 +245,26 @@ const OdersManagement: React.FC = () => {
     return rangeWithDots
   }
 
+  const calculateTotalWithDiscount = (
+    totalPrice: number,
+    deliveryCost: number,
+    discoun: number
+  ) => {
+    const subtotal = totalPrice || 0
+    const delivery = deliveryCost ? deliveryCost : 0
+    const calculateDiscount = discoun ? (subtotal * discoun) / 100 : 0
+    const discount = Math.ceil(calculateDiscount * 10) / 10
+    console.log(
+      'operando',
+      subtotal,
+      delivery,
+      discount,
+      (subtotal + delivery - discount).toFixed(2)
+    )
+
+    return ((subtotal * 100 + delivery * 100 - discount * 100) / 100).toFixed(2)
+  }
+
   return (
     <>
       <main className='flex flex-1 flex-col bg-gray-50 dark:bg-gray-900  pb-12'>
@@ -668,10 +688,26 @@ const OdersManagement: React.FC = () => {
                       Descuento:
                     </span>
                     <span className='font-medium text-red-600 dark:text-red-400'>
-                      - S/ {Number(selectedOrder.discount).toFixed(2)}
+                      - % {Number(selectedOrder.discount).toFixed(2)}
+                      {' = '} S /
+                      {(
+                        Math.ceil(
+                          ((selectedOrder.totalPrice * selectedOrder.discount) /
+                            100) *
+                            10
+                        ) / 10
+                      ).toFixed(2)}
                     </span>
                   </div>
                 )}
+                <div className='flex justify-between items-center text-sm'>
+                  <span className='text-gray-600 dark:text-gray-400'>
+                    Subtotal:
+                  </span>
+                  <span className='font-medium dark:text-gray-300'>
+                    S/ {Number(selectedOrder.totalPrice).toFixed(2)}
+                  </span>
+                </div>
 
                 <div className='border-t pt-3 mt-3 border-gray-200 dark:border-gray-700'>
                   <div className='flex justify-between items-center'>
@@ -680,11 +716,11 @@ const OdersManagement: React.FC = () => {
                     </span>
                     <span className='text-base font-bold dark:text-white'>
                       S/{' '}
-                      {(
-                        Number(selectedOrder.totalPrice) +
-                        (Number(selectedOrder.deliveryCost) || 0) -
-                        (Number(selectedOrder.discount) || 0)
-                      ).toFixed(2)}
+                      {calculateTotalWithDiscount(
+                        selectedOrder.totalPrice,
+                        selectedOrder.deliveryCost,
+                        selectedOrder.discount
+                      )}
                     </span>
                   </div>
                 </div>
@@ -695,11 +731,11 @@ const OdersManagement: React.FC = () => {
               <div className='flex flex-col'>
                 <span className='text-2xl font-black text-blue-600 dark:text-blue-400'>
                   Total: S/{' '}
-                  {(
-                    Number(selectedOrder.totalPrice) +
-                    (Number(selectedOrder.deliveryCost) || 0) -
-                    (Number(selectedOrder.discount) || 0)
-                  ).toFixed(2)}
+                  {calculateTotalWithDiscount(
+                    selectedOrder.totalPrice,
+                    selectedOrder.deliveryCost,
+                    selectedOrder.discount
+                  )}
                 </span>
                 <div className='flex gap-4 mt-2 text-xs text-gray-500 dark:text-gray-400'>
                   {selectedOrder.deliveryCost &&
