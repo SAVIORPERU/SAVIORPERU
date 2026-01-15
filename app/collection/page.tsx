@@ -145,7 +145,10 @@ export default function Collection() {
         <div className='flex justify-center items-center gap-4 mt-8'>
           <button
             disabled={page <= 1}
-            onClick={() => setPage((prev) => prev - 1)}
+            onClick={() => {
+              scrollToTop()
+              setPage((prev) => prev - 1)
+            }}
             className='px-4 py-2 border rounded disabled:opacity-50'
           >
             Anterior
@@ -155,7 +158,10 @@ export default function Collection() {
           </span>
           <button
             disabled={page >= pagination.totalPages}
-            onClick={() => setPage((prev) => prev + 1)}
+            onClick={() => {
+              scrollToTop()
+              setPage((prev) => prev + 1)
+            }}
             className='px-4 py-2 border rounded disabled:opacity-50'
           >
             Siguiente
@@ -164,15 +170,15 @@ export default function Collection() {
       )}
 
       {/* Botón scroll to top */}
-      {isVisible && (
-        <button
-          onClick={scrollToTop}
-          className='buttonUp'
-          aria-label='Volver arriba'
-        >
-          <RiArrowUpDoubleLine className='w-10 h-10' />
-        </button>
-      )}
+      {/* {isVisible && ( */}
+      <button
+        onClick={scrollToTop}
+        className='buttonUp'
+        aria-label='Volver arriba'
+      >
+        <RiArrowUpDoubleLine className='w-10 h-10' />
+      </button>
+      {/* )} */}
     </div>
   )
 }
