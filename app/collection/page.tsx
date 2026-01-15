@@ -71,6 +71,10 @@ export default function Collection() {
     return () => window.removeEventListener('scroll', toggleVisibility)
   }, [page, filter, sort])
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [page])
+
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -145,10 +149,7 @@ export default function Collection() {
         <div className='flex justify-center items-center gap-4 mt-8'>
           <button
             disabled={page <= 1}
-            onClick={() => {
-              scrollToTop()
-              setPage((prev) => prev - 1)
-            }}
+            onClick={() => setPage((prev) => prev - 1)}
             className='px-4 py-2 border rounded disabled:opacity-50'
           >
             Anterior
@@ -158,10 +159,7 @@ export default function Collection() {
           </span>
           <button
             disabled={page >= pagination.totalPages}
-            onClick={() => {
-              scrollToTop()
-              setPage((prev) => prev + 1)
-            }}
+            onClick={() => setPage((prev) => prev + 1)}
             className='px-4 py-2 border rounded disabled:opacity-50'
           >
             Siguiente
