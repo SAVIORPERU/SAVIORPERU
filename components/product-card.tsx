@@ -166,8 +166,8 @@ export default function ProductCard({
           )}
           {buttonState === 'idle' && (
             <>
-              {product.estado === 'NO DISPONIBLE' ? (
-                product.estado
+              {product.estado === 'NO DISPONIBLE' || product.stock === 0 ? (
+                'NO DISPONIBLE'
               ) : (
                 <>
                   Añadir al carrito <MdOutlineShoppingCart />

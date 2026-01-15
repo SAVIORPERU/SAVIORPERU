@@ -4,6 +4,8 @@ import { products } from './products' // 👈 tu archivo con productos iniciales
 import { Prisma } from '@/app/generated/prisma/client'
 import { z } from 'zod'
 
+export const revalidate = 60
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)

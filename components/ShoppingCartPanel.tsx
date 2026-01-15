@@ -106,21 +106,21 @@ export default function ShoppingCartPanel({
       {/* Backdrop */}
       <div
         className='fixed inset-0 bg-black bg-opacity-50 z-auto'
-        onClick={() => {
-          if (cuponError.length) {
-            setCuponError('')
-            setDescuento(0)
-            setCodigoCupon('')
-            setDiscount('')
-            setLoading(false)
-          }
-          setTimeout(() => {
+        onMouseDown={(e) => {
+          if (e.target === e.currentTarget) {
+            if (cuponError.length) {
+              setCuponError('')
+              setDescuento(0)
+              setCodigoCupon('')
+              setDiscount('')
+              setLoading(false)
+            }
             onClose()
-          }, 100)
+          }
         }}
       >
         {/* Cart Panel */}
-        <div className='cartPanel' onClick={(e) => e.stopPropagation()}>
+        <div className='cartPanel'>
           <div className='flex justify-between items-center mb-6'>
             <h2 className='text-xl font-semibold text-gray-800'>Tu Carrito</h2>
             <button
