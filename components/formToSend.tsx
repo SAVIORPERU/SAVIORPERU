@@ -487,10 +487,22 @@ ${totalInfo}${locationLink}
   return (
     <main
       className='cardFormCaontainer'
-      onClick={() => setShowCardClientName(false)}
-      onMouseDown={(e) => e.stopPropagation()}
+      // onClick={(e) => {
+      //   if (e.target === e.currentTarget) {
+      //     setShowCardClientName(false)
+      //   }
+      // }}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) {
+          setShowCardClientName(false)
+        }
+      }}
     >
-      <form className='formContainer' onClick={(e) => e.stopPropagation()}>
+      <form
+        className='formContainer'
+        onClick={(e) => e.stopPropagation()}
+        onMouseUp={(e) => e.stopPropagation()}
+      >
         {/* Nombre del Cliente */}
         <div>
           <label htmlFor='inputName' className='labelClientName'>
@@ -741,7 +753,14 @@ ${totalInfo}${locationLink}
               </Link>
             )
           ) : (
-            <Link href={'/sign-in'} className='linkWhatsapp'>
+            <Link
+              href={'/sign-in'}
+              className='linkWhatsapp'
+              onClick={() => {
+                setShowCardClientName(false)
+                onClose()
+              }}
+            >
               👉 Inicia sesión para realizar tu pedido 👈
             </Link>
           )}
