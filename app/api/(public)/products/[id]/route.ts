@@ -1,6 +1,7 @@
 import prisma from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+import { revalidatePath, revalidateTag } from 'next/cache'
 
 // GET - Obtener un producto por ID
 export async function GET(
@@ -53,6 +54,8 @@ const updateProductSchema = z.object({
   price: z.number().positive().optional(),
   image: z.string().url().optional(),
   image2: z.string().url().optional().nullable(),
+  image3: z.string().url().optional().nullable(),
+  image4: z.string().url().optional().nullable(),
   stock: z.number().int().min(0).optional(),
   destacado: z.boolean().optional(),
   newCategory: z.string().optional()
@@ -110,6 +113,12 @@ export async function PUT(
         ...(validatedData.image2 !== undefined && {
           image2: validatedData.image2
         }),
+        ...(validatedData.image3 !== undefined && {
+          image3: validatedData.image3
+        }),
+        ...(validatedData.image4 !== undefined && {
+          image4: validatedData.image4
+        }),
         ...(validatedData.stock !== undefined && {
           stock: validatedData.stock
         }),
@@ -133,6 +142,10 @@ export async function PUT(
         })
       }
     }
+
+    // Invalidar caché de productos
+    revalidatePath('/api/products')
+    revalidatePath(`/collection/${id}`)
 
     return NextResponse.json({
       message: 'Producto actualizado exitosamente',
@@ -206,6 +219,10 @@ export async function DELETE(
     await prisma.productos.delete({
       where: { id }
     })
+
+    // Invalidar caché de productos
+    revalidatePath('/api/products')
+    revalidatePath(`/collection/${id}`)
 
     return NextResponse.json({
       message: 'Producto eliminado exitosamente',

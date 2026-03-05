@@ -3,8 +3,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { products } from './products' // 👈 tu archivo con productos iniciales
 import { Prisma } from '@/app/generated/prisma/client'
 import { z } from 'zod'
+import { revalidatePath } from 'next/cache'
 
-export const revalidate = 60
+// Nota: Con cacheComponents: true, el caché se maneja vía lib/cache/products.ts
+// usando 'use cache' + cacheLife('hours'). Esta ruta es dinámica por defecto.
 
 export async function GET(req: NextRequest) {
   try {
@@ -184,6 +186,16 @@ const createProductSchema = z
       .url('La segunda imagen debe ser una URL válida')
       .optional()
       .nullable(),
+    image3: z
+      .string()
+      .url('La tercera imagen debe ser una URL válida')
+      .optional()
+      .nullable(),
+    image4: z
+      .string()
+      .url('La cuarta imagen debe ser una URL válida')
+      .optional()
+      .nullable(),
     stock: z.number().int().min(0, 'El stock no puede ser negativo').default(1),
     destacado: z.boolean().default(false), // Para marcar como destacado automáticamente
     newCategory: z.string().optional()
@@ -215,6 +227,8 @@ export async function POST(req: NextRequest) {
         price: validatedData.price,
         image: validatedData.image,
         image2: validatedData.image2,
+        image3: validatedData.image3,
+        image4: validatedData.image4,
         stock: validatedData.stock
       }
     })
@@ -227,6 +241,10 @@ export async function POST(req: NextRequest) {
         }
       })
     }
+
+    // Invalidar caché de productos
+    revalidatePath('/api/products')
+    revalidatePath('/collection')
 
     return NextResponse.json(
       {

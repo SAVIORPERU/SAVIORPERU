@@ -7,6 +7,8 @@ export interface Producto {
   price: number
   image: string
   image2: string | null
+  image3: string | null
+  image4: string | null
   stock: number
   destacado: boolean
   createdAt: string
@@ -49,6 +51,28 @@ export interface CloudinaryImage {
   format: string
 }
 
+export interface CloudinaryImageExtended extends CloudinaryImage {
+  width?: number
+  height?: number
+}
+
+export interface CloudinaryFolder {
+  name: string
+  path: string
+}
+
+export interface CloudinaryFoldersResponse {
+  folders: CloudinaryFolder[]
+  has_more: boolean
+}
+
+export interface CloudinaryAssetsResponse {
+  resources: CloudinaryImageExtended[]
+  next_cursor: string | null
+  total_count: number
+  has_more: boolean
+}
+
 export interface CloudinaryApiResponse {
   resources: CloudinaryImage[]
   next_cursor: string | null
@@ -65,5 +89,15 @@ export interface FormData {
   destacado: boolean
   image: string
   image2: string
+  image3: string
+  image4: string
   newCategory: string
+}
+
+export interface UploadFileStatus {
+  name: string
+  status: 'pending' | 'uploading' | 'success' | 'error'
+  progress?: number
+  error?: string
+  url?: string
 }

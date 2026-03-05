@@ -1,11 +1,16 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
+import { usePDFGenerator } from './usePDFGenerator'
+import { ProductReviewButton } from './ProductReviewButton'
+import { getUserReviewsForOrder } from '@/app/collection/[id]/reviews/actions'
+import Link from 'next/link'
 
 interface OrderItem {
   id: number
   producto: {
+    id: number
     name: string
     price: string
   }
@@ -41,7 +46,48 @@ export default function OrderDetailsModal({
   isOpen,
   onClose
 }: OrderDetailsModalProps) {
+  const [userReviews, setUserReviews] = useState<Record<number, {
+    id: number
+    rating: number
+    comment: string | null
+    aiApproved: boolean | null
+    aiError: boolean
+    createdAt: Date
+  }>>({})
+
+  // Hook debe llamarse antes de cualquier return
+  const { generatePDF, isGenerating } = usePDFGenerator()
+
+  // Ref debe llamarse antes de cualquier return
+  const mouseDownTarget = React.useRef<EventTarget | null>(null)
+
+  // Obtener reviews del usuario para este pedido
+  useEffect(() => {
+    if (isOpen && order) {
+      getUserReviewsForOrder(order.id).then(setUserReviews)
+    }
+  }, [isOpen, order?.id])
+
   if (!isOpen || !order) return null
+
+  const handleGeneratePDF = async (order: Order) => {
+    const pdfData = {
+      orderId: order.id,
+      clientName: order.clientName,
+      status: order.status,
+      totalPrice: order.totalPrice,
+      createdAt: order.createdAt,
+      orderItems: order.orderItems,
+      address: order.address,
+      agencia: order.agencia,
+      clientPhone: order.clientPhone,
+      dni: order.dni,
+      deliveryCost: order.deliveryCost,
+      discount: order.discount
+    }
+
+    await generatePDF(pdfData)
+  }
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -58,8 +104,29 @@ export default function OrderDetailsModal({
     }
   }
 
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Guardamos dónde se inició el clic
+    mouseDownTarget.current = e.target
+  }
+
+  const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Solo cerramos si el clic inició en el overlay Y terminó en el overlay
+    if (
+      mouseDownTarget.current === e.currentTarget &&
+      e.target === e.currentTarget
+    ) {
+      onClose()
+    }
+  }
+
+  console.log('order', { order })
+
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
+    <div
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+      className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'
+    >
       <div className='relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-card rounded-lg border border-border'>
         {/* Header */}
         <div className='sticky top-0 flex items-center justify-between p-6 border-b border-border bg-card z-10'>
@@ -195,6 +262,9 @@ export default function OrderDetailsModal({
                 <thead className='bg-accent'>
                   <tr>
                     <th className='text-left p-3 text-sm font-medium text-foreground'>
+                      Id
+                    </th>
+                    <th className='text-left p-3 text-sm font-medium text-foreground'>
                       Producto
                     </th>
                     <th className='text-left p-3 text-sm font-medium text-foreground'>
@@ -206,6 +276,9 @@ export default function OrderDetailsModal({
                     <th className='text-left p-3 text-sm font-medium text-foreground'>
                       Subtotal
                     </th>
+                    <th className='text-left p-3 text-sm font-medium text-foreground'>
+                      Opinión
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -214,10 +287,14 @@ export default function OrderDetailsModal({
                       key={item.id}
                       className='border-b border-border last:border-0'
                     >
+                      <td className='p-3 text-gray-500'>{item.producto.id}</td>
                       <td className='p-3'>
-                        <div className='font-medium text-foreground'>
+                        <Link
+                          href={`/collection/${item.producto.id}`}
+                          className='font-medium text-blue-300 hover:underline'
+                        >
                           {item.producto.name}
-                        </div>
+                        </Link>
                       </td>
                       <td className='p-3 text-foreground'>
                         S/. {Number(item.producto.price).toFixed(2)}
@@ -225,6 +302,24 @@ export default function OrderDetailsModal({
                       <td className='p-3 text-foreground'>{item.quantity}</td>
                       <td className='p-3 font-medium text-foreground'>
                         S/. {Number(item.totalPrice).toFixed(2)}
+                      </td>
+                      <td className='p-3'>
+                        {order.status === 'Entregado' ? (
+                          <ProductReviewButton
+                            productId={item.producto.id}
+                            productName={item.producto.name}
+                            userReview={userReviews[item.producto.id] || null}
+                            onReviewCreated={async () => {
+                              // Recargar reviews después de crear una
+                              const reviews = await getUserReviewsForOrder(order.id)
+                              setUserReviews(reviews)
+                            }}
+                          />
+                        ) : (
+                          <span className='text-xs text-muted-foreground'>
+                            Disponible al entregar
+                          </span>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -253,7 +348,7 @@ export default function OrderDetailsModal({
                   <div className='flex justify-between'>
                     <span className='text-foreground'>Envío:</span>
                     <span className='font-medium text-foreground'>
-                      S/. {order.deliveryCost}
+                      + S/. {order.deliveryCost}
                     </span>
                   </div>
                 )}
@@ -296,15 +391,11 @@ export default function OrderDetailsModal({
           {order.status === 'Entregado' && (
             <button
               onClick={() => {
-                // Llamar a la función para generar PDF
-                window.dispatchEvent(
-                  new CustomEvent('generate-pdf', { detail: order.id })
-                )
-                onClose()
+                handleGeneratePDF(order)
               }}
               className='px-4 py-2 bg-foreground text-background rounded-lg hover:opacity-90 transition-opacity'
             >
-              Generar PDF
+              {isGenerating ? 'Generando PDF...' : 'Generar PDF'}
             </button>
           )}
         </div>

@@ -1,6 +1,8 @@
 import prisma from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+import { revalidatePath, revalidateTag } from 'next/cache'
+import type { Prisma } from '@/app/generated/prisma/client'
 
 export async function GET(req: NextRequest) {
   try {
@@ -11,7 +13,7 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get('search') || ''
 
     // Construir filtros
-    const where: any = {
+    const where: Prisma.ProductosWhereInput = {
       destacados: {
         some: {} // Solo productos que están en destacados
       }
@@ -225,6 +227,11 @@ export async function POST(req: NextRequest) {
         }
       }
     })
+
+    // Invalidar caché de productos destacados
+    revalidatePath('/api/productos-destacados')
+    revalidatePath('/api/products')
+    revalidatePath('/collection')
 
     return NextResponse.json(
       {

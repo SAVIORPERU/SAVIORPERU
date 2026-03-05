@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
-import styles from './hero-section.module.css'
+import Image from 'next/image'
+import { optimizeCloudinaryUrl } from '@/lib/utils/image-optimizer'
 
 interface Settings {
   imagenIzquierda?: string
@@ -35,15 +36,16 @@ const HeroSection = () => {
     const fetchSettings = async () => {
       try {
         setLoading(true)
-        const response = await fetch('/api/settings')
+        const response = await fetch('/api/config')
 
         if (!response.ok) throw new Error(`Error ${response.status}`)
 
         const data = await response.json()
-        setSettings(data.data || {})
+        console.log('hero section', data)
+        setSettings(data.data.settings || {})
         setError(null)
       } catch (error) {
-        console.error('Error cargando settings:', error)
+        console.error('Error cargando config:', error)
         setError('No se pudieron cargar las imágenes')
         setSettings({})
       } finally {
@@ -57,27 +59,23 @@ const HeroSection = () => {
   // Skeleton con altura DINÁMICA
   if (loading) {
     return (
-      <section className={styles.heroSection}>
-        <div className='w-full'>
-          <img
+      <section className='heroSection' style={{ height: containerHeight }}>
+        <div className='w-full h-full relative'>
+          <Image
             src='/CargandoImagen.png'
             alt='Imagen izquierda'
-            className='w-full h-full object-cover'
-            onError={(e) => {
-              e.currentTarget.src = '/placeholder-hero-left.jpg'
-              e.currentTarget.alt = 'Imagen alternativa izquierda'
-            }}
+            fill
+            className='object-cover'
+            sizes='50vw'
           />
         </div>
-        <div className='w-full'>
-          <img
+        <div className='w-full h-full relative'>
+          <Image
             src='/CargandoImagen.png'
             alt='Imagen derecha'
-            className='w-full h-full object-cover'
-            onError={(e) => {
-              e.currentTarget.src = '/placeholder-hero-right.jpg'
-              e.currentTarget.alt = 'Imagen alternativa derecha'
-            }}
+            fill
+            className='object-cover'
+            sizes='50vw'
           />
         </div>
       </section>
@@ -86,27 +84,33 @@ const HeroSection = () => {
 
   // Versión final CORREGIDA
   return (
-    <section className={styles.heroSection}>
-      <div className='w-full flex-1'>
-        <img
-          src={settings.imagenIzquierda}
+    <section className='heroSection' style={{ height: '90vh' }}>
+      <div className='w-full h-full relative'>
+        <Image
+          src={
+            settings.imagenIzquierda
+              ? optimizeCloudinaryUrl(settings.imagenIzquierda, 1200)
+              : '/placeholder.svg'
+          }
           alt='Imagen izquierda'
-          className='w-full h-full object-cover'
-          onError={(e) => {
-            e.currentTarget.src = '/placeholder-hero-left.jpg'
-            e.currentTarget.alt = 'Imagen alternativa izquierda'
-          }}
+          fill
+          className='object-cover'
+          sizes='50vw'
+          priority
         />
       </div>
-      <div className='w-full flex-1'>
-        <img
-          src={settings.imagenDerecha}
+      <div className='w-full h-full relative'>
+        <Image
+          src={
+            settings.imagenDerecha
+              ? optimizeCloudinaryUrl(settings.imagenDerecha, 1200)
+              : '/placeholder.svg'
+          }
           alt='Imagen derecha'
-          className='w-full h-full object-cover'
-          onError={(e) => {
-            e.currentTarget.src = '/placeholder-hero-right.jpg'
-            e.currentTarget.alt = 'Imagen alternativa derecha'
-          }}
+          fill
+          className='object-cover'
+          sizes='50vw'
+          priority
         />
       </div>
     </section>

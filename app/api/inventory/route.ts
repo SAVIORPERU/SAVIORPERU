@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
+import type { Prisma } from '@/app/generated/prisma/client'
 
 export async function GET(req: NextRequest) {
   try {
@@ -17,7 +18,7 @@ export async function GET(req: NextRequest) {
     const sortOrder = searchParams.get('sortOrder') || 'asc'
 
     // Construir filtros
-    const where: any = {}
+    const where: Prisma.ProductosWhereInput = {}
 
     if (search) {
       where.OR = [
@@ -34,30 +35,31 @@ export async function GET(req: NextRequest) {
       where.estado = estado
     }
 
-    if (minStock) {
-      where.stock = { gte: parseInt(minStock) }
-    }
-
-    if (maxStock) {
-      where.stock = { ...where.stock, lte: parseInt(maxStock) }
-    }
-
-    if (lowStockOnly) {
-      where.stock = { ...where.stock, lte: 10 } // Considerar bajo stock <= 10 unidades
+    if (minStock || maxStock || lowStockOnly) {
+      where.stock = {}
+      if (minStock) {
+        where.stock.gte = parseInt(minStock)
+      }
+      if (maxStock) {
+        where.stock.lte = parseInt(maxStock)
+      }
+      if (lowStockOnly) {
+        where.stock.lte = 10
+      }
     }
 
     // Ordenamiento
-    const orderBy: any = {}
+    const orderBy: Prisma.ProductosOrderByWithRelationInput = {}
     if (sortBy === 'stock') {
-      orderBy.stock = sortOrder
+      orderBy.stock = sortOrder as Prisma.SortOrder
     } else if (sortBy === 'price') {
-      orderBy.price = sortOrder
+      orderBy.price = sortOrder as Prisma.SortOrder
     } else if (sortBy === 'name') {
-      orderBy.name = sortOrder
+      orderBy.name = sortOrder as Prisma.SortOrder
     } else if (sortBy === 'createdAt') {
-      orderBy.createdAt = sortOrder
+      orderBy.createdAt = sortOrder as Prisma.SortOrder
     } else {
-      orderBy.name = 'asc'
+      orderBy.name = 'asc' as Prisma.SortOrder
     }
 
     // Paginación

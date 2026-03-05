@@ -13,15 +13,21 @@ import { ToastAction } from './ui/toast'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/hooks/use-toast'
 import { RiLoader4Line } from 'react-icons/ri'
+import { useForm, UseFormReturn } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import {
+  DeliverySchema,
+  type DeliveryFormData
+} from '@/lib/schemas/delivery.schema'
+import {
+  calculateOrderTotals,
+  generateWhatsAppOrderMessage,
+  FREE_DELIVERY_THRESHOLD
+} from '@/lib/utils/order-calculations'
 
 // --- Constantes ---
 const COUNTRY_CODE = '51'
-const PHONE_NUMBER = '907679229'
 const LOCAL_STORAGE_KEY = 'dataDeliverySend'
-const FREE_DELIVERY_THRESHOLD = 150
-const MIN_DNI_LENGTH = 8
-const MIN_PHONE_LENGTH = 7
-const MIN_ADDRESS_LENGTH = 3
 
 // --- Interfaces ---
 interface ProsItemsProduct {
@@ -42,35 +48,11 @@ interface IProps {
   discountPercentage: number
 }
 
-interface DeliveryData {
-  clientName: string
-  address: string
+interface DeliveryData extends DeliveryFormData {
   deliveryCost: number
-  locationToSend: 'lima_metropolitana' | 'provincia'
   agencia: string
   dni: string
   clientPhone: string
-  getlocation: {
-    lat: number
-    lng: number
-  }
-  email?: string
-}
-
-// Valores iniciales para el estado de la entrega
-const INITIAL_DELIVERY_STATE: DeliveryData = {
-  clientName: '',
-  address: '',
-  deliveryCost: 0,
-  locationToSend: 'lima_metropolitana',
-  agencia: '',
-  dni: '',
-  clientPhone: '',
-  getlocation: {
-    lat: 0,
-    lng: 0
-  },
-  email: ''
 }
 
 // --- Componente FormToSend ---
@@ -87,17 +69,46 @@ const FormToSend = ({
   const router = useRouter()
   const { toast } = useToast()
 
-  const [deliveryData, setDeliveryData] = useState<DeliveryData>(
-    INITIAL_DELIVERY_STATE
-  )
   const [hasFullNameOverride, setHasFullNameOverride] = useState(false)
   const [minimoDelivery, setMinimoDelivery] = useState(10)
   const [maximoDelivery, setMaximoDelivery] = useState(15)
   const [loadingSettings, setLoadingSettings] = useState(true)
   const [isSavingOrder, setIsSavingOrder] = useState(false)
   const [telefono, setTelefono] = useState(958284730)
+  const [markedLocation, setMarkedLocation] = useState<{
+    lat: number
+    lng: number
+  } | null>(null)
 
-  const subTotalNumber = useMemo(() => Number(subTotal), [subTotal])
+  // React Hook Form setup
+  const form: UseFormReturn<DeliveryFormData> = useForm<DeliveryFormData>({
+    resolver: zodResolver(DeliverySchema),
+    defaultValues: {
+      clientName: '',
+      address: '',
+      locationToSend: 'lima_metropolitana',
+      deliveryCost: 0,
+      agencia: '',
+      dni: '',
+      clientPhone: '',
+      getlocation: { lat: 0, lng: 0 },
+      email: ''
+    }
+  })
+
+  const {
+    watch,
+    setValue,
+    formState: { errors }
+  } = form
+  const watchedLocationToSend = watch('locationToSend')
+  const watchedClientName = watch('clientName')
+  const watchedDni = watch('dni')
+  const watchedPhone = watch('clientPhone')
+  const watchedAgencia = watch('agencia')
+  const watchedAddress = watch('address')
+  const watchedGetlocation = watch('getlocation')
+  const watchedDeliveryCost = watch('deliveryCost')
 
   // --- Funciones de localStorage ---
   const loadLocalStorage = useCallback(() => {
@@ -105,36 +116,61 @@ const FormToSend = ({
       const data = localStorage.getItem(LOCAL_STORAGE_KEY)
       if (data) {
         const parsedData = JSON.parse(data)
-        setDeliveryData((prevData) => ({
-          ...INITIAL_DELIVERY_STATE,
-          ...parsedData,
-          getlocation:
-            parsedData.getlocation || INITIAL_DELIVERY_STATE.getlocation
-        }))
+        // Cargar datos en el formulario
+        if (parsedData.clientName) setValue('clientName', parsedData.clientName)
+        if (parsedData.address) setValue('address', parsedData.address)
+        if (parsedData.locationToSend)
+          setValue('locationToSend', parsedData.locationToSend)
+        if (parsedData.agencia) setValue('agencia', parsedData.agencia)
+        if (parsedData.dni) setValue('dni', parsedData.dni)
+        if (parsedData.clientPhone)
+          setValue('clientPhone', parsedData.clientPhone)
+        if (parsedData.getlocation) {
+          setValue('getlocation', parsedData.getlocation)
+          setMarkedLocation(parsedData.getlocation)
+        }
+        // deliveryCost se maneja por separado según el mapa
       }
     } catch (error) {
       console.error('Error loading data from localStorage:', error)
     }
-  }, [])
+  }, [setValue])
 
-  const saveToLocalStorage = useCallback((data: DeliveryData) => {
+  const saveToLocalStorage = useCallback(() => {
     try {
+      const data = {
+        clientName: watchedClientName,
+        address: watchedAddress,
+        locationToSend: watchedLocationToSend,
+        agencia: watchedAgencia,
+        dni: watchedDni,
+        clientPhone: watchedPhone,
+        getlocation: watchedGetlocation
+      }
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data))
     } catch (error) {
       console.error('Error saving to localStorage:', error)
     }
-  }, [])
+  }, [
+    watchedClientName,
+    watchedAddress,
+    watchedLocationToSend,
+    watchedAgencia,
+    watchedDni,
+    watchedPhone,
+    watchedGetlocation
+  ])
 
   // --- Fetch Settings ---
   const fetchSettings = useCallback(async () => {
     try {
-      const response = await fetch('/api/settings')
+      const response = await fetch('/api/config')
       if (!response.ok) throw new Error(`Error ${response.status}`)
 
       const data = await response.json()
-      setMinimoDelivery(data?.data?.minimoDelivery || 10)
-      setMaximoDelivery(data?.data?.maximoDelivery || 15)
-      setTelefono(data?.data?.telefono)
+      setMinimoDelivery(data?.data.settings.minimoDelivery || 10)
+      setMaximoDelivery(data?.data.settings.maximoDelivery || 15)
+      setTelefono(data?.data.settings.telefono)
     } catch (error) {
       console.error('Error cargando settings:', error)
     } finally {
@@ -151,8 +187,9 @@ const FormToSend = ({
 
     setIsSavingOrder(true)
     try {
+      const formDataValues = form.getValues()
       const orderData = {
-        ...deliveryData,
+        ...formDataValues,
         email: user.emailAddresses[0].emailAddress,
         products: itemsProducts.map((item) => ({
           productoId: item.id,
@@ -167,9 +204,9 @@ const FormToSend = ({
         ),
         discount: discountPercentage,
         deliveryCost:
-          subTotalNumber >= FREE_DELIVERY_THRESHOLD
+          getCartTotal() >= FREE_DELIVERY_THRESHOLD
             ? 0
-            : deliveryData.deliveryCost
+            : formDataValues.deliveryCost
       }
 
       const response = await fetch('/api/orders', {
@@ -187,135 +224,100 @@ const FormToSend = ({
       setIsSavingOrder(false)
     }
   }, [
-    deliveryData,
+    form,
     user,
     itemsProducts,
     getCartTotal,
-    discountPercentage,
-    subTotalNumber
+    discountPercentage
   ])
 
-  // --- Cálculo del Total ---
-  const calculateTotal = useMemo((): string => {
-    const { locationToSend, deliveryCost } = deliveryData
+  // --- Cálculos usando función compartida ---
+  const calculations = useMemo(() => {
+    // Usar getCartTotal() como subtotal SIN descuento
+    // calculateOrderTotals aplicará el descuento correctamente
+    return calculateOrderTotals({
+      subtotal: getCartTotal(),
+      deliveryCost: watchedDeliveryCost,
+      discountPercentage: discountPercentage,
+      locationToSend: watchedLocationToSend,
+      minimoDelivery,
+      maximoDelivery
+    })
+  }, [
+    watchedDeliveryCost,
+    discountPercentage,
+    watchedLocationToSend,
+    minimoDelivery,
+    maximoDelivery,
+    getCartTotal
+  ])
 
-    // Validar que subTotalNumber sea un número válido
-    if (isNaN(subTotalNumber)) {
-      return '0.00'
-    }
-
-    // Envío gratis si el subtotal es >= 150
-    if (subTotalNumber >= FREE_DELIVERY_THRESHOLD) {
-      return subTotalNumber.toFixed(2)
-    }
-
-    // Para Provincia: el recargo no se suma al total (se paga al recibir)
-    if (locationToSend === 'provincia') {
-      return subTotalNumber.toFixed(2)
-    }
-
-    // Para Lima Metropolitana: aplicar costo de delivery
-    const safeCost = Number(deliveryCost) || 0
-
-    if (safeCost === 0) {
-      return subTotalNumber.toFixed(2)
-    }
-
-    // Aplicar límites de delivery
-    let finalDeliveryCost = safeCost
-    if (safeCost > 0 && safeCost < minimoDelivery) {
-      finalDeliveryCost = minimoDelivery
-    }
-    if (safeCost > maximoDelivery) {
-      finalDeliveryCost = maximoDelivery
-    }
-
-    const total = Number(subTotalNumber) + Number(finalDeliveryCost)
-    return total.toFixed(2)
-  }, [subTotalNumber, deliveryData, minimoDelivery, maximoDelivery])
-
-  // --- Cálculo del Delivery a Mostrar ---
-  const deliveryDisplay = useMemo((): string | number => {
-    const { locationToSend, deliveryCost } = deliveryData
-
-    if (locationToSend === 'provincia') {
-      return 'Recargo según agencia (S/ 10.00 - S/ 15.00)'
-    }
-
-    if (subTotalNumber >= FREE_DELIVERY_THRESHOLD) {
-      return 0
-    }
-
-    const safeCost = Number(deliveryCost) || 0
-
-    if (safeCost === 0) {
-      return 0
-    }
-
-    if (safeCost > 0 && safeCost < minimoDelivery) {
-      return minimoDelivery
-    }
-
-    if (safeCost > maximoDelivery) {
-      return maximoDelivery
-    }
-
-    return safeCost
-  }, [subTotalNumber, deliveryData, minimoDelivery, maximoDelivery])
+  const { total, displayDelivery, subtotal: subtotalCalculado } = calculations
 
   // --- Validación del Formulario ---
   const formValidation = useMemo(() => {
-    const {
-      clientName,
-      address,
-      locationToSend,
-      deliveryCost,
-      agencia,
-      dni,
-      clientPhone
-    } = deliveryData
+    // Verificar si hay errores de validación de Zod
+    const hasErrors = Object.keys(errors).length > 0
 
-    // Validaciones comunes
-    if (!clientName.trim() || address.length < MIN_ADDRESS_LENGTH) {
-      return { isValid: false, message: 'Completa tu nombre y dirección' }
-    }
-
+    // Validar que el carrito no esté vacío
     if (itemsProducts.length === 0) {
       return { isValid: false, message: 'El carrito está vacío' }
     }
 
-    // Validaciones específicas por tipo de envío
-    if (locationToSend === 'provincia') {
-      if (!agencia) {
+    // Validaciones según tipo de envío
+    if (watchedLocationToSend === 'lima_metropolitana') {
+      // Lima: requiere nombre, dirección y mapa (SIEMPRE)
+      if (!watchedClientName || watchedClientName.trim() === '') {
+        return { isValid: false, message: 'Ingresa tu nombre' }
+      }
+      if (!watchedAddress || watchedAddress.trim() === '') {
+        return { isValid: false, message: 'Ingresa tu dirección' }
+      }
+      // Mapa SIEMPRE requerido para Lima
+      if (
+        !markedLocation ||
+        (markedLocation.lat === 0 && markedLocation.lng === 0)
+      ) {
+        return { isValid: false, message: 'Marca tu ubicación en el mapa' }
+      }
+    } else if (watchedLocationToSend === 'provincia') {
+      // Provincia: requiere nombre, dirección, agencia, DNI y teléfono
+      if (!watchedClientName || watchedClientName.trim() === '') {
+        return { isValid: false, message: 'Ingresa tu nombre' }
+      }
+      if (!watchedAddress || watchedAddress.trim() === '') {
+        return { isValid: false, message: 'Ingresa departamento/provincia' }
+      }
+      if (!watchedAgencia || watchedAgencia.trim() === '') {
         return { isValid: false, message: 'Selecciona una agencia' }
       }
-      if (dni.length < MIN_DNI_LENGTH) {
-        return {
-          isValid: false,
-          message: 'Ingresa un DNI válido (mínimo 8 dígitos)'
-        }
+      if (!watchedDni || watchedDni.length < 8) {
+        return { isValid: false, message: 'Ingresa un DNI válido (8 dígitos)' }
       }
-      if (clientPhone.length < MIN_PHONE_LENGTH) {
+      if (!watchedPhone || watchedPhone.length < 7) {
         return { isValid: false, message: 'Ingresa un teléfono válido' }
       }
-      return { isValid: true, message: '' }
     }
 
-    // Lima Metropolitana
-    if (subTotalNumber >= FREE_DELIVERY_THRESHOLD) {
-      return { isValid: true, message: '' }
+    return {
+      isValid: !hasErrors,
+      message: hasErrors ? (Object.values(errors)[0]?.message as string) : ''
     }
-
-    const safeCost = Number(deliveryCost) || 0
-    if (safeCost === 0) {
-      return { isValid: false, message: 'Marca tu ubicación en el mapa' }
-    }
-
-    return { isValid: true, message: '' }
-  }, [deliveryData, itemsProducts.length, subTotalNumber])
+  }, [
+    errors,
+    itemsProducts.length,
+    watchedLocationToSend,
+    watchedClientName,
+    watchedAddress,
+    watchedAgencia,
+    watchedDni,
+    watchedPhone,
+    markedLocation
+  ])
 
   // --- Generación de contenido WhatsApp ---
   const generateWhatsAppContent = useCallback(() => {
+    const formDataValues = form.getValues()
     const {
       clientName,
       locationToSend,
@@ -324,101 +326,64 @@ const FormToSend = ({
       clientPhone,
       agencia,
       getlocation
-    } = deliveryData
+    } = formDataValues
 
-    const clientInfo = `🙍🏻Cliente: ${clientName}.
-${
-  locationToSend === 'provincia'
-    ? `🪪DNI: ${dni}.
-📞Teléfono: ${clientPhone}.
-📍Departamento/Provincia: ${address}.
-🚌Agencia: ${agencia}.`
-    : `📍Dirección: ${address}.`
-}`
-
-    const productList = itemsProducts
-      .map((item) => {
-        const sizeInfo = item.size ? `\n↕️Talla: ${item.size}.` : ''
-        return `📌Producto: ${item.name}.
-#️⃣Cantidad: ${item.quantity}.${sizeInfo}
-💲Precio: S/ ${Number(item.price).toFixed(2)}.
-\n`
-      })
-      .join('')
-
-    const shippingType = locationToSend === 'provincia' ? '🏍️' : '🚚'
-    const deliveryLabel =
-      locationToSend === 'provincia' ? 'Recargo de agencia' : 'Delivery'
-    const deliveryPrice =
-      typeof deliveryDisplay === 'number'
-        ? `S/ ${deliveryDisplay.toFixed(2)}`
-        : deliveryDisplay
-
-    const discountInfo =
-      discountCode === codigoCupon
-        ? `🏷️Descuento: ${discountPercentage}%
-💰Subtotal: S/ ${subTotal}.`
-        : `💰Subtotal: S/ ${subTotal}`
-
-    const totalInfo = `✅TOTAL: S/ ${calculateTotal}`
-
-    const locationLink =
-      getlocation.lat && locationToSend === 'lima_metropolitana'
-        ? `\n📍Ubicación: http://maps.google.com/?q=${getlocation.lat},${getlocation.lng}&z=17&hl=es`
-        : ''
-
-    return `${clientInfo}
-${productList}
-${shippingType}${deliveryLabel}: ${deliveryPrice}
-${discountInfo}
-${totalInfo}${locationLink}
-`
+    return generateWhatsAppOrderMessage({
+      clientName,
+      locationToSend,
+      address,
+      dni,
+      clientPhone,
+      agencia,
+      items: itemsProducts,
+      subtotal: subtotalCalculado,  // Usar subtotal calculado (sin descuento)
+      deliveryDisplay: displayDelivery,
+      discountPercentage,
+      discountCode,
+      codigoCupon,
+      total,
+      getlocation
+    })
   }, [
-    deliveryData,
+    form,
     itemsProducts,
-    discountCode,
+    subtotalCalculado,
+    displayDelivery,
     discountPercentage,
-    subTotal,
-    calculateTotal,
-    deliveryDisplay
+    discountCode,
+    codigoCupon,
+    total
   ])
 
   // --- Manejadores ---
-  const handleInputChange = useCallback(
-    <K extends keyof DeliveryData>(key: K, value: DeliveryData[K]) => {
-      setDeliveryData((prev) => {
-        const updated = { ...prev, [key]: value }
-        saveToLocalStorage(updated)
-        return updated
-      })
-    },
-    [saveToLocalStorage]
-  )
+  // const handleInputChange = useCallback(
+  //   <K extends keyof DeliveryFormData>(key: K, value: DeliveryFormData[K]) => {
+  //     setValue(key, value)
+  //     saveToLocalStorage()
+  //   },
+  //   [setValue, saveToLocalStorage]
+  // )
 
   const selectDelivery = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const newLocation = event.target.value as
         | 'lima_metropolitana'
         | 'provincia'
-      setDeliveryData((prev) => {
-        const updated: DeliveryData = {
-          ...prev,
-          locationToSend: newLocation,
-          address: '',
-          deliveryCost: 0,
-          agencia: newLocation === 'provincia' ? prev.agencia : '',
-          dni: newLocation === 'provincia' ? prev.dni : '',
-          clientPhone: newLocation === 'provincia' ? prev.clientPhone : '',
-          getlocation:
-            newLocation === 'lima_metropolitana'
-              ? prev.getlocation
-              : INITIAL_DELIVERY_STATE.getlocation
-        }
-        saveToLocalStorage(updated)
-        return updated
-      })
+      setValue('locationToSend', newLocation)
+      // Resetear campos según el tipo de envío
+      if (newLocation === 'provincia') {
+        setValue('address', '')
+        setValue('deliveryCost', 0)
+        setValue('getlocation', { lat: 0, lng: 0 })
+        setMarkedLocation(null)
+      } else {
+        setValue('agencia', '')
+        setValue('dni', '')
+        setValue('clientPhone', '')
+      }
+      saveToLocalStorage()
     },
-    [saveToLocalStorage]
+    [setValue, saveToLocalStorage]
   )
 
   const handleOrderSubmit = useCallback(
@@ -465,16 +430,17 @@ ${totalInfo}${locationLink}
 
   useEffect(() => {
     const userName = user?.fullName
-    if (userName && !hasFullNameOverride && !deliveryData.clientName) {
-      setDeliveryData((prev) => ({ ...prev, clientName: userName }))
+    if (userName && !hasFullNameOverride && !watchedClientName) {
+      setValue('clientName', userName)
     }
-  }, [user, hasFullNameOverride, deliveryData.clientName])
+  }, [user, hasFullNameOverride, watchedClientName, setValue])
 
   // --- Render helpers ---
   const whatsappHref = `https://wa.me/+${COUNTRY_CODE}${telefono}?text=${encodeURIComponent(
     generateWhatsAppContent()
   )}`
 
+  const { register } = form
   const isUserSignedIn = !!user?.id
   const buttonBackgroundColor = formValidation.isValid ? '#00d95f' : 'gray'
   const buttonPointerEvents =
@@ -487,11 +453,6 @@ ${totalInfo}${locationLink}
   return (
     <main
       className='cardFormCaontainer'
-      // onClick={(e) => {
-      //   if (e.target === e.currentTarget) {
-      //     setShowCardClientName(false)
-      //   }
-      // }}
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) {
           setShowCardClientName(false)
@@ -501,7 +462,7 @@ ${totalInfo}${locationLink}
       <form
         className='formContainer'
         onClick={(e) => e.stopPropagation()}
-        onMouseUp={(e) => e.stopPropagation()}
+        // onMouseUp={(e) => e.stopPropagation()}
       >
         {/* Nombre del Cliente */}
         <div>
@@ -512,14 +473,20 @@ ${totalInfo}${locationLink}
             className='inputinputClientName'
             id='inputName'
             placeholder='Ingrese su nombre y apellido'
-            onChange={(event) => {
-              if (!hasFullNameOverride) {
-                setHasFullNameOverride(true)
+            {...register('clientName', {
+              onChange: (e) => {
+                if (!hasFullNameOverride) {
+                  setHasFullNameOverride(true)
+                }
+                saveToLocalStorage()
               }
-              handleInputChange('clientName', event.target.value)
-            }}
-            value={deliveryData.clientName}
+            })}
           />
+          {errors.clientName && (
+            <span className='text-orange-600 text-sm'>
+              {errors.clientName.message}
+            </span>
+          )}
         </div>
 
         {/* Selección de Tipo de Envío */}
@@ -532,7 +499,7 @@ ${totalInfo}${locationLink}
               type='radio'
               name='delivery'
               value='lima_metropolitana'
-              checked={deliveryData.locationToSend === 'lima_metropolitana'}
+              checked={watchedLocationToSend === 'lima_metropolitana'}
               onChange={selectDelivery}
               className='mr-1'
             />{' '}
@@ -543,7 +510,7 @@ ${totalInfo}${locationLink}
               type='radio'
               name='delivery'
               value='provincia'
-              checked={deliveryData.locationToSend === 'provincia'}
+              checked={watchedLocationToSend === 'provincia'}
               onChange={selectDelivery}
               className='mr-1'
             />{' '}
@@ -552,7 +519,7 @@ ${totalInfo}${locationLink}
         </div>
 
         {/* Formulario Dinámico según Tipo de Envío */}
-        {deliveryData.locationToSend === 'lima_metropolitana' && (
+        {watchedLocationToSend === 'lima_metropolitana' && (
           <>
             <div className='w-full h-full pb-4'>
               <label className='labelClientName'>Marca tu ubicación 📍*</label>
@@ -561,21 +528,36 @@ ${totalInfo}${locationLink}
                   <RiLoader4Line className='animate-spin h-8 w-8 text-green-500' />
                 </div>
               ) : (
-                <InteractiveMap
-                  setDeliveryCost={(cost: number) => {
-                    const adjustedCost =
-                      cost > maximoDelivery
-                        ? maximoDelivery
-                        : cost < minimoDelivery
-                        ? minimoDelivery
-                        : cost
-                    handleInputChange('deliveryCost', adjustedCost)
-                  }}
-                  setGetlocation={(loc: { lat: number; lng: number }) =>
-                    handleInputChange('getlocation', loc)
-                  }
-                  locationToSend={deliveryData.getlocation}
-                />
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  // onMouseDown={(e) => e.stopPropagation()}
+                  // onMouseUp={(e) => e.stopPropagation()}
+                  className='h-full'
+                >
+                  <InteractiveMap
+                    setDeliveryCost={(cost: number) => {
+                      const adjustedCost =
+                        cost > maximoDelivery
+                          ? maximoDelivery
+                          : cost < minimoDelivery
+                            ? minimoDelivery
+                            : cost
+                      setValue('deliveryCost', adjustedCost)
+                      saveToLocalStorage()
+                    }}
+                    setGetlocation={(loc: { lat: number; lng: number }) => {
+                      setValue('getlocation', loc)
+                      setMarkedLocation(loc)
+                      saveToLocalStorage()
+                    }}
+                    locationToSend={watchedGetlocation}
+                  />
+                </div>
+              )}
+              {errors.getlocation && (
+                <span className='text-orange-600 text-sm'>
+                  {errors.getlocation.message}
+                </span>
               )}
             </div>
             <div>
@@ -586,32 +568,35 @@ ${totalInfo}${locationLink}
                 className='inputinputClientName'
                 id='inputAddress'
                 placeholder='Calle / N° de Casa / N° de Departamento'
-                onChange={(event) =>
-                  handleInputChange('address', event.target.value)
-                }
-                value={deliveryData.address}
+                {...register('address', {
+                  onChange: () => saveToLocalStorage()
+                })}
               />
+              {errors.address && (
+                <span className='text-orange-600 text-sm'>
+                  {errors.address.message}
+                </span>
+              )}
             </div>
           </>
         )}
 
-        {deliveryData.locationToSend === 'provincia' && (
+        {watchedLocationToSend === 'provincia' && (
           <>
             <div className='flex flex-col'>
               <label className='labelClientName'>Seleccionar Agencia*</label>
               <select
                 name='agencia'
                 id='agencia'
-                value={deliveryData.agencia}
-                onChange={(event) =>
-                  handleInputChange('agencia', event.target.value)
-                }
+                value={watchedAgencia}
+                onChange={(event) => {
+                  setValue('agencia', event.target.value)
+                  saveToLocalStorage()
+                }}
                 className={`rounded-md border focus:border-green-500 outline-none mt-1 ${
-                  deliveryData.agencia === ''
-                    ? 'text-gray-400'
-                    : 'text-zinc-900'
+                  !watchedAgencia ? 'text-gray-400' : 'text-zinc-900'
                 } h-11 p-2 ${
-                  deliveryData.agencia === '' ? 'border-orange-400' : 'bg-white'
+                  !watchedAgencia ? 'border-orange-400' : 'bg-white'
                 }`}
               >
                 <option value='' disabled>
@@ -627,18 +612,27 @@ ${totalInfo}${locationLink}
                   </option>
                 ))}
               </select>
+              {errors.agencia && (
+                <span className='text-orange-600 text-sm'>
+                  {errors.agencia.message}
+                </span>
+              )}
 
               <div>
                 <label className='labelClientName'>DNI*</label>
                 <input
                   className='inputinputClientName'
                   placeholder='Ingrese su DNI'
-                  onChange={(event) =>
-                    handleInputChange('dni', event.target.value)
-                  }
-                  value={deliveryData.dni}
+                  {...register('dni', {
+                    onChange: () => saveToLocalStorage()
+                  })}
                   maxLength={8}
                 />
+                {errors.dni && (
+                  <span className='text-orange-600 text-sm'>
+                    {errors.dni.message}
+                  </span>
+                )}
               </div>
 
               <div>
@@ -646,11 +640,15 @@ ${totalInfo}${locationLink}
                 <input
                   className='inputinputClientName'
                   placeholder='Ingrese su teléfono'
-                  onChange={(event) =>
-                    handleInputChange('clientPhone', event.target.value)
-                  }
-                  value={deliveryData.clientPhone}
+                  {...register('clientPhone', {
+                    onChange: () => saveToLocalStorage()
+                  })}
                 />
+                {errors.clientPhone && (
+                  <span className='text-orange-600 text-sm'>
+                    {errors.clientPhone.message}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -662,11 +660,15 @@ ${totalInfo}${locationLink}
                 className='inputinputClientName'
                 id='inputDeptProv'
                 placeholder='Escribe el Departamento y Provincia'
-                onChange={(event) =>
-                  handleInputChange('address', event.target.value)
-                }
-                value={deliveryData.address}
+                {...register('address', {
+                  onChange: () => saveToLocalStorage()
+                })}
               />
+              {errors.address && (
+                <span className='text-orange-600 text-sm'>
+                  {errors.address.message}
+                </span>
+              )}
             </div>
           </>
         )}
@@ -679,23 +681,23 @@ ${totalInfo}${locationLink}
         >
           <div
             className={
-              subTotalNumber >= FREE_DELIVERY_THRESHOLD
+              getCartTotal() >= FREE_DELIVERY_THRESHOLD
                 ? 'text-green-500'
                 : !formValidation.isValid
-                ? 'text-orange-500'
-                : 'text-green-500'
+                  ? 'text-orange-500'
+                  : 'text-green-500'
             }
           >
-            {deliveryData.locationToSend === 'provincia' ? (
+            {watchedLocationToSend === 'provincia' ? (
               <span>Recargo de agencia: (S/ 10.00 - S/ 15.00)</span>
             ) : (
               <>
                 <span>Delivery: </span>
                 <span>
                   S/{' '}
-                  {typeof deliveryDisplay === 'number'
-                    ? deliveryDisplay.toFixed(2)
-                    : deliveryDisplay}
+                  {typeof displayDelivery === 'number'
+                    ? displayDelivery.toFixed(2)
+                    : displayDelivery}
                 </span>
               </>
             )}
@@ -706,7 +708,7 @@ ${totalInfo}${locationLink}
           </div>
           <div className='font-bold text-lg'>
             <span>Total: </span>
-            <span>S/ {calculateTotal}</span>
+            <span>S/ {total}</span>
           </div>
         </div>
 
